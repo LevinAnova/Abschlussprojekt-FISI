@@ -505,3 +505,45 @@
   .error-message button:hover {
     background-color: var(--vw-light-blue);
   }
+
+  .back-to-landing {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--vw-blue, #001e50);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 100;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .back-to-landing:hover, .back-to-landing:active {
+    background-color: var(--vw-light-blue, #4cc0f1);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .back-to-landing svg {
+    fill: currentColor;
+    transform: rotate(180deg);
+  }
+  
+  @media (max-width: 768px) {
+    .back-to-landing span {
+      display: none;
+    }
+    
+    .back-to-landing {
+      padding: 10px;
+      border-radius: 50%;
+    }
+  }

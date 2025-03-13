@@ -8,6 +8,12 @@
 </head>
 <body>
   <div class="animated-background"></div>
+  <button class="back-to-landing" onclick="window.location.href='landing.html'">
+    <span>Zurück zur Startseite</span>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+      <path d="M10.4 12l5.3-5.3c0.4-0.4 0.4-1 0-1.4s-1-0.4-1.4 0l-6 6c-0.4 0.4-0.4 1 0 1.4l6 6c0.2 0.2 0.5 0.3 0.7 0.3s0.5-0.1 0.7-0.3c0.4-0.4 0.4-1 0-1.4L10.4 12z"/>
+    </svg>
+  </button>
   <div class="container">
     <header>
       <img src="img/vwlogo.png" alt="VW Logo" class="logo">
@@ -455,6 +461,39 @@
       setupOrientationHandling();
       setupAutoRefresh();
     });
+
+    // Inaktivitäts-Timer
+let inactivityTimeout;
+const inactivityTime = 5 * 60 * 1000; // 5 Minuten in Millisekunden
+
+// Funktion zum Zurücksetzen des Timers
+function resetInactivityTimer() {
+  // Timer zurücksetzen
+  clearTimeout(inactivityTimeout);
+  
+  // Neuen Timer starten
+  inactivityTimeout = setTimeout(() => {
+    // Nach 5 Minuten zur Landing Page zurückkehren
+    window.location.href = 'landing.html';
+  }, inactivityTime);
+}
+
+// Event-Listener für Benutzerinteraktionen
+function setupInactivityDetection() {
+  // Liste der Events, die als "Aktivität" gelten
+  const events = [
+    'mousedown', 'mousemove', 'keypress', 
+    'scroll', 'touchstart', 'click', 'keydown'
+  ];
+  
+  // Event-Listener für jedes Event hinzufügen
+  events.forEach(eventName => {
+    document.addEventListener(eventName, resetInactivityTimer, true);
+  });
+  
+  // Initial den Timer starten
+  resetInactivityTimer();
+}
   </script>
 </body>
 </html>
