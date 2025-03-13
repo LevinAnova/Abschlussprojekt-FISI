@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Volkswagen Ausbildungsberufe</title>
   <link rel="stylesheet" href="style/styles.css">
-
 </head>
 <body>
   <div class="animated-background"></div>
@@ -50,36 +49,54 @@
 
   <div id="detailPage" class="detail-page">
     <div class="detail-header">
-      <button id="backButton" class="back-button">←</button>
+      <button id="backButton" class="back-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
       <h2 id="detailTitle" class="detail-title">Ausbildungsberuf</h2>
       <div style="width: 40px;"></div>
     </div>
     
     <span id="detailCategory" class="detail-category">Kategorie</span>
     
-    <div class="detail-section">
-      <h3>Beschreibung</h3>
-      <div id="detailDescription"></div>
-    </div>
-    
-    <div class="detail-section">
-      <h3>Ausbildungsdauer</h3>
-      <div id="detailDuration"></div>
-    </div>
-    
-    <div class="detail-section">
-      <h3>Anforderungen</h3>
-      <div id="detailRequirements"></div>
-    </div>
-    
-    <div class="detail-section">
-      <h3>Karrieremöglichkeiten</h3>
-      <div id="detailCareer"></div>
-    </div>
-    
-    <div class="detail-section">
-      <h3>Standorte</h3>
-      <div id="detailLocations"></div>
+    <div class="detail-container">
+      <div class="detail-main">
+        <div class="detail-section">
+          <h3>Beschreibung</h3>
+          <div id="detailDescription"></div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Ausbildungsdauer</h3>
+          <div id="detailDuration"></div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Anforderungen</h3>
+          <div id="detailRequirements"></div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Karrieremöglichkeiten</h3>
+          <div id="detailCareer"></div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Standorte</h3>
+          <div id="detailLocations"></div>
+        </div>
+      </div>
+      
+      <div class="detail-sidebar">
+        <div class="qr-code-container">
+          <div class="qr-title">Direkt bewerben</div>
+          <div class="qr-text">Scanne den QR-Code, um dich für diesen Ausbildungsberuf zu bewerben.</div>
+          <div class="qr-code" id="berufQrCode">
+            <div class="qr-beruf-id"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -102,7 +119,7 @@
         { id: "all", name: "Alle" },
         { id: "technik", name: "Technik" },
         { id: "elektronik", name: "Elektronik" },
-        { id: "it", name: "IT" },
+        { id: "it", name: "Informatik" },
         { id: "kaufmannisch", name: "Kaufmännisch" },
         { id: "logistik", name: "Logistik" }
       ],
@@ -353,6 +370,7 @@
       const detailRequirements = document.getElementById('detailRequirements');
       const detailCareer = document.getElementById('detailCareer');
       const detailLocations = document.getElementById('detailLocations');
+      const qrBerufId = document.querySelector('.qr-beruf-id');
 
       detailTitle.textContent = beruf.title;
       detailCategory.textContent = getCategoryName(beruf.category);
@@ -376,6 +394,22 @@
       } else {
         detailLocations.innerHTML = '<p>Keine Angaben</p>';
       }
+      
+      // QR-Code mit Berufs-ID anzeigen
+      qrBerufId.textContent = `Ausbildung: ${beruf.id}`;
+      
+      // Simuliere, dass jeder Beruf einen individuellen QR-Code hat
+      const qrCodeElement = document.getElementById('berufQrCode');
+      qrCodeElement.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23001e50'%3E%3Cpath d='M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2v-2zM17 13h2v2h-2v-2zM13 17h2v2h-2v-2zM17 17h2v2h-2v-2zM19 13h2v2h-2v-2zM19 17h2v2h-2v-2zM22 7h-2V5h2v2zM22 11h-2V9h2v2zM22 15h-2v-2h2v2zM22 19h-2v-2h2v2z'/%3E%3C/svg%3E")`;
+      
+      // Zufällige Rotation des QR-Codes basierend auf der Berufs-ID, um Einzigartigkeit zu simulieren
+      const rotationDegree = (beruf.id.charCodeAt(0) + beruf.id.length) % 4 * 90;
+      qrCodeElement.style.transform = `rotate(${rotationDegree}deg)`;
+      
+      // Nach kurzer Zeit zurücksetzen, damit der Animations-Effekt sichtbar wird
+      setTimeout(() => {
+        qrCodeElement.style.transform = 'rotate(0deg)';
+      }, 300);
 
       const detailSections = document.querySelectorAll('.detail-section');
       detailSections.forEach((section, index) => {
@@ -475,9 +509,9 @@
     let inactivityTimeout;
     let warningTimeout;
     let countdownInterval;
-    const inactivityTime = 2 * 60 * 1000; // 1 Minute in Millisekunden
-    const warningTime = 10 * 1000; // 30 Sekunden vor Ablauf Warnung anzeigen
-    let remainingSeconds = 10; // Startwert für den Countdown
+    const inactivityTime = 1 * 60 * 1000; // 1 Minute in Millisekunden
+    const warningTime = 30 * 1000; // 30 Sekunden vor Ablauf Warnung anzeigen
+    let remainingSeconds = 30; // Startwert für den Countdown
 
     // Countdown aktualisieren
     function updateCountdown() {
