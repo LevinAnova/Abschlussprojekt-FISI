@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Volkswagen Ausbildungsberufe</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="style/styles.css">
 </head>
 <body>
   <div class="animated-background"></div>
@@ -12,29 +12,27 @@
     <header>
       <img src="img/vwlogo.png" alt="VW Logo" class="logo">
       <h1 class="title">Ausbildungsberufe</h1>
-      <div style="width: 60px;"></div> <!-- Spacer to balance the header -->
+      <div style="width: 60px;"></div>
     </header>
     
     <div class="filter-container" id="filterContainer">
-      <!-- Filter buttons will be dynamically loaded -->
+
       <button class="filter-btn active" data-category="all">Alle</button>
     </div>
     
     <div class="card-container" id="cardContainer">
-      <!-- Loading indicator -->
+
       <div id="loadingIndicator" class="loading-indicator">
         <div class="spinner"></div>
         <p>Daten werden geladen...</p>
       </div>
-      <!-- Cards will be dynamically loaded -->
     </div>
     
     <footer>
       <p>© Volkswagen AG 2025 | Ausbildungsberufe</p>
     </footer>
   </div>
-  
-  <!-- Detail page template -->
+
   <div id="detailPage" class="detail-page">
     <div class="detail-header">
       <button id="backButton" class="back-button">←</button>
@@ -71,23 +69,20 @@
   </div>
 
   <script>
-    // Configuration object for CMS settings
+
     const cmsConfig = {
-      // Adjust these settings based on your CMS
-      apiUrl: 'api/content', // Path to your API endpoint
-      imageBasePath: 'images/', // Base path for CMS images
-      refreshInterval: 3600000, // Auto-refresh data every hour (in milliseconds)
-      cacheName: 'vw-ausbildung-cache', // Cache name for offline functionality
-      useMockData: true // Set to false in production, using mock data for development
+      apiUrl: 'api/content',
+      imageBasePath: 'images/',
+      refreshInterval: 3600000,
+      cacheName: 'vw-ausbildung-cache',
+      useMockData: true
     };
     
-    // Cache for storing fetched data
     let contentCache = {
       categories: [],
       berufe: []
     };
-    
-    // Mock data for development (simulating CMS content)
+
     const mockData = {
       categories: [
         { id: "all", name: "Alle" },
@@ -202,7 +197,6 @@
       ]
     };
     
-    // Fetch data from CMS API or use mock data
     async function fetchCmsData() {
       const loadingIndicator = document.getElementById('loadingIndicator');
       loadingIndicator.style.display = 'flex';
@@ -222,7 +216,6 @@
         }
       } catch (error) {
         console.error('Error fetching data:', error);
-        // Show error message to user
         const cardContainer = document.getElementById('cardContainer');
         cardContainer.innerHTML = `
           <div class="error-message">
@@ -237,7 +230,6 @@
       }
     }
     
-    // Initialize filter buttons from categories
     function initializeFilters(categories) {
       const filterContainer = document.getElementById('filterContainer');
       filterContainer.innerHTML = '';
@@ -249,29 +241,25 @@
         button.textContent = category.name;
         
         button.addEventListener('click', function() {
-          // Add visual feedback for touch
+
           this.classList.add('touch-active');
           setTimeout(() => {
             this.classList.remove('touch-active');
           }, 200);
           
-          // Remove active class from all buttons
           document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.classList.remove('active');
           });
-          
-          // Add active class to clicked/touched button
+
           this.classList.add('active');
-          
-          // Filter the cards
+
           filterCards(this.dataset.category);
         });
         
         filterContainer.appendChild(button);
       });
     }
-    
-    // Create cards from berufe data
+
     function createCards(berufe) {
       const container = document.getElementById('cardContainer');
       container.innerHTML = '';
@@ -283,7 +271,6 @@
         card.dataset.category = beruf.category;
         card.style.animationDelay = `${0.1 + (index * 0.05)}s`;
         
-        // Add click event to open detail page
         card.addEventListener('click', function() {
           openDetailPage(beruf.id);
         });
@@ -302,31 +289,27 @@
         container.appendChild(card);
       });
     }
-    
-    // Helper function to get category name by id
+
     function getCategoryName(categoryId) {
       const category = contentCache.categories.find(cat => cat.id === categoryId);
       return category ? category.name : categoryId;
     }
-    
-    // Find beruf by ID
+
     function findBerufById(id) {
       return contentCache.berufe.find(beruf => beruf.id === id);
     }
-    
-    // Filter cards by category
+
     function filterCards(categoryId) {
       const cards = document.querySelectorAll('.card');
       
       cards.forEach((card, index) => {
         const display = categoryId === 'all' || card.dataset.category === categoryId;
-        
-        // Reset animation first
+
         card.style.animation = 'none';
         
         if (display) {
           card.style.display = 'flex';
-          // Re-trigger animation with a slight delay for staggered effect
+
           setTimeout(() => {
             card.style.animation = `rotateIn 0.7s cubic-bezier(0.23, 1, 0.32, 1) forwards ${index * 0.05}s`;
           }, 10);
@@ -335,8 +318,7 @@
         }
       });
     }
-    
-    // Open detail page for beruf by ID
+
     function openDetailPage(berufId) {
       const detailPage = document.getElementById('detailPage');
       const beruf = findBerufById(berufId);
@@ -353,130 +335,108 @@
       const detailRequirements = document.getElementById('detailRequirements');
       const detailCareer = document.getElementById('detailCareer');
       const detailLocations = document.getElementById('detailLocations');
-      
-      // Set content
+
       detailTitle.textContent = beruf.title;
       detailCategory.textContent = getCategoryName(beruf.category);
       detailDescription.innerHTML = `<p>${beruf.description}</p>`;
       detailDuration.innerHTML = `<p>${beruf.duration}</p>`;
-      
-      // Set requirements if available
+
       if (beruf.requirements && beruf.requirements.length > 0) {
         detailRequirements.innerHTML = `<ul>${beruf.requirements.map(req => `<li>${req}</li>`).join('')}</ul>`;
       } else {
         detailRequirements.innerHTML = '<p>Keine Angaben</p>';
       }
-      
-      // Set career options if available
+
       if (beruf.career_options && beruf.career_options.length > 0) {
         detailCareer.innerHTML = `<ul>${beruf.career_options.map(career => `<li>${career}</li>`).join('')}</ul>`;
       } else {
         detailCareer.innerHTML = '<p>Keine Angaben</p>';
       }
-      
-      // Set locations if available
+
       if (beruf.locations && beruf.locations.length > 0) {
         detailLocations.innerHTML = `<ul>${beruf.locations.map(location => `<li>${location}</li>`).join('')}</ul>`;
       } else {
         detailLocations.innerHTML = '<p>Keine Angaben</p>';
       }
-      
-      // Apply animations for text sections
+
       const detailSections = document.querySelectorAll('.detail-section');
       detailSections.forEach((section, index) => {
         section.style.animationDelay = `${0.3 + (index * 0.1)}s`;
       });
-      
-      // Show detail page with animation
+
       detailPage.style.display = 'flex';
-      document.body.style.overflow = 'hidden'; // Prevent scrolling background
-      
-      // Reset animation
+      document.body.style.overflow = 'hidden'; 
+
       detailPage.style.animation = 'none';
       setTimeout(() => {
         detailPage.style.animation = 'slideIn 0.5s ease forwards';
       }, 10);
     }
-    
-    // Close detail page
+
     function closeDetailPage() {
       const detailPage = document.getElementById('detailPage');
       detailPage.style.animation = 'slideOut 0.5s ease forwards';
-      
-      // Hide detail page after animation completes
+
       setTimeout(() => {
         detailPage.style.display = 'none';
-        document.body.style.overflow = 'auto'; // Re-enable scrolling
+        document.body.style.overflow = 'auto';
       }, 500);
     }
-    
-    // Initialize the app
+
     async function initializeApp() {
-      // Fetch data from CMS
       const data = await fetchCmsData();
       
       if (data) {
-        // Store data in cache
         contentCache = data;
-        
-        // Initialize filters
+
         initializeFilters(data.categories);
-        
-        // Create cards
         createCards(data.berufe);
       }
     }
-    
-    // Setup touch events for cards
+
     function setupTouchEvents() {
       document.addEventListener('click', function(event) {
         if (event.target.closest('#backButton')) {
           closeDetailPage();
         }
       });
-      
-      // Close detail page when pressing Escape key
+
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
           closeDetailPage();
         }
       });
     }
-    
-    // Handle orientation changes
+
     function setupOrientationHandling() {
-      // Detect orientation changes for Samsung Flip Display
+
       window.addEventListener('orientationchange', function() {
-        // Re-layout the cards when orientation changes
+
         setTimeout(() => {
           const activeCategory = document.querySelector('.filter-btn.active').dataset.category;
           filterCards(activeCategory);
         }, 100);
       });
-      
-      // Check for orientation on resize too (for Flip Display)
+
       window.addEventListener('resize', function() {
-        // Adjust layout based on orientation
         const isLandscape = window.innerWidth > window.innerHeight;
         document.body.classList.toggle('landscape', isLandscape);
         document.body.classList.toggle('portrait', !isLandscape);
       });
-      
-      // Set initial orientation
+
       const isLandscape = window.innerWidth > window.innerHeight;
       document.body.classList.toggle('landscape', isLandscape);
       document.body.classList.toggle('portrait', !isLandscape);
     }
-    
-    // Set up automatic refresh of content
+
     function setupAutoRefresh() {
-      // Refresh content periodically
+
       if (cmsConfig.refreshInterval > 0) {
         setInterval(async function() {
           const data = await fetchCmsData();
           if (data) {
             contentCache = data;
-            // Only update UI if user is not in detail view
+
             if (document.getElementById('detailPage').style.display !== 'flex') {
               const activeCategory = document.querySelector('.filter-btn.active').dataset.category;
               initializeFilters(data.categories);
@@ -488,7 +448,7 @@
       }
     }
     
-    // Initialize the page
+
     document.addEventListener('DOMContentLoaded', () => {
       initializeApp();
       setupTouchEvents();

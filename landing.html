@@ -37,8 +37,7 @@
       text-align: center;
       overflow: hidden;
     }
-    
-    /* Background animations */
+
     .bg-animation {
       position: absolute;
       top: 0;
@@ -98,7 +97,6 @@
       }
     }
     
-    /* Logo animation */
     .logo-container {
       margin-bottom: 40px;
       position: relative;
@@ -120,7 +118,6 @@
       }
     }
     
-    /* Content animations */
     .content {
       position: relative;
       z-index: 2;
@@ -212,7 +209,6 @@
       }
     }
     
-    /* Enhanced car animation */
     .car-animation {
       position: absolute;
       bottom: 30px;
@@ -227,8 +223,8 @@
       width: 120px;
       height: auto;
       bottom: 0;
-      left: -150px; /* Start offscreen */
-      opacity: 0; /* Start invisible */
+      left: -150px;
+      opacity: 0; 
     }
     
     .car.active {
@@ -273,7 +269,6 @@
       }
     }
     
-    /* Floating elements */
     .floating-element {
       position: absolute;
       z-index: 1;
@@ -322,7 +317,6 @@
       }
     }
     
-    /* Animations */
     @keyframes fadeInUp {
       from {
         opacity: 0;
@@ -355,8 +349,7 @@
         transform: translateX(0);
       }
     }
-    
-    /* Responsive adjustments */
+
     @media (max-width: 768px) {
       .title {
         font-size: 3rem;
@@ -376,7 +369,6 @@
       }
     }
     
-    /* Orientation handling for Flip Display */
     @media (orientation: landscape) {
       .content {
         max-width: 70%;
@@ -400,7 +392,6 @@
 </head>
 <body>
   <div class="landing-container">
-    <!-- Background animation -->
     <div class="bg-animation">
       <div class="circle"></div>
       <div class="circle"></div>
@@ -408,7 +399,6 @@
       <div class="circle"></div>
     </div>
     
-    <!-- Floating elements -->
     <div class="floating-element">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgba(255,255,255,0.3)">
         <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
@@ -425,19 +415,16 @@
       </svg>
     </div>
     
-    <!-- Logo container with placeholder for VW logo -->
     <div class="logo-container">
       <img src="img/vwlogo.png" alt="Volkswagen Logo" class="logo">
     </div>
     
-    <!-- Main content -->
     <div class="content">
       <h1 class="title">Starte deine Zukunft bei Volkswagen</h1>
       <h2 class="subtitle">Entdecke spannende Ausbildungsberufe und werde Teil unseres Teams</h2>
       <a href="index.html" class="cta-button">Ausbildungen entdecken</a>
     </div>
 
-    <!-- Car animation -->
     <div class="car-animation">
       <div class="road"></div>
       <img src="img/volkswagen-id7-side-view.png" alt="Car Silhouette 1" class="car" id="car1">
@@ -449,9 +436,9 @@
   </div>
 
   <script>
-    // Car animation functionality
+
     document.addEventListener('DOMContentLoaded', function() {
-      // List of all car elements
+
       const cars = [
         document.getElementById('car1'),
         document.getElementById('car2'),
@@ -460,36 +447,26 @@
         document.getElementById('car5')
       ];
       
-      // Keep track of active car
       let activeCar = null;
       
-      // Function to start a random car
       function startRandomCar() {
-        // Choose a random car
         const randomIndex = Math.floor(Math.random() * cars.length);
         const car = cars[randomIndex];
-        
-        // Reset position and make active
+      
         car.style.left = '-150px';
         car.classList.add('active');
         activeCar = car;
         
-        // Listen for when the animation ends
         car.addEventListener('animationend', carAnimationEnded, { once: true });
       }
       
-      // Function to handle when a car animation ends
       function carAnimationEnded() {
-        // Remove active class from current car
         if (activeCar) {
           activeCar.classList.remove('active');
         }
         
-        // Start a new car immediately
         setTimeout(startRandomCar, 0);
-      }
-      
-      // Start the first car
+      }      
       startRandomCar();
     });
   </script>
