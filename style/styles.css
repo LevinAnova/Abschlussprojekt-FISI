@@ -509,40 +509,37 @@ footer {
 .qr-code {
   width: 250px;
   height: 250px;
-  background-color: #f2f2f2;
-  border: 1px solid #ddd;
   margin: 15px auto;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   transition: transform 0.3s ease;
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .qr-code:hover {
   transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-.qr-code::before {
-  content: "";
-  width: 200px;
-  height: 200px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23001e50'%3E%3Cpath d='M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2v-2zM17 13h2v2h-2v-2zM13 17h2v2h-2v-2zM17 17h2v2h-2v-2zM19 13h2v2h-2v-2zM19 17h2v2h-2v-2zM22 7h-2V5h2v2zM22 11h-2V9h2v2zM22 15h-2v-2h2v2zM22 19h-2v-2h2v2z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  opacity: 0.5;
+.qr-code img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .qr-beruf-id {
   position: absolute;
-  bottom: 5px;
+  bottom: -25px;
   width: 100%;
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: bold;
   color: var(--vw-blue);
-  background-color: rgba(255, 255, 255, 0.8);
   padding: 5px 0;
 }
 
