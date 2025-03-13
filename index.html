@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Volkswagen Ausbildungsberufe</title>
   <link rel="stylesheet" href="style/styles.css">
+
 </head>
 <body>
   <div class="animated-background"></div>
@@ -22,12 +23,10 @@
     </header>
     
     <div class="filter-container" id="filterContainer">
-
       <button class="filter-btn active" data-category="all">Alle</button>
     </div>
     
     <div class="card-container" id="cardContainer">
-
       <div id="loadingIndicator" class="loading-indicator">
         <div class="spinner"></div>
         <p>Daten werden geladen...</p>
@@ -37,6 +36,16 @@
     <footer>
       <p>© Volkswagen AG 2025 | Ausbildungsberufe</p>
     </footer>
+  </div>
+
+  <!-- Inaktivitätswarnung -->
+  <div id="inactivityWarning" class="inactivity-warning">
+    <div class="warning-content">
+      <div class="warning-icon">⚠️</div>
+      <p>Aufgrund von Inaktivität werden Sie zur Startseite weitergeleitet.</p>
+      <div class="countdown" id="countdown">30</div>
+      <button id="stayButton" onclick="resetInactivityTimer()">Auf dieser Seite bleiben</button>
+    </div>
   </div>
 
   <div id="detailPage" class="detail-page">
@@ -75,7 +84,6 @@
   </div>
 
   <script>
-
     const cmsConfig = {
       apiUrl: 'api/content',
       imageBasePath: 'images/',
@@ -247,6 +255,8 @@
         button.textContent = category.name;
         
         button.addEventListener('click', function() {
+          // Benutzerinteraktion - Timer zurücksetzen
+          resetInactivityTimer();
 
           this.classList.add('touch-active');
           setTimeout(() => {
@@ -278,6 +288,8 @@
         card.style.animationDelay = `${0.1 + (index * 0.05)}s`;
         
         card.addEventListener('click', function() {
+          // Benutzerinteraktion - Timer zurücksetzen
+          resetInactivityTimer();
           openDetailPage(beruf.id);
         });
         
@@ -380,6 +392,8 @@
     }
 
     function closeDetailPage() {
+      // Benutzerinteraktion - Timer zurücksetzen
+      resetInactivityTimer();
       const detailPage = document.getElementById('detailPage');
       detailPage.style.animation = 'slideOut 0.5s ease forwards';
 
@@ -408,6 +422,8 @@
       });
 
       document.addEventListener('keydown', function(e) {
+        // Benutzerinteraktion - Timer zurücksetzen
+        resetInactivityTimer();
         if (e.key === 'Escape') {
           closeDetailPage();
         }
@@ -415,9 +431,9 @@
     }
 
     function setupOrientationHandling() {
-
       window.addEventListener('orientationchange', function() {
-
+        // Benutzerinteraktion - Timer zurücksetzen
+        resetInactivityTimer();
         setTimeout(() => {
           const activeCategory = document.querySelector('.filter-btn.active').dataset.category;
           filterCards(activeCategory);
@@ -425,6 +441,8 @@
       });
 
       window.addEventListener('resize', function() {
+        // Benutzerinteraktion - Timer zurücksetzen
+        resetInactivityTimer();
         const isLandscape = window.innerWidth > window.innerHeight;
         document.body.classList.toggle('landscape', isLandscape);
         document.body.classList.toggle('portrait', !isLandscape);
@@ -436,7 +454,6 @@
     }
 
     function setupAutoRefresh() {
-
       if (cmsConfig.refreshInterval > 0) {
         setInterval(async function() {
           const data = await fetchCmsData();
@@ -454,46 +471,99 @@
       }
     }
     
+    // Verbesserte Inaktivitäts-Timer-Funktionen
+    let inactivityTimeout;
+    let warningTimeout;
+    let countdownInterval;
+    const inactivityTime = 2 * 60 * 1000; // 1 Minute in Millisekunden
+    const warningTime = 10 * 1000; // 30 Sekunden vor Ablauf Warnung anzeigen
+    let remainingSeconds = 10; // Startwert für den Countdown
+
+    // Countdown aktualisieren
+    function updateCountdown() {
+      const countdownElement = document.getElementById('countdown');
+      countdownElement.textContent = remainingSeconds;
+      
+      // Farbe ändern wenn weniger als 10 Sekunden
+      if (remainingSeconds <= 10) {
+        countdownElement.style.color = '#ff0000';
+        countdownElement.style.fontSize = '2.2rem';
+      }
+      
+      remainingSeconds--;
+      
+      // Stoppen wenn der Countdown bei 0 angelangt ist
+      if (remainingSeconds < 0) {
+        clearInterval(countdownInterval);
+      }
+    }
+
+    // Warnmeldung anzeigen
+    function showInactivityWarning() {
+      document.getElementById('inactivityWarning').style.display = 'flex';
+      
+      // Countdown zurücksetzen und starten
+      remainingSeconds = Math.floor(warningTime / 1000);
+      updateCountdown();
+      
+      // Countdown-Interval starten (jede Sekunde aktualisieren)
+      countdownInterval = setInterval(updateCountdown, 1000);
+    }
+
+    // Warnmeldung ausblenden
+    function hideInactivityWarning() {
+      document.getElementById('inactivityWarning').style.display = 'none';
+      // Countdown stoppen
+      clearInterval(countdownInterval);
+    }
+
+    // Funktion zum Zurücksetzen des Timers
+    function resetInactivityTimer() {
+      // Timer zurücksetzen
+      clearTimeout(inactivityTimeout);
+      clearTimeout(warningTimeout);
+      clearInterval(countdownInterval);
+      
+      // Warnmeldung ausblenden (falls angezeigt)
+      hideInactivityWarning();
+      
+      // Neuen Timer für Warnung starten
+      warningTimeout = setTimeout(() => {
+        // Warnmeldung anzeigen
+        showInactivityWarning();
+      }, inactivityTime - warningTime);
+      
+      // Neuen Timer für Weiterleitung starten
+      inactivityTimeout = setTimeout(() => {
+        // Nach Inaktivitätszeit zur Landing Page zurückkehren
+        window.location.href = 'landing.html';
+      }, inactivityTime);
+    }
+
+    // Event-Listener für Benutzerinteraktionen einrichten
+    function setupInactivityDetection() {
+      // Liste der Events, die als "Aktivität" gelten
+      const events = [
+        'mousedown', 'mousemove', 'keypress', 
+        'scroll', 'touchstart', 'click', 'keydown'
+      ];
+      
+      // Event-Listener für jedes Event hinzufügen
+      events.forEach(eventName => {
+        document.addEventListener(eventName, resetInactivityTimer, true);
+      });
+      
+      // Initial den Timer starten
+      resetInactivityTimer();
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
       initializeApp();
       setupTouchEvents();
       setupOrientationHandling();
       setupAutoRefresh();
+      setupInactivityDetection(); // Inaktivitätserkennung starten
     });
-
-    // Inaktivitäts-Timer
-let inactivityTimeout;
-const inactivityTime = 1 * 60 * 1000; // 5 Minuten in Millisekunden
-
-// Funktion zum Zurücksetzen des Timers
-function resetInactivityTimer() {
-  // Timer zurücksetzen
-  clearTimeout(inactivityTimeout);
-  
-  // Neuen Timer starten
-  inactivityTimeout = setTimeout(() => {
-    // Nach 5 Minuten zur Landing Page zurückkehren
-    window.location.href = 'landing.html';
-  }, inactivityTime);
-}
-
-// Event-Listener für Benutzerinteraktionen
-function setupInactivityDetection() {
-  // Liste der Events, die als "Aktivität" gelten
-  const events = [
-    'mousedown', 'mousemove', 'keypress', 
-    'scroll', 'touchstart', 'click', 'keydown'
-  ];
-  
-  // Event-Listener für jedes Event hinzufügen
-  events.forEach(eventName => {
-    document.addEventListener(eventName, resetInactivityTimer, true);
-  });
-  
-  // Initial den Timer starten
-  resetInactivityTimer();
-}
   </script>
 </body>
 </html>
