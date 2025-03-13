@@ -439,12 +439,12 @@
     100% { background-position: 0% 50%; }
   }
   
-  /* Pulsating title effect */
+  /* Pulsating title effect 
   .title {
     position: relative;
     animation: glow 3s ease-in-out infinite;
   }
-  
+  */
   @keyframes glow {
     0% { text-shadow: 0 0 5px rgba(76,192,241,0); }
     50% { text-shadow: 0 0 20px rgba(76,192,241,0.7); }
@@ -509,7 +509,7 @@
   .back-to-landing {
     position: fixed;
     top: 20px;
-    left: 20px;
+    right: 20px;
     display: flex;
     align-items: center;
     gap: 8px;
