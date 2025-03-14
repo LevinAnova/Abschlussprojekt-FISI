@@ -407,13 +407,13 @@ const fontSizeAdjustments = {
     localStorage.setItem('selectedLanguage', lang);
     
     // RTL Sprache erkennen und Seite entsprechend anpassen
-    if (lang === 'ar') {
+   /* if (lang === 'ar') {
       document.body.classList.add('rtl-language');
       document.documentElement.setAttribute('dir', 'rtl');
     } else {
       document.body.classList.remove('rtl-language');
       document.documentElement.setAttribute('dir', 'ltr');
-    }
+    } */
     
     // Seitentitel ändern
     document.title = translations[lang].pageTitle;

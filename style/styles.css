@@ -515,8 +515,8 @@ footer {
 }
 
 .qr-code {
-  width: 200px;
-  height: 200px;
+  width: 250px;
+  height: 250px;
   margin: 15px auto;
   position: relative;
   display: flex;
@@ -870,17 +870,18 @@ footer {
   margin-right: 5px;
 }
 
-/* RTL Unterstützung für Arabisch */
+RTL Unterstützung für Arabisch 
 .language-selector select option[value="ar"] {
-  /*direction: rtl; */
-  text-align: right;
+ direction: rtl; 
+ text-align: right; 
 }
-/*
+
+
 .rtl-language {
   direction: rtl;
   text-align: right;
 }
-*/
+
 @media (max-width: 768px) {
   .language-selector {
     top: 20px;
