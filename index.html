@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Volkswagen Ausbildungsberufe</title>
   <link rel="stylesheet" href="style/styles.css">
+  
 </head>
 <body>
   <div class="animated-background"></div>
@@ -14,6 +15,30 @@
       <path d="M10.4 12l5.3-5.3c0.4-0.4 0.4-1 0-1.4s-1-0.4-1.4 0l-6 6c-0.4 0.4-0.4 1 0 1.4l6 6c0.2 0.2 0.5 0.3 0.7 0.3s0.5-0.1 0.7-0.3c0.4-0.4 0.4-1 0-1.4L10.4 12z"/>
     </svg>
   </button>
+  <div class="language-selector">
+    <label for="language-select">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+      </svg>
+      Sprache
+    </label>
+    <select id="language-select" onchange="changeLanguage(this.value)">
+      <option value="de">Deutsch</option>
+      <option value="en">English</option>
+      <option value="fr">Français</option>
+      <option value="es">Español</option>
+      <option value="it">Italiano</option>
+      <option value="ar">العربية</option>
+      <option value="ru">Русский</option>
+      <option value="pl">Polski</option>
+      <option value="cz">Čeština</option>
+      <option value="hu">Magyar</option>
+      <option value="ro">Română</option>
+      <option value="bg">Български</option>
+    </select>
+  </div>
   <div class="container">
     <header>
       <img src="img/vwlogo.png" alt="VW Logo" class="logo">
@@ -772,5 +797,6 @@
       setupInactivityDetection(); // Inaktivitätserkennung starten
     });
   </script>
+  <script src="translation.js"></script>
 </body>
 </html>
