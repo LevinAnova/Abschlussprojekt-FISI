@@ -7,7 +7,7 @@
   --card-color: #fff;
   --vw-blue: #001e50;
   --vw-light-blue: #4cc0f1;
-  --error-color: #ff3b30;
+  --error-color: #ff0d00;
 }
 
 * {
@@ -124,7 +124,7 @@ header {
   opacity: 0;
   cursor: pointer;
   perspective: 1000px;
-  border: 2px solid transparent;
+  border: 0.2px solid transparent;
 }
 
 .card:hover, .card:focus, .card:active {
@@ -199,7 +199,6 @@ footer {
   }
 }
 
-/* Enhanced animations inspired by the CodePen template */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
@@ -277,7 +276,7 @@ footer {
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background-color: #ffffff; /* Keep white background even in dark mode */
+    --background-color: #ffffff;
     --text-color: #222;
     --card-color: #fff;
   }
@@ -531,7 +530,7 @@ footer {
 }
 
 .qr-code:hover {
-  transform: scale(1.05);
+  transform: scale(1.5);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
@@ -617,7 +616,7 @@ footer {
   background: var(--vw-light-blue);
 }
 
-/* Page background with animated gradient */
+/* Page background with animated gradient 
 .animated-background {
   position: fixed;
   top: 0;
@@ -629,7 +628,7 @@ footer {
   animation: gradientBG 15s ease infinite;
   z-index: -1;
 }
-
+*/
 @keyframes gradientBG {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -704,7 +703,7 @@ footer {
 }
 
 .back-to-landing {
-  position: fixed;
+  position: absolute;
   top: 20px;
   right: 20px;
   display: flex;
@@ -873,15 +872,15 @@ footer {
 
 /* RTL Unterstützung für Arabisch */
 .language-selector select option[value="ar"] {
-  direction: rtl;
+  /*direction: rtl; */
   text-align: right;
 }
-
+/*
 .rtl-language {
   direction: rtl;
   text-align: right;
 }
-
+*/
 @media (max-width: 768px) {
   .language-selector {
     top: 20px;
