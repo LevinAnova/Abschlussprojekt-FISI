@@ -512,6 +512,7 @@ footer {
   border-top: 4px solid var(--vw-blue);
   max-width: 350px;
   margin: 0 auto;
+  margin-bottom: 0.8rem;
 }
 
 .qr-code {

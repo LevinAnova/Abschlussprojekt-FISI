@@ -60,6 +60,18 @@
     
     <span id="detailCategory" class="detail-category">Kategorie</span>
     
+
+    <div class="detail-sidebar">
+      <div class="qr-code-container">
+        <div class="qr-title">Direkt bewerben</div>
+        <div class="qr-text">Scanne den QR-Code, um dich für diesen Ausbildungsberuf zu bewerben.</div>
+        <div class="qr-code" id="berufQrCode">
+          <img id="qrCodeImage" src="" alt="QR-Code für die Bewerbung">
+          <div class="qr-beruf-id"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="detail-container">
       <div class="detail-main">
         <div class="detail-section">
@@ -88,16 +100,7 @@
         </div>
       </div>
       
-      <div class="detail-sidebar">
-        <div class="qr-code-container">
-          <div class="qr-title">Direkt bewerben</div>
-          <div class="qr-text">Scanne den QR-Code, um dich für diesen Ausbildungsberuf zu bewerben.</div>
-          <div class="qr-code" id="berufQrCode">
-            <img id="qrCodeImage" src="" alt="QR-Code für die Bewerbung">
-            <div class="qr-beruf-id"></div>
-          </div>
-        </div>
-      </div>
+
     </div>
   </div>
 
@@ -567,7 +570,7 @@
       }
       
       // QR-Code-Anzeige
-      qrBerufId.textContent = `Ausbildung: ${beruf.title}`;
+     // qrBerufId.textContent = `Ausbildung: ${beruf.title}`;
       
       // QR-Code-Bild laden
       qrCodeImage.src = `img/qrcodes/qr-${beruf.id}.png`;
