@@ -530,7 +530,7 @@ footer {
 }
 
 .qr-code:hover {
-  transform: scale(1.5);
+  transform: scale(1.15);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
@@ -870,7 +870,7 @@ footer {
   margin-right: 5px;
 }
 
-RTL Unterstützung für Arabisch 
+/* RTL Unterstützung für Arabisch */ 
 .language-selector select option[value="ar"] {
  direction: rtl; 
  text-align: right; 
