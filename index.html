@@ -116,118 +116,287 @@
     };
 
     const mockData = {
-      categories: [
-        { id: "all", name: "Alle" },
-        { id: "technik", name: "Technik" },
-        { id: "elektronik", name: "Elektronik" },
-        { id: "it", name: "IT" },
-        { id: "kaufmannisch", name: "Kaufmännisch" },
-        { id: "logistik", name: "Logistik" }
-      ],
-      
-      berufe: [
-        {
-          id: "kfz-mechatroniker",
-          title: "Kfz-Mechatroniker/in",
-          description: "Wartung, Reparatur und Diagnose von Fahrzeugen",
-          duration: "3,5 Jahre",
-          category: "technik",
-          requirements: ["Gutes technisches Verständnis", "Handwerkliches Geschick", "Interesse an Elektronik"],
-          career_options: ["Meister/in für Kraftfahrzeugtechnik", "Techniker/in für Kraftfahrzeugtechnik", "Studium Fahrzeugtechnik"],
-          locations: ["Wolfsburg", "Hannover", "Braunschweig"]
-        },
-        {
-          id: "elektroniker-automatisierung",
-          title: "Elektroniker/in für Automatisierungstechnik",
-          description: "Installation und Programmierung von Automatisierungssystemen",
-          duration: "3,5 Jahre",
-          category: "elektronik",
-          requirements: ["Interesse an Elektronik", "Technisches Verständnis", "Logisches Denkvermögen"],
-          career_options: ["Techniker/in für Automatisierungstechnik", "Studium Elektrotechnik"],
-          locations: ["Wolfsburg", "Kassel", "Emden"]
-        },
-        {
-          id: "industriemechaniker",
-          title: "Industriemechaniker/in",
-          description: "Herstellung und Instandhaltung von Maschinen und Produktionsanlagen",
-          duration: "3,5 Jahre",
-          category: "technik",
-          requirements: ["Handwerkliches Geschick", "Sorgfältige Arbeitsweise", "Technisches Verständnis"],
-          career_options: ["Techniker/in für Maschinenbau", "Meister/in für Industriemechanik"],
-          locations: ["Wolfsburg", "Hannover", "Emden", "Salzgitter"]
-        },
-        {
-          id: "fachinformatiker-systemintegration",
-          title: "Fachinformatiker/in für Systemintegration",
-          description: "Planung und Konfiguration von IT-Systemen",
-          duration: "3 Jahre",
-          category: "it",
-          requirements: ["Interesse an IT", "Logisches Denkvermögen", "Gute Englischkenntnisse"],
-          career_options: ["IT-Systemadministrator/in", "IT-Projektmanager/in", "Studium Informatik"],
-          locations: ["Emden"]
-        },
-        {
-          id: "fachinformatiker-anwendungsentwicklung",
-          title: "Fachinformatiker/in für Anwendungsentwicklung",
-          description: "Entwicklung und Programmierung von Anwendungen",
-          duration: "3 Jahre",
-          category: "it",
-          requirements: ["Programmierkenntnisse", "Logisches Denkvermögen", "Gute Englischkenntnisse"],
-          career_options: ["Softwareentwickler/in", "Studium Informatik", "Web-Entwickler/in"],
-          locations: ["Wolfsburg", "Berlin", "München"]
-        },
-        {
-          id: "industriekaufmann",
-          title: "Industriekaufmann/-frau",
-          description: "Kaufmännische und betriebswirtschaftliche Tätigkeiten",
-          duration: "3 Jahre",
-          category: "kaufmannisch",
-          requirements: ["Gute Kommunikationsfähigkeit", "Organisationsfähigkeit", "Wirtschaftliches Denken"],
-          career_options: ["Betriebswirt/in", "Studium BWL", "Fachwirt/in für Industrie"],
-          locations: ["Wolfsburg", "Hannover", "Stuttgart"]
-        },
-        {
-          id: "technischer-produktdesigner",
-          title: "Technische/r Produktdesigner/in",
-          description: "Entwicklung technischer Produkte und Komponenten",
-          duration: "3,5 Jahre",
-          category: "technik",
-          requirements: ["Räumliches Vorstellungsvermögen", "Technisches Zeichnen", "CAD-Kenntnisse"],
-          career_options: ["Techniker/in für Konstruktion", "Studium Produktdesign"],
-          locations: ["Wolfsburg", "Osnabrück"]
-        },
-        {
-          id: "elektroniker-betriebstechnik",
-          title: "Elektroniker/in für Betriebstechnik",
-          description: "Installation und Wartung elektrischer Anlagen",
-          duration: "3,5 Jahre",
-          category: "elektronik",
-          requirements: ["Handwerkliches Geschick", "Technisches Verständnis", "Mathematisches Grundwissen"],
-          career_options: ["Techniker/in für Elektrotechnik", "Meister/in für Elektrotechnik"],
-          locations: ["Wolfsburg", "Kassel", "Hannover"]
-        },
-        {
-          id: "werkzeugmechaniker",
-          title: "Werkzeugmechaniker/in",
-          description: "Herstellung von Werkzeugen und Vorrichtungen",
-          duration: "3,5 Jahre",
-          category: "technik",
-          requirements: ["Präzises Arbeiten", "Handwerkliches Geschick", "Technisches Verständnis"],
-          career_options: ["Techniker/in für Werkzeugbau", "Meister/in für Werkzeugbau"],
-          locations: ["Wolfsburg", "Braunschweig"]
-        },
-        {
-          id: "fachkraft-lagerlogistik",
-          title: "Fachkraft für Lagerlogistik",
-          description: "Organisation und Verwaltung des Warenflusses",
-          duration: "3 Jahre",
-          category: "logistik",
-          requirements: ["Organisationsfähigkeit", "Sorgfältige Arbeitsweise", "Technisches Verständnis"],
-          career_options: ["Logistikmeister/in", "Fachwirt/in für Logistik"],
-          locations: ["Wolfsburg", "Hannover", "Kassel"]
-        }
-      ]
-    };
+  categories: [
+    { id: "all", name: "Alle" },
+    { id: "produkt-technik", name: "Produkt & Technik" },
+    { id: "it-elektronik", name: "IT & Elektronik" },
+    { id: "service", name: "Service" },
+    { id: "organisation", name: "Organisation" },
+    { id: "schutz-sicherheit", name: "Schutz & Sicherheit" }
+  ],
+  
+  berufe: [
+    // Produkt & Technik
+    {
+      id: "chemielaborant",
+      title: "Chemielaborant/-in",
+      description: "Durchführung chemischer Analysen und Experimente in Laboren",
+      duration: "3,5 Jahre",
+      category: "produkt-technik",
+      requirements: ["Interesse an Chemie und Naturwissenschaften", "Präzise und sorgfältige Arbeitsweise", "Gutes technisches Verständnis"],
+      career_options: ["Techniker/-in für Chemietechnik", "Studium Chemie oder Chemieingenieurwesen", "Laborleiter/-in"],
+      locations: ["Wolfsburg", "Kassel", "Salzgitter"]
+    },
+    {
+      id: "fachkraft-metalltechnik",
+      title: "Fachkraft für Metalltechnik",
+      description: "Bearbeitung von Metallteilen und Montage von Baugruppen für die Fahrzeugproduktion",
+      duration: "2 Jahre",
+      category: "produkt-technik",
+      requirements: ["Handwerkliches Geschick", "Technisches Verständnis", "Sorgfältige Arbeitsweise"],
+      career_options: ["Industriemechaniker/-in", "Zerspanungsmechaniker/-in", "Werkzeugmechaniker/-in"],
+      locations: ["Wolfsburg", "Hannover", "Emden", "Kassel"]
+    },
+    {
+      id: "fahrzeuglackierer",
+      title: "Fahrzeuglackierer/-in",
+      description: "Vorbereitung, Lackierung und Oberflächenbehandlung von Fahrzeugen und Fahrzeugteilen",
+      duration: "3 Jahre",
+      category: "produkt-technik",
+      requirements: ["Guter Farbsinn", "Handwerkliches Geschick", "Sorgfältige und genaue Arbeitsweise"],
+      career_options: ["Meister/-in für Fahrzeuglackierung", "Techniker/-in für Farb- und Lacktechnik", "Ausbilder/-in"],
+      locations: ["Wolfsburg", "Emden", "Osnabrück", "Zwickau"]
+    },
+    {
+      id: "giesereimechaniker",
+      title: "Gießereimechaniker/-in",
+      description: "Herstellung von Bauteilen durch Gießverfahren für den Motorenbau und andere Komponenten",
+      duration: "3,5 Jahre",
+      category: "produkt-technik",
+      requirements: ["Technisches Verständnis", "Handwerkliches Geschick", "Körperliche Belastbarkeit"],
+      career_options: ["Techniker/-in für Gießereitechnik", "Meister/-in für Gießerei", "Produktionsspezialist/-in"],
+      locations: ["Hannover", "Kassel", "Braunschweig"]
+    },
+    {
+      id: "industriemechaniker",
+      title: "Industriemechaniker/-in",
+      description: "Herstellung, Wartung und Instandhaltung von Maschinen und Produktionsanlagen",
+      duration: "3,5 Jahre",
+      category: "produkt-technik",
+      requirements: ["Handwerkliches Geschick", "Sorgfältige Arbeitsweise", "Technisches Verständnis"],
+      career_options: ["Techniker/-in für Maschinenbau", "Meister/-in für Industriemechanik", "Studium Maschinenbau"],
+      locations: ["Wolfsburg", "Hannover", "Emden", "Salzgitter", "Braunschweig"]
+    },
+    {
+      id: "produktionstechnologe",
+      title: "Produktionstechnologe/-in",
+      description: "Optimierung von Fertigungsprozessen und Produktionsanlagen in der Automobilfertigung",
+      duration: "3 Jahre",
+      category: "produkt-technik",
+      requirements: ["Technisches Verständnis", "Analytisches Denken", "Interesse an Automatisierung"],
+      career_options: ["Techniker/-in für Produktionstechnik", "Studium Produktionstechnik", "Prozessingenieur/-in"],
+      locations: ["Wolfsburg", "Emden", "Zwickau"]
+    },
+    {
+      id: "technischer-produktdesigner",
+      title: "Technische/r Produktdesigner/-in",
+      description: "Entwicklung und Konstruktion technischer Produkte und Komponenten mit modernen CAD-Systemen",
+      duration: "3,5 Jahre",
+      category: "produkt-technik",
+      requirements: ["Räumliches Vorstellungsvermögen", "Technisches Zeichnen", "CAD-Kenntnisse"],
+      career_options: ["Techniker/-in für Konstruktion", "Studium Produktdesign", "Konstrukteur/-in"],
+      locations: ["Wolfsburg", "Osnabrück", "Dresden"]
+    },
+    {
+      id: "werkstoffpruefer",
+      title: "Werkstoffprüfer/-in",
+      description: "Prüfung und Analyse von Werkstoffen auf Qualität und Eigenschaften für die Fahrzeugproduktion",
+      duration: "3,5 Jahre",
+      category: "produkt-technik",
+      requirements: ["Genaue Arbeitsweise", "Interesse an Physik und Chemie", "Technisches Verständnis"],
+      career_options: ["Techniker/-in für Werkstofftechnik", "Studium Materialwissenschaften", "Qualitätsprüfer/-in"],
+      locations: ["Wolfsburg", "Kassel", "Braunschweig"]
+    },
+    {
+      id: "werkzeugmechaniker",
+      title: "Werkzeugmechaniker/-in",
+      description: "Herstellung von Werkzeugen, Vorrichtungen und Spezialmaschinen für die Produktion",
+      duration: "3,5 Jahre",
+      category: "produkt-technik",
+      requirements: ["Präzises Arbeiten", "Handwerkliches Geschick", "Technisches Verständnis"],
+      career_options: ["Techniker/-in für Werkzeugbau", "Meister/-in für Werkzeugbau", "Spezialist/-in für Werkzeugkonstruktion"],
+      locations: ["Wolfsburg", "Braunschweig", "Kassel", "Emden"]
+    },
+    {
+      id: "zerspanungsmechaniker",
+      title: "Zerspanungsmechaniker/-in",
+      description: "Herstellung von Präzisionsbauteilen mit CNC-Maschinen für den Fahrzeugbau",
+      duration: "3,5 Jahre",
+      category: "produkt-technik",
+      requirements: ["Technisches Verständnis", "Präzises Arbeiten", "Räumliches Vorstellungsvermögen"],
+      career_options: ["Techniker/-in für Maschinenbau", "Meister/-in für Zerspanungstechnik", "CNC-Programmierer/-in"],
+      locations: ["Wolfsburg", "Hannover", "Salzgitter", "Kassel"]
+    },
+    
+    // IT & Elektronik
+    {
+      id: "elektroniker-automatisierung",
+      title: "Elektroniker/-in für Automatisierungstechnik",
+      description: "Installation, Programmierung und Wartung von Automatisierungssystemen in der Produktion",
+      duration: "3,5 Jahre",
+      category: "it-elektronik",
+      requirements: ["Interesse an Elektronik", "Technisches Verständnis", "Logisches Denkvermögen"],
+      career_options: ["Techniker/-in für Automatisierungstechnik", "Studium Elektrotechnik", "SPS-Programmierer/-in"],
+      locations: ["Wolfsburg", "Kassel", "Emden", "Zwickau"]
+    },
+    {
+      id: "elektroniker-informationstechnik",
+      title: "Elektroniker/-in für Informations- und Systemtechnik",
+      description: "Entwicklung und Wartung von IT-Systemen und elektronischen Anlagen im Automobilbereich",
+      duration: "3,5 Jahre",
+      category: "it-elektronik",
+      requirements: ["Interesse an IT und Elektronik", "Logisches Denkvermögen", "Technisches Verständnis"],
+      career_options: ["Techniker/-in für Informationstechnik", "Studium Informationstechnik", "IT-Systemspezialist/-in"],
+      locations: ["Wolfsburg", "Hannover", "Braunschweig"]
+    },
+    {
+      id: "fachinformatiker-anwendungsentwicklung",
+      title: "Fachinformatiker/-in Anwendungsentwicklung",
+      description: "Entwicklung und Programmierung von Software-Anwendungen für Volkswagen",
+      duration: "3 Jahre",
+      category: "it-elektronik",
+      requirements: ["Programmierkenntnisse", "Logisches Denkvermögen", "Gute Englischkenntnisse"],
+      career_options: ["Softwareentwickler/-in", "Studium Informatik", "Web-Entwickler/-in"],
+      locations: ["Wolfsburg", "Berlin", "München", "Hannover"]
+    },
+    {
+      id: "fachinformatiker-datenanalyse",
+      title: "Fachinformatiker/-in Daten und Prozessanalyse",
+      description: "Analyse und Optimierung von Daten und IT-Prozessen in der Fahrzeugproduktion",
+      duration: "3 Jahre",
+      category: "it-elektronik",
+      requirements: ["Analytisches Denken", "Interesse an Datenverarbeitung", "Gute Englischkenntnisse"],
+      career_options: ["Data Analyst", "Business Intelligence Spezialist/-in", "Studium Wirtschaftsinformatik"],
+      locations: ["Wolfsburg", "Berlin", "Hannover"]
+    },
+    {
+      id: "fachinformatiker-systemintegration",
+      title: "Fachinformatiker/-in Systemintegration",
+      description: "Planung, Konfiguration und Administration von IT-Systemen bei Volkswagen",
+      duration: "3 Jahre",
+      category: "it-elektronik",
+      requirements: ["Interesse an IT-Systemen", "Logisches Denkvermögen", "Gute Englischkenntnisse"],
+      career_options: ["IT-Systemadministrator/-in", "IT-Projektmanager/-in", "Studium Informatik"],
+      locations: ["Wolfsburg", "Hannover", "Berlin", "Zwickau"]
+    },
+    {
+      id: "it-systemelektroniker",
+      title: "IT-Systemelektroniker/-in",
+      description: "Installation und Wartung von IT-Hardware und -Systemen im gesamten Konzern",
+      duration: "3 Jahre",
+      category: "it-elektronik",
+      requirements: ["Technisches Verständnis", "Interesse an IT-Hardware", "Handwerkliches Geschick"],
+      career_options: ["IT-Techniker/-in", "Netzwerktechniker/-in", "Studium Informationstechnik"],
+      locations: ["Wolfsburg", "Hannover", "Dresden"]
+    },
+    {
+      id: "kaufmann-digitalisierungsmanagement",
+      title: "Kauffrau / Kaufmann für Digitalisierungsmanagement",
+      description: "Planung und Umsetzung von Digitalisierungsprojekten im Volkswagen-Konzern",
+      duration: "3 Jahre",
+      category: "it-elektronik",
+      requirements: ["Interesse an IT und Digitalisierung", "Organisationstalent", "Kommunikationsfähigkeit"],
+      career_options: ["Projektmanager/-in Digitalisierung", "Studium Wirtschaftsinformatik", "Digital Transformation Manager/-in"],
+      locations: ["Wolfsburg", "Berlin", "München"]
+    },
+    {
+      id: "kfz-mechatroniker-hochvolt",
+      title: "Kraftfahrzeugmechatroniker/-in System- und Hochvolttechnik",
+      description: "Wartung, Diagnose und Reparatur von Elektro- und Hybridfahrzeugen",
+      duration: "3,5 Jahre",
+      category: "it-elektronik",
+      requirements: ["Technisches Verständnis", "Interesse an E-Mobilität", "Sorgfältige Arbeitsweise"],
+      career_options: ["Techniker/-in für Elektromobilität", "Meister/-in für Kraftfahrzeugtechnik", "Diagnosespezialist/-in E-Fahrzeuge"],
+      locations: ["Wolfsburg", "Emden", "Zwickau", "Dresden"]
+    },
+    {
+      id: "mechatroniker",
+      title: "Mechatroniker/-in",
+      description: "Aufbau, Wartung und Programmierung mechatronischer Systeme und Anlagen",
+      duration: "3,5 Jahre",
+      category: "it-elektronik",
+      requirements: ["Interesse an Elektronik und Mechanik", "Technisches Verständnis", "Sorgfältige Arbeitsweise"],
+      career_options: ["Techniker/-in für Mechatronik", "Studium Mechatronik", "Automatisierungstechniker/-in"],
+      locations: ["Wolfsburg", "Hannover", "Braunschweig", "Kassel"]
+    },
+    
+    // Service
+    {
+      id: "fachkraft-systemgastronomie",
+      title: "Fachkraft für Systemgastronomie",
+      description: "Organisation und Durchführung gastronomischer Dienstleistungen in den Volkswagen-Betriebsrestaurants",
+      duration: "3 Jahre",
+      category: "service",
+      requirements: ["Kundenorientierung", "Organisationstalent", "Teamfähigkeit"],
+      career_options: ["Betriebswirt/-in für Systemgastronomie", "Restaurant-Manager/-in", "Ausbilder/-in"],
+      locations: ["Wolfsburg", "Hannover", "Braunschweig"]
+    },
+    {
+      id: "koch",
+      title: "Köchin / Koch",
+      description: "Zubereitung von Speisen und Gerichten in den Großküchen von Volkswagen",
+      duration: "3 Jahre",
+      category: "service",
+      requirements: ["Kreativität", "Sorgfältige Arbeitsweise", "Belastbarkeit"],
+      career_options: ["Küchenchef/-in", "Betriebswirt/-in für Catering", "Diätkoch/-köchin"],
+      locations: ["Wolfsburg", "Hannover", "Berlin", "Stuttgart"]
+    },
+    
+    // Organisation
+    {
+      id: "fachkraft-lagerlogistik",
+      title: "Fachkraft für Lagerlogistik",
+      description: "Organisation und Verwaltung des Warenflusses in den Logistikzentren",
+      duration: "3 Jahre",
+      category: "organisation",
+      requirements: ["Organisationsfähigkeit", "Sorgfältige Arbeitsweise", "Technisches Verständnis"],
+      career_options: ["Logistikmeister/-in", "Fachwirt/-in für Logistik", "Supply Chain Manager/-in"],
+      locations: ["Wolfsburg", "Hannover", "Kassel", "Emden"]
+    },
+    {
+      id: "industriekaufmann",
+      title: "Industriekauffrau / Industriekaufmann",
+      description: "Kaufmännische und betriebswirtschaftliche Tätigkeiten in verschiedenen Abteilungen",
+      duration: "3 Jahre",
+      category: "organisation",
+      requirements: ["Gute Kommunikationsfähigkeit", "Organisationsfähigkeit", "Wirtschaftliches Denken"],
+      career_options: ["Betriebswirt/-in", "Studium BWL", "Fachwirt/-in für Industrie"],
+      locations: ["Wolfsburg", "Hannover", "Stuttgart", "Berlin"]
+    },
+    {
+      id: "kaufmann-bueromanagement",
+      title: "Kauffrau / Kaufmann für Büromanagement",
+      description: "Organisation und Durchführung von Büroprozessen in allen Unternehmensbereichen",
+      duration: "3 Jahre",
+      category: "organisation",
+      requirements: ["Organisationstalent", "Kommunikationsfähigkeit", "EDV-Kenntnisse"],
+      career_options: ["Fachwirt/-in für Büro- und Projektorganisation", "Office Manager/-in", "Personalreferent/-in"],
+      locations: ["Wolfsburg", "Hannover", "Berlin", "München"]
+    },
+    
+    // Schutz & Sicherheit
+    {
+      id: "fachkraft-schutz-sicherheit",
+      title: "Fachkraft für Schutz und Sicherheit",
+      description: "Durchführung von Sicherheits- und Schutzmaßnahmen auf dem Werksgelände",
+      duration: "3 Jahre",
+      category: "schutz-sicherheit",
+      requirements: ["Körperliche Fitness", "Verantwortungsbewusstsein", "Konfliktfähigkeit"],
+      career_options: ["Meister/-in für Schutz und Sicherheit", "Werkschutzleiter/-in", "Sicherheitsbeauftragter/-in"],
+      locations: ["Wolfsburg", "Hannover", "Emden", "Kassel"]
+    },
+    {
+      id: "werkfeuerwehrmann",
+      title: "Werkfeuerwehrfrau / Werkfeuerwehrmann",
+      description: "Brandschutz, Notfallrettung und Gefahrenabwehr auf dem Werksgelände",
+      duration: "3 Jahre",
+      category: "schutz-sicherheit",
+      requirements: ["Körperliche Fitness", "Belastbarkeit", "Technisches Verständnis"],
+      career_options: ["Gruppenführer/-in", "Zugführer/-in", "Werksfeuerwehrleiter/-in"],
+      locations: ["Wolfsburg", "Emden", "Hannover", "Kassel"]
+    }
+  ]
+};
     
     async function fetchCmsData() {
       const loadingIndicator = document.getElementById('loadingIndicator');
@@ -407,7 +576,7 @@
       // Fallback für nicht vorhandene QR-Codes
       qrCodeImage.onerror = function() {
         // Bei Fehler ein Platzhalter-QR-Code anzeigen
-        this.src = 'img/qrcodes/eatqr.png';
+        this.src = 'img/qrcodes/platzhalter.jpeg';
         this.alt = 'Platzhalter QR-Code';
         console.warn(`QR-Code für ${beruf.id} nicht gefunden, verwende Platzhalter.`);
       };
@@ -511,8 +680,8 @@
     let warningTimeout;
     let countdownInterval;
     const inactivityTime = 1 * 60 * 1000; // 1 Minute in Millisekunden
-    const warningTime = 30 * 1000; // 30 Sekunden vor Ablauf Warnung anzeigen
-    let remainingSeconds = 30; // Startwert für den Countdown
+    const warningTime = 10 * 1000; // 10 Sekunden vor Ablauf Warnung anzeigen
+    let remainingSeconds = 10; // Startwert für den Countdown
 
     // Countdown aktualisieren
     function updateCountdown() {
