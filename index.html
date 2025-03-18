@@ -829,7 +829,8 @@
       // Liste der Berufe, für die Wissenstests existieren
       const availableTests = [
         'chemielaborant',
-        'fachkraft-metalltechnik'
+        'fachkraft-metalltechnik',
+        'fachinformatiker-systemintegration'
       ];
       
       return availableTests.includes(berufId);
@@ -840,7 +841,9 @@
       // Pfad zu den externen Wissenstest-Dateien
       const testPaths = {
         'chemielaborant': 'tests/chemielaborant.html',
-        'fachkraft-metalltechnik': 'tests/metalltechnik.html'
+        'fachkraft-metalltechnik': 'tests/metalltechnik.html',
+        'fachinformatiker-systemintegration' : 'tests/blank.html'
+
       };
       
       // Rückgabe des Pfads oder eines Fallbacks
