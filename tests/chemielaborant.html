@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wissenstest: Chemielaborant/-in - Volkswagen Ausbildung</title>
+  <style>
+    :root {
+      --primary-color: #001e50;
+      --secondary-color: #4cc0f1;
+      --background-color: #f8f9fa;
+      --text-color: #333;
+      --border-color: #e2e8f0;
+      --success-color: #28a745;
+      --error-color: #dc3545;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', 'Arial', sans-serif;
+    }
+
+    body {
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: b.5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .logo-container {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+
+    .logo {
+      height: 40px;
+      width: auto;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    header p {
+      margin-top: 10px;
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .quiz-container {
+      padding: 30px;
+    }
+
+    .intro {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background-color: #e8f4fd;
+      border-radius: 8px;
+      border-left: 4px solid var(--secondary-color);
+    }
+
+    .question-container {
+      margin-bottom: 30px;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background-color: white;
+      display: none;
+    }
+
+    .question-container.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-number {
+      font-size: 0.9rem;
+      color: var(--secondary-color);
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .question {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .answer-option {
+      padding: 15px;
+      border-radius: 8px;
+      border: 2px solid var(--border-color);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .answer-option:hover {
+      background-color: #f0f7ff;
+      border-color: #cce5ff;
+    }
+
+    .answer-option.selected {
+      border-color: var(--secondary-color);
+      background-color: #e6f7ff;
+    }
+
+    .answer-option.correct {
+      border-color: var(--success-color);
+      background-color: rgba(40, 167, 69, 0.1);
+    }
+
+    .answer-option.incorrect {
+      border-color: var(--error-color);
+      background-color: rgba(220, 53, 69, 0.1);
+    }
+
+    .feedback {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .feedback.correct {
+      background-color: rgba(40, 167, 69, 0.1);
+      border-left: 4px solid var(--success-color);
+    }
+
+    .feedback.incorrect {
+      background-color: rgba(220, 53, 69, 0.1);
+      border-left: 4px solid var(--error-color);
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .button {
+      padding: 12px 25px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .button.primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .button.secondary {
+      background-color: #e2e8f0;
+      color: var(--text-color);
+    }
+
+    .button.secondary:hover {
+      background-color: #d2d8e0;
+    }
+
+    .button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Results page styles */
+    .results {
+      padding: 30px;
+      text-align: center;
+      display: none;
+    }
+
+    .results h2 {
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+    }
+
+    .score {
+      font-size: 2.5rem;
+      margin: 20px 0;
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+
+    .progress-bar {
+      height: 12px;
+      background-color: #e2e8f0;
+      border-radius: 6px;
+      margin-bottom: 30px;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: var(--secondary-color);
+      border-radius: 6px;
+      transition: width 1s ease;
+    }
+
+    .message {
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+    }
+
+    .results-summary {
+      margin: 30px 0;
+      text-align: left;
+    }
+
+    .result-item {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px solid var(--border-color);
+    }
+
+    .result-item.correct {
+      border-left: 4px solid var(--success-color);
+    }
+
+    .result-item.incorrect {
+      border-left: 4px solid var(--error-color);
+    }
+
+    .action-buttons {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        border-radius: 8px;
+      }
+
+      header {
+        padding: 15px 10px;
+      }
+
+      .logo-container {
+        position: static;
+        margin-bottom: 15px;
+      }
+
+      .quiz-container {
+        padding: 20px 15px;
+      }
+      
+      .button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+      
+      .navigation {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .navigation .button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo-container">
+        <img src="../img/vwlogo.png" alt="Volkswagen Logo" class="logo">
+      </div>
+      <h1>Wissenstest: Chemielaborant/-in</h1>
+      <p>Teste dein Wissen über den Beruf des Chemielaboranten</p>
+    </header>
+
+    <div class="quiz-container">
+      <div class="intro">
+        <h2>Willkommen zum Wissenstest!</h2>
+        <p>Dieser Test enthält 5 Fragen rund um den Beruf des Chemielaboranten. Finde heraus, ob dieser spannende Ausbildungsberuf zu dir passen könnte.</p>
+        <button class="button primary" id="startButton">Test starten</button>
+      </div>
+
+      <!-- Question 1 -->
+      <div class="question-container" id="question1">
+        <div class="question-number">Frage 1 von 5</div>
+        <div class="question">Welche Schutzausrüstung muss im Labor immer getragen werden?</div>
+        <div class="answers">
+          <div class="answer-option" data-index="0">Nur Handschuhe sind ausreichend</div>
+          <div class="answer-option" data-index="1">Laborkittel, Schutzbrille und je nach Tätigkeit Handschuhe</div>
+          <div class="answer-option" data-index="2">Schutzbrille reicht vollkommen aus</div>
+          <div class="answer-option" data-index="3">Im modernen Labor ist keine Schutzausrüstung mehr notwendig</div>
+        </div>
+        <div class="feedback" id="feedback1">
+          <p>Im Labor ist Sicherheit oberstes Gebot. Daher muss immer ein Laborkittel, eine Schutzbrille und je nach Tätigkeit auch Handschuhe getragen werden.</p>
+        </div>
+        <div class="navigation">
+          <button class="button secondary" id="prev1" disabled>Zurück</button>
+          <button class="button primary" id="next1" disabled>Weiter</button>
+        </div>
+      </div>
+
+      <!-- Question 2 -->
+      <div class="question-container" id="question2">
+        <div class="question-number">Frage 2 von 5</div>
+        <div class="question">Wie sollte Schwefelsäure korrekt verdünnt werden?</div>
+        <div class="answers">
+          <div class="answer-option" data-index="0">Wasser in Säure geben</div>
+          <div class="answer-option" data-index="1">Säure in Wasser geben</div>
+          <div class="answer-option" data-index="2">Ist egal, Hauptsache schnell</div>
+          <div class="answer-option" data-index="3">Säure und Wasser gleichzeitig mischen</div>
+        </div>
+        <div class="feedback" id="feedback2">
+          <p>Beim Verdünnen von Säuren gilt: "Erst das Wasser, dann die Säure, sonst geschieht das Ungeheure!" Die Säure wird immer langsam ins Wasser gegeben, nie umgekehrt.</p>
+        </div>
+        <div class="navigation">
+          <button class="button secondary" id="prev2">Zurück</button>
+          <button class="button primary" id="next2" disabled>Weiter</button>
+        </div>
+      </div>
+
+      <!-- Question 3 -->
+      <div class="question-container" id="question3">
+        <div class="question-number">Frage 3 von 5</div>
+        <div class="question">Was ist ein Erlenmeyerkolben?</div>
+        <div class="answers">
+          <div class="answer-option" data-index="0">Ein konischer Glaskolben mit flachem Boden</div>
+          <div class="answer-option" data-index="1">Ein kugelförmiger Kolben mit langem Hals</div>
+          <div class="answer-option" data-index="2">Ein Messgerät für Flüssigkeitsdichten</div>
+          <div class="answer-option" data-index="3">Ein Spezialwerkzeug zur Glasbläserei</div>
+        </div>
+        <div class="feedback" id="feedback3">
+          <p>Der Erlenmeyerkolben ist ein konischer Glaskolben mit flachem Boden, der häufig zum Mischen und Erhitzen von Flüssigkeiten verwendet wird.</p>
+        </div>
+        <div class="navigation">
+          <button class="button secondary" id="prev3">Zurück</button>
+          <button class="button primary" id="next3" disabled>Weiter</button>
+        </div>
+      </div>
+
+      <!-- Question 4 -->
+      <div class="question-container" id="question4">
+        <div class="question-number">Frage 4 von 5</div>
+        <div class="question">Was ist der pH-Wert?</div>
+        <div class="answers">
+          <div class="answer-option" data-index="0">Ein Maß für die Temperatur einer Lösung</div>
+          <div class="answer-option" data-index="1">Ein Maß für den Sauerstoffgehalt im Wasser</div>
+          <div class="answer-option" data-index="2">Ein Maß für die Konzentration von Wasserstoffionen</div>
+          <div class="answer-option" data-index="3">Ein Maß für die Viskosität einer Flüssigkeit</div>
+        </div>
+        <div class="feedback" id="feedback4">
+          <p>Der pH-Wert ist ein Maß für die Konzentration von Wasserstoffionen in einer wässrigen Lösung und gibt an, ob diese sauer, neutral oder basisch ist.</p>
+        </div>
+        <div class="navigation">
+          <button class="button secondary" id="prev4">Zurück</button>
+          <button class="button primary" id="next4" disabled>Weiter</button>
+        </div>
+      </div>
+
+      <!-- Question 5 -->
+      <div class="question-container" id="question5">
+        <div class="question-number">Frage 5 von 5</div>
+        <div class="question">Welche Methode wird zur Trennung von Stoffgemischen häufig eingesetzt?</div>
+        <div class="answers">
+          <div class="answer-option" data-index="0">Koagulation</div>
+          <div class="answer-option" data-index="1">Chromatographie</div>
+          <div class="answer-option" data-index="2">Karamellisierung</div>
+          <div class="answer-option" data-index="3">Egalisierung</div>
+        </div>
+        <div class="feedback" id="feedback5">
+          <p>Die Chromatographie ist eine wichtige Methode in der Analytik, mit der Stoffgemische aufgetrennt werden können. Sie basiert auf der unterschiedlichen Verteilung der Stoffe zwischen einer stationären und einer mobilen Phase.</p>
+        </div>
+        <div class="navigation">
+          <button class="button secondary" id="prev5">Zurück</button>
+          <button class="button primary" id="next5" disabled>Ergebnis anzeigen</button>
+        </div>
+      </div>
+
+      <!-- Results section -->
+      <div class="results" id="results">
+        <h2>Dein Ergebnis</h2>
+        <p>Du hast <span id="correctAnswers">0</span> von 5 Fragen richtig beantwortet.</p>
+        <div class="score" id="scoreDisplay">0%</div>
+        <div class="progress-bar">
+          <div class="progress" id="progressBar" style="width: 0%"></div>
+        </div>
+        <div class="message" id="resultMessage"></div>
+        
+        <div class="results-summary" id="resultsSummary">
+          <!-- Results summary will be inserted here -->
+        </div>
+        
+        <div class="action-buttons">
+          <button class="button primary" id="restartButton">Test neu starten</button>
+          <a href="../index.html" class="button secondary">Zurück zur Berufsübersicht</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Quiz configuration
+    const quizConfig = {
+      questions: [
+        { id: 1, correctAnswer: 1 },
+        { id: 2, correctAnswer: 1 },
+        { id: 3, correctAnswer: 0 },
+        { id: 4, correctAnswer: 2 },
+        { id: 5, correctAnswer: 1 }
+      ],
+      total: 5
+    };
+
+    // Quiz state
+    const quizState = {
+      currentQuestion: 0,
+      answers: [],
+      score: 0
+    };
+
+    // DOM elements
+    const intro = document.querySelector('.intro');
+    const startButton = document.getElementById('startButton');
+    const questions = document.querySelectorAll('.question-container');
+    const results = document.getElementById('results');
+    const correctAnswersDisplay = document.getElementById('correctAnswers');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const progressBar = document.getElementById('progressBar');
+    const resultMessage = document.getElementById('resultMessage');
+    const resultsSummary = document.getElementById('resultsSummary');
+    const restartButton = document.getElementById('restartButton');
+
+    // Initialize the quiz
+    function initQuiz() {
+      // Hide all questions initially
+      questions.forEach(q => q.classList.remove('active'));
+      
+      // Event listeners for start button
+      startButton.addEventListener('click', () => {
+        intro.style.display = 'none';
+        showQuestion(1);
+      });
+      
+      // Event listeners for each question
+      quizConfig.questions.forEach(q => {
+        const questionContainer = document.getElementById(`question${q.id}`);
+        const answers = questionContainer.querySelectorAll('.answer-option');
+        const feedback = document.getElementById(`feedback${q.id}`);
+        const nextButton = document.getElementById(`next${q.id}`);
+        const prevButton = document.getElementById(`prev${q.id}`);
+        
+        // Answer selection
+        answers.forEach(answer => {
+          answer.addEventListener('click', () => {
+            // Prüfen, ob bereits eine Antwort gewählt wurde
+            if (feedback.style.display === 'block') {
+              return; // Keine weitere Auswahl erlauben
+            }
+            
+            const answerIndex = parseInt(answer.dataset.index);
+            const isCorrect = answerIndex === q.correctAnswer;
+            
+            // Mark as selected and show feedback
+            answers.forEach(a => a.classList.remove('selected', 'correct', 'incorrect'));
+            answer.classList.add('selected');
+            
+            if (isCorrect) {
+              answer.classList.add('correct');
+              feedback.classList.add('correct');
+              feedback.classList.remove('incorrect');
+              // Feedback-Text für richtige Antwort
+              feedback.innerHTML = `<p><strong>Richtig!</strong> ${feedback.querySelector('p').textContent.replace('<strong>Richtig!</strong> ', '')}</p>`;
+            } else {
+              answer.classList.add('incorrect');
+              answers[q.correctAnswer].classList.add('correct');
+              feedback.classList.add('incorrect');
+              feedback.classList.remove('correct');
+              // Feedback-Text für falsche Antwort anpassen
+              feedback.innerHTML = `<p><strong>Leider falsch. Die Richtige Antwort ist: </strong> ${feedback.querySelector('p').textContent.replace('<strong>Richtig!</strong> ', '')}</p>`;
+            }
+            
+            feedback.style.display = 'block';
+            nextButton.disabled = false;
+            
+            // Alle Antworten deaktivieren (visuell)
+            answers.forEach(a => {
+              a.style.pointerEvents = 'none';
+              a.style.opacity = '0.8';
+            });
+            
+            // Record answer
+            quizState.answers[q.id - 1] = {
+              questionId: q.id,
+              selected: answerIndex,
+              correct: isCorrect
+            };
+          });
+        });
+        
+        // Next button
+        nextButton.addEventListener('click', () => {
+          if (q.id < quizConfig.total) {
+            showQuestion(q.id + 1);
+          } else {
+            showResults();
+          }
+        });
+        
+        // Previous button
+        if (prevButton) {
+          prevButton.addEventListener('click', () => {
+            showQuestion(q.id - 1);
+          });
+        }
+      });
+      
+      // Restart button
+      restartButton.addEventListener('click', resetQuiz);
+    }
+
+    // Show a specific question
+    function showQuestion(id) {
+      questions.forEach(q => q.classList.remove('active'));
+      const question = document.getElementById(`question${id}`);
+      question.classList.add('active');
+      quizState.currentQuestion = id;
+      
+      // Prüfen, ob Frage bereits beantwortet wurde
+      const existingAnswer = quizState.answers[id - 1];
+      if (existingAnswer) {
+        // Interface entsprechend anpassen
+        const answers = question.querySelectorAll('.answer-option');
+        const feedback = document.getElementById(`feedback${id}`);
+        
+        // Antwort als ausgewählt markieren
+        answers.forEach(a => {
+          if (parseInt(a.dataset.index) === existingAnswer.selected) {
+            a.classList.add('selected');
+            a.classList.add(existingAnswer.correct ? 'correct' : 'incorrect');
+          }
+          
+          if (parseInt(a.dataset.index) === quizConfig.questions[id - 1].correctAnswer && !existingAnswer.correct) {
+            a.classList.add('correct');
+          }
+          
+          // Antworten deaktivieren
+          a.style.pointerEvents = 'none';
+          a.style.opacity = '0.8';
+        });
+        
+        // Feedback anzeigen
+        feedback.style.display = 'block';
+        feedback.classList.add(existingAnswer.correct ? 'correct' : 'incorrect');
+        
+        // Next Button aktivieren
+        const nextButton = document.getElementById(`next${id}`);
+        nextButton.disabled = false;
+      }
+    }
+
+    // Show results
+    function showResults() {
+      questions.forEach(q => q.classList.remove('active'));
+      results.style.display = 'block';
+      
+      // Calculate score
+      quizState.score = quizState.answers.filter(a => a && a.correct).length;
+      const percentage = Math.round((quizState.score / quizConfig.total) * 100);
+      
+      // Update UI
+      correctAnswersDisplay.textContent = quizState.score;
+      scoreDisplay.textContent = `${percentage}%`;
+      progressBar.style.width = `${percentage}%`;
+      
+      // Set message based on score
+      if (percentage >= 80) {
+        resultMessage.textContent = "Hervorragend! Du hast die wichtigsten Grundlagen des Chemielaborant-Berufs verstanden.";
+      } else if (percentage >= 60) {
+        resultMessage.textContent = "Gut gemacht! Du hast schon einiges Wissen über den Beruf des Chemielaboranten.";
+      } else {
+        resultMessage.textContent = "Du kennst schon einige Grundlagen. Mit mehr Informationen über den Beruf wirst du noch besser.";
+      }
+      
+      // Create summary
+      generateSummary();
+    }
+
+    // Generate results summary
+    function generateSummary() {
+      resultsSummary.innerHTML = '';
+      
+      quizState.answers.forEach(answer => {
+        if (!answer) return;
+        
+        const questionElement = document.getElementById(`question${answer.questionId}`);
+        const questionText = questionElement.querySelector('.question').textContent;
+        const selectedText = questionElement.querySelectorAll('.answer-option')[answer.selected].textContent;
+        const correctText = questionElement.querySelectorAll('.answer-option')[quizConfig.questions[answer.questionId - 1].correctAnswer].textContent;
+        
+        const resultItem = document.createElement('div');
+        resultItem.className = `result-item ${answer.correct ? 'correct' : 'incorrect'}`;
+        
+        resultItem.innerHTML = `
+          <p><strong>Frage ${answer.questionId}:</strong> ${questionText}</p>
+          <p>Deine Antwort: ${selectedText}</p>
+          ${!answer.correct ? `<p>Richtige Antwort: ${correctText}</p>` : ''}
+        `;
+        
+        resultsSummary.appendChild(resultItem);
+      });
+    }
+
+    // Reset quiz to start over
+    function resetQuiz() {
+      // Reset state
+      quizState.currentQuestion = 0;
+      quizState.answers = [];
+      quizState.score = 0;
+      
+      // Reset UI
+      questions.forEach(question => {
+        const answers = question.querySelectorAll('.answer-option');
+        const feedback = question.querySelector('.feedback');
+        const nextButton = question.querySelector('.button.primary');
+        
+        answers.forEach(answer => {
+          answer.classList.remove('selected', 'correct', 'incorrect');
+          // Zurücksetzen der Antwort-Interaktivität
+          answer.style.pointerEvents = 'auto';
+          answer.style.opacity = '1';
+        });
+        
+        feedback.style.display = 'none';
+        feedback.classList.remove('correct', 'incorrect');
+        nextButton.disabled = true;
+      });
+      
+      // Show intro
+      intro.style.display = 'block';
+      results.style.display = 'none';
+    }
+
+    // Initialize the quiz when DOM is loaded
+    document.addEventListener('DOMContentLoaded', initQuiz);
+  </script>
+</body>
+</html>

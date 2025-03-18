@@ -563,6 +563,82 @@ footer {
   margin-bottom: 15px;
 }
 
+/* Wissenstest-Button Styles */
+.knowledge-test-container {
+  background-color: var(--card-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: fadeIn 0.5s ease forwards;
+  animation-delay: 0.7s;
+  opacity: 0;
+  border-top: 4px solid var(--vw-light-blue);
+  max-width: 350px;
+  margin: 0 auto 1.5rem auto;
+}
+
+.knowledge-test-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: var(--vw-light-blue);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.knowledge-test-button:hover {
+  background-color: var(--vw-blue);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+.knowledge-test-button:active {
+  transform: translateY(-1px);
+}
+
+.knowledge-test-button svg {
+  transition: transform 0.3s ease;
+}
+
+.knowledge-test-button:hover svg {
+  transform: rotate(360deg);
+}
+
+.knowledge-test-info {
+  font-size: 0.9rem;
+  color: var(--text-color);
+  margin-top: 10px;
+  font-style: italic;
+}
+
+.knowledge-test-button.disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.knowledge-test-button.disabled:hover {
+  transform: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.knowledge-test-button.hidden {
+  display: none;
+}
+
 /* Media Query anpassen für bessere mobile Ansicht */
 @media (min-width: 768px) {
   .detail-container {

@@ -95,6 +95,17 @@
           <div class="qr-beruf-id"></div>
         </div>
       </div>
+      
+      <div class="knowledge-test-container" id="knowledgeTestContainer">
+        <a id="testKnowledgeLink" href="#" target="_blank" class="knowledge-test-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          Teste dein Wissen
+        </a>
+        <p class="knowledge-test-info">Finde heraus, ob dieser Beruf zu dir passt!</p>
+      </div>
     </div>
 
     <div class="detail-container">
@@ -570,8 +581,13 @@
       const detailLocations = document.getElementById('detailLocations');
       const qrBerufId = document.querySelector('.qr-beruf-id');
       const qrCodeImage = document.getElementById('qrCodeImage');
+      const knowledgeTestLink = document.getElementById('testKnowledgeLink');
+      const knowledgeTestContainer = document.getElementById('knowledgeTestContainer');
 
       detailTitle.textContent = beruf.title;
+      // Speichern der Berufs-ID für den Wissenstest
+      detailTitle.dataset.berufId = berufId;
+      
       detailCategory.textContent = getCategoryName(beruf.category);
       detailDescription.innerHTML = `<p>${beruf.description}</p>`;
       detailDuration.innerHTML = `<p>${beruf.duration}</p>`;
@@ -608,6 +624,25 @@
         this.alt = 'Platzhalter QR-Code';
         console.warn(`QR-Code für ${beruf.id} nicht gefunden, verwende Platzhalter.`);
       };
+      
+      // Wissenstest-Link Konfiguration
+      // Prüfen, ob für diesen Beruf ein Wissenstest verfügbar ist
+      const hasKnowledgeTest = checkIfKnowledgeTestExists(berufId);
+      
+      if (hasKnowledgeTest) {
+        // Setze den richtigen Link für den Test
+        const testUrl = getKnowledgeTestUrl(berufId);
+        knowledgeTestLink.href = testUrl;
+        knowledgeTestLink.classList.remove('disabled');
+        knowledgeTestLink.title = `Teste dein Wissen über ${beruf.title}`;
+        knowledgeTestContainer.style.display = 'flex';
+        
+        // Event-Listener für Inaktivitätstimer-Reset
+        knowledgeTestLink.addEventListener('click', resetInactivityTimer);
+      } else {
+        // Wenn kein Wissenstest verfügbar ist, Button ausblenden
+        knowledgeTestContainer.style.display = 'none';
+      }
 
       const detailSections = document.querySelectorAll('.detail-section');
       detailSections.forEach((section, index) => {
@@ -787,6 +822,29 @@
       
       // Initial den Timer starten
       resetInactivityTimer();
+    }
+    
+    // Funktion zur Prüfung, ob für einen Beruf ein Wissenstest existiert
+    function checkIfKnowledgeTestExists(berufId) {
+      // Liste der Berufe, für die Wissenstests existieren
+      const availableTests = [
+        'chemielaborant',
+        'fachkraft-metalltechnik'
+      ];
+      
+      return availableTests.includes(berufId);
+    }
+    
+    // Funktion zum Abrufen der korrekten URL für den Wissenstest
+    function getKnowledgeTestUrl(berufId) {
+      // Pfad zu den externen Wissenstest-Dateien
+      const testPaths = {
+        'chemielaborant': 'tests/chemielaborant.html',
+        'fachkraft-metalltechnik': 'tests/metalltechnik.html'
+      };
+      
+      // Rückgabe des Pfads oder eines Fallbacks
+      return testPaths[berufId] || '#';
     }
 
     document.addEventListener('DOMContentLoaded', () => {
