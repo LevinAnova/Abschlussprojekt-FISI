@@ -22,11 +22,10 @@ body {
   color: var(--text-color);
   overflow-x: hidden;
   scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
 html {
-  touch-action: manipulation; /* Improve touch responsiveness */
+  touch-action: manipulation;
 }
 
 * {
@@ -611,11 +610,11 @@ footer {
   background: var(--vw-blue);
   border-radius: 10px;
 }
-
+/*
 .detail-page::-webkit-scrollbar-thumb:hover {
   background: var(--vw-light-blue);
 }
-
+*/
 /* Page background with animated gradient 
 .animated-background {
   position: fixed;

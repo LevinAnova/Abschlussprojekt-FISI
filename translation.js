@@ -574,10 +574,10 @@ changeLanguage(savedLanguage);
 } */
 
 // CSS für nicht-lateinische Schriftzeichen berücksichtigen
-if (savedLanguage === 'ar' || savedLanguage === 'ru' || savedLanguage === 'bg') {
+/*if (savedLanguage === 'ar' || savedLanguage === 'ru' || savedLanguage === 'bg') {
 document.body.classList.add('non-latin-script');
 }
-
+*/
 // Sprachspezifische Anpassungen für Mobile vornehmen
 adjustLanguageSelector();
 window.addEventListener('resize', adjustLanguageSelector);
