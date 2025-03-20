@@ -3,25 +3,599 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wissenstest: Chemielaborant/-in - Volkswagen Ausbildung</title>
+  <title>Wissenstest: Elektroniker für Automatisierungstechnik</title>
   <link rel="stylesheet" href="../style/test-styles.css">
+  <style>
+    .quiz-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .quiz-header {
+      background-color: #001e50;
+      color: white;
+      padding: 15px;
+      border-radius: 10px 10px 0 0;
+      margin-bottom: 20px;
+    }
+    
+    .quiz-title {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+    
+    .quiz-intro {
+      background-color: #f0f5ff;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid #001e50;
+    }
+    
+    .quiz-question {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .terms-container, .images-container {
+      margin-top: 20px;
+    }
+    
+    .term-item {
+      padding: 15px;
+      margin-bottom: 10px;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      min-height: 70px;
+      position: relative;
+    }
+    
+    .term-item.matched {
+      border: 2px solid #4CC0F1;
+      background-color: #f0f9ff;
+    }
+    
+    .image-item {
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: white;
+      text-align: center;
+      cursor: move;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .image-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .image-item.matched {
+      opacity: 0.6;
+      background-color: #f0f0f0;
+    }
+    
+    .image-item img {
+      max-width: 100%;
+      height: auto;
+      max-height: 120px;
+      object-fit: contain;
+      margin-bottom: 8px;
+    }
+    
+    .matched-image {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+    }
+    
+    .matched-text {
+      display: block;
+      font-size: 0.8rem;
+      color: #4CC0F1;
+      margin-top: 5px;
+    }
+    
+    .feedback {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+    }
+    
+    .feedback.correct {
+      background-color: #e7f6e7;
+      border: 1px solid #84d084;
+    }
+    
+    .feedback.incorrect {
+      background-color: #fff0f0;
+      border: 1px solid #ffb6b6;
+    }
+    
+    .explanation {
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    
+    .quiz-controls {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .btn {
+      background-color: #001e50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    
+    .btn:hover {
+      background-color: #4CC0F1;
+    }
+    
+    .progress {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    .quiz-result {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      display: none;
+    }
+    
+    .result-title {
+      color: #001e50;
+      font-size: 1.6rem;
+      margin-bottom: 15px;
+    }
+    
+    .result-score {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+    
+    .progress-bar {
+      height: 10px;
+      background-color: #eee;
+      border-radius: 5px;
+      margin-bottom: 30px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background-color: #001e50;
+      transition: width 0.8s ease;
+    }
+    
+    .result-details {
+      margin-top: 30px;
+      text-align: left;
+    }
+    
+    .result-item {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+    
+    .result-item.correct {
+      background-color: #e7f6e7;
+    }
+    
+    .result-item.partially {
+      background-color: #fff8e7;
+    }
+    
+    .columns {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .column {
+      flex: 1;
+    }
+    
+    @media (max-width: 768px) {
+      .columns {
+        flex-direction: column;
+      }
+    }
+    
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="logo-container">
-        <img src="../img/vwlogo.png" alt="Volkswagen Logo" class="logo">
-      </div>
-      <h1>Wissenstest: Chemielaborant/-in</h1>
-      <p>Teste dein Wissen über den Beruf des Chemielaboranten</p>
-    </header>
-    <iframe id="iframe" width="800" height="400" allowfullscreen="" scrolling="no" src="../circuit-construction-kit-dc_en.html"></iframe>
-        <div class="action-buttons">
-          <button class="button primary" id="restartButton">Test neu starten</button>
-          <a href="../index.html" class="button secondary">Zurück zur Berufsübersicht</a>
-        </div>
-      </div>
+  <div class="quiz-container">
+    <div class="quiz-header">
+      <h1 class="quiz-title">Wissenstest: Elektroniker für Automatisierungstechnik</h1>
+    </div>
+    
+    <div id="quiz-content">
+      <!-- Quiz wird per JavaScript initialisiert -->
     </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Fragen und Antworten definieren
+      const questions = [
+        {
+          id: 1,
+          title: "Sensoren in der Automatisierungstechnik",
+          intro: "Ordne die Bilder den richtigen Sensoren zu. Ziehe die Bilder auf die entsprechenden Begriffe.",
+          terms: [
+            { id: 'term-1', text: "Induktiver Näherungsschalter" },
+            { id: 'term-2', text: "Optischer Sensor" },
+            { id: 'term-3', text: "Temperaturfühler PT100" },
+            { id: 'term-4', text: "Kapazitiver Sensor" }
+          ],
+          images: [
+            { id: 'img-1', src: "../img/eat/induktiver-sensor.jpg", matchesId: 'term-1', alt: "Induktiver Näherungsschalter" },
+            { id: 'img-2', src: "../img/eat/optischer-sensor.jpg", matchesId: 'term-2', alt: "Optischer Sensor" },
+            { id: 'img-3', src: "../img/eat/temperaturfuehler.jpg", matchesId: 'term-3', alt: "Temperaturfühler PT100" },
+            { id: 'img-4', src: "../img/eat/kapazitiver-sensor.jpg", matchesId: 'term-4', alt: "Kapazitiver Sensor" }
+          ],
+          explanation: "Sensoren sind wesentliche Komponenten in der Automatisierungstechnik. Der induktive Näherungsschalter erkennt metallische Objekte ohne Berührung, der optische Sensor funktioniert mittels Lichtstrahlen, der PT100 misst Temperaturen über den elektrischen Widerstand und der kapazitive Sensor reagiert auf Veränderungen im elektrischen Feld und kann auch nicht-metallische Materialien detektieren."
+        },
+        {
+          id: 2,
+          title: "Steuerungstechnik-Komponenten",
+          intro: "Ordne die Bilder den richtigen Steuerungskomponenten zu. Ziehe die Bilder auf die entsprechenden Begriffe.",
+          terms: [
+            { id: 'term-1', text: "Speicherprogrammierbare Steuerung (SPS)" },
+            { id: 'term-2', text: "HMI-Panel (Human Machine Interface)" },
+            { id: 'term-3', text: "Frequenzumrichter" },
+            { id: 'term-4', text: "E/A-Modul (Ein-/Ausgangsmodul)" }
+          ],
+          images: [
+            { id: 'img-1', src: "../img/eat/sps.jpg", matchesId: 'term-1', alt: "SPS" },
+            { id: 'img-2', src: "../img/eat/hmi-panel.jpg", matchesId: 'term-2', alt: "HMI-Panel" },
+            { id: 'img-3', src: "../img/eat/frequenzumrichter.jpg", matchesId: 'term-3', alt: "Frequenzumrichter" },
+            { id: 'img-4', src: "../img/eat/ea-modul.jpg", matchesId: 'term-4', alt: "E/A-Modul" }
+          ],
+          explanation: "Die SPS ist das Herzstück einer Automatisierungsanlage und führt das Steuerungsprogramm aus. HMI-Panels dienen zur Bedienung und Visualisierung der Prozesse. Frequenzumrichter regeln die Drehzahl von Elektromotoren. E/A-Module verbinden die physikalischen Ein- und Ausgangssignale mit der Steuerung."
+        },
+        {
+          id: 3,
+          title: "Feldbus-Systeme und industrielle Netzwerke",
+          intro: "Ordne die Bilder den richtigen Netzwerksystemen zu. Ziehe die Bilder auf die entsprechenden Begriffe.",
+          terms: [
+            { id: 'term-1', text: "PROFINET" },
+            { id: 'term-2', text: "PROFIBUS" },
+            { id: 'term-3', text: "EtherCAT" },
+            { id: 'term-4', text: "IO-Link" }
+          ],
+          images: [
+            { id: 'img-1', src: "../img/eat/profinet.jpg", matchesId: 'term-1', alt: "PROFINET" },
+            { id: 'img-2', src: "../img/eat/profibus.jpg", matchesId: 'term-2', alt: "PROFIBUS" },
+            { id: 'img-3', src: "../img/eat/ethercat.jpg", matchesId: 'term-3', alt: "EtherCAT" },
+            { id: 'img-4', src: "../img/eat/io-link.jpg", matchesId: 'term-4', alt: "IO-Link" }
+          ],
+          explanation: "Feldbussysteme und industrielle Netzwerke sind für die Kommunikation in der Automatisierungstechnik entscheidend. PROFINET ist ein Industrial-Ethernet-Standard mit Echtzeitfähigkeit. PROFIBUS ist ein feldbusorientierter Standard für die Prozess- und Fertigungsautomatisierung. EtherCAT ist ein hochperformantes Echtzeit-Ethernet-System. IO-Link ist ein Punkt-zu-Punkt-Kommunikationsstandard für Sensoren und Aktoren."
+        }
+      ];
+      
+      let currentQuestionIndex = 0;
+      let score = 0;
+      let answeredQuestions = [];
+      let matchedPairs = [];
+      
+      const quizContentElement = document.getElementById('quiz-content');
+      
+      // Quiz initialisieren
+      function initQuiz() {
+        showQuestion(currentQuestionIndex);
+      }
+      
+      // Frage anzeigen
+      function showQuestion(index) {
+        const question = questions[index];
+        matchedPairs = [];
+        
+        const questionHTML = `
+          <div class="quiz-question" id="question-${question.id}">
+            <div class="quiz-intro">
+              <h2>${question.title}</h2>
+              <p>${question.intro}</p>
+            </div>
+            
+            <div class="columns">
+              <div class="column">
+                <h3>Begriffe:</h3>
+                <div class="terms-container">
+                  ${question.terms.map(term => `
+                    <div class="term-item" id="${term.id}" data-term-id="${term.id}">
+                      ${term.text}
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              
+              <div class="column">
+                <h3>Bilder:</h3>
+                <div class="images-container">
+                  ${question.images.map(image => `
+                    <div class="image-item" id="${image.id}" draggable="true" data-image-id="${image.id}" data-matches-id="${image.matchesId}">
+                      <img src="${image.src}" alt="${image.alt}">
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+            
+            <div class="feedback" id="feedback">
+              <h3 id="feedback-title"></h3>
+              <p class="explanation">${question.explanation}</p>
+              <button class="btn" id="next-button">
+                ${index < questions.length - 1 ? 'Nächste Frage' : 'Ergebnis anzeigen'}
+              </button>
+            </div>
+            
+            <div class="quiz-controls">
+              <div class="progress">Frage ${index + 1} von ${questions.length}</div>
+              <button class="btn" id="check-button" disabled>Antworten überprüfen</button>
+            </div>
+          </div>
+        `;
+        
+        quizContentElement.innerHTML = questionHTML;
+        
+        // Event-Listener hinzufügen
+        setupDragAndDrop();
+        
+        document.getElementById('check-button').addEventListener('click', checkAnswers);
+        document.getElementById('next-button').addEventListener('click', handleNextQuestion);
+      }
+      
+      // Drag-and-Drop einrichten
+      function setupDragAndDrop() {
+        const imageItems = document.querySelectorAll('.image-item');
+        const termItems = document.querySelectorAll('.term-item');
+        
+        imageItems.forEach(item => {
+          item.addEventListener('dragstart', handleDragStart);
+          item.addEventListener('dragend', handleDragEnd);
+        });
+        
+        termItems.forEach(item => {
+          item.addEventListener('dragover', handleDragOver);
+          item.addEventListener('dragenter', handleDragEnter);
+          item.addEventListener('dragleave', handleDragLeave);
+          item.addEventListener('drop', handleDrop);
+        });
+      }
+      
+      // Drag-Event Handler
+      let draggedItem = null;
+      
+      function handleDragStart(e) {
+        draggedItem = this;
+        setTimeout(() => {
+          this.classList.add('dragging');
+        }, 0);
+      }
+      
+      function handleDragEnd() {
+        this.classList.remove('dragging');
+      }
+      
+      function handleDragOver(e) {
+        e.preventDefault();
+      }
+      
+      function handleDragEnter(e) {
+        e.preventDefault();
+        this.classList.add('drag-over');
+      }
+      
+      function handleDragLeave() {
+        this.classList.remove('drag-over');
+      }
+      
+      function handleDrop(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        
+        // Nur weitermachen, wenn ein Bild gezogen wird
+        if (!draggedItem) return;
+        
+        const termId = this.dataset.termId;
+        const imageId = draggedItem.dataset.imageId;
+        const matchesId = draggedItem.dataset.matchesId;
+        
+        // Prüfen, ob dieses Bild bereits zugeordnet wurde
+        if (isImageMatched(imageId)) return;
+        
+        // Prüfen, ob dieser Begriff bereits ein Bild hat
+        if (isTermMatched(termId)) return;
+        
+        // Zuordnung speichern
+        matchedPairs.push({
+          imageId: imageId,
+          termId: termId,
+          isCorrect: matchesId === termId
+        });
+        
+        // UI aktualisieren
+        updateUI();
+        
+        // Prüfen, ob alle Bilder zugeordnet sind
+        if (matchedPairs.length === questions[currentQuestionIndex].images.length) {
+          document.getElementById('check-button').disabled = false;
+        }
+      }
+      
+      // Hilfsfunktionen
+      function isImageMatched(imageId) {
+        return matchedPairs.some(pair => pair.imageId === imageId);
+      }
+      
+      function isTermMatched(termId) {
+        return matchedPairs.some(pair => pair.termId === termId);
+      }
+      
+      function updateUI() {
+        // Alle Paarungen durchgehen und UI aktualisieren
+        matchedPairs.forEach(pair => {
+          const imageElement = document.getElementById(pair.imageId);
+          const termElement = document.getElementById(pair.termId);
+          
+          if (imageElement && termElement) {
+            // Bild als zugeordnet markieren
+            imageElement.classList.add('matched');
+            imageElement.setAttribute('draggable', 'false');
+            
+            // Term als zugeordnet markieren
+            termElement.classList.add('matched');
+            
+            // Kleines Bild zum Begriff hinzufügen
+            const imgSrc = imageElement.querySelector('img').src;
+            const imgAlt = imageElement.querySelector('img').alt;
+            
+            if (!termElement.querySelector('.matched-image')) {
+              const matchedImg = document.createElement('img');
+              matchedImg.src = imgSrc;
+              matchedImg.alt = imgAlt;
+              matchedImg.className = 'matched-image';
+              termElement.appendChild(matchedImg);
+              
+              // Text hinzufügen
+              const matchedText = document.createElement('span');
+              matchedText.className = 'matched-text';
+              matchedText.textContent = 'Zugeordnet';
+              imageElement.appendChild(matchedText);
+            }
+          }
+        });
+      }
+      
+      // Antworten überprüfen
+      function checkAnswers() {
+        const question = questions[currentQuestionIndex];
+        let allCorrect = true;
+        let correctCount = 0;
+        
+        // Jede Zuordnung überprüfen
+        matchedPairs.forEach(pair => {
+          const image = question.images.find(img => img.id === pair.imageId);
+          if (image.matchesId !== pair.termId) {
+            allCorrect = false;
+          } else {
+            correctCount++;
+          }
+        });
+        
+        // Feedback anzeigen
+        const feedbackElement = document.getElementById('feedback');
+        const feedbackTitleElement = document.getElementById('feedback-title');
+        
+        if (allCorrect) {
+          feedbackElement.classList.add('correct');
+          feedbackTitleElement.textContent = 'Sehr gut! Alle Zuordnungen sind korrekt.';
+          score++;
+        } else {
+          feedbackElement.classList.add('incorrect');
+          feedbackTitleElement.textContent = `Fast! Du hast ${correctCount} von ${question.images.length} Zuordnungen richtig.`;
+        }
+        
+        // Zu beantworteten Fragen hinzufügen
+        answeredQuestions.push({
+          questionTitle: question.title,
+          isCorrect: allCorrect,
+          correctCount: correctCount,
+          totalCount: question.images.length
+        });
+        
+        // Feedback einblenden
+        feedbackElement.style.display = 'block';
+        
+        // Check-Button ausblenden
+        document.getElementById('check-button').style.display = 'none';
+      }
+      
+      // Nächste Frage oder Ergebnis anzeigen
+      function handleNextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+          currentQuestionIndex++;
+          showQuestion(currentQuestionIndex);
+        } else {
+          showResult();
+        }
+      }
+      
+      // Ergebnis anzeigen
+      function showResult() {
+        const resultHTML = `
+          <div class="quiz-result" id="quiz-result">
+            <h2 class="result-title">Dein Ergebnis</h2>
+            <p class="result-score">Du hast ${score} von ${questions.length} Fragen vollständig richtig beantwortet!</p>
+            
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${(score / questions.length) * 100}%;"></div>
+            </div>
+            
+            <div class="result-details">
+              <h3>Übersicht:</h3>
+              ${answeredQuestions.map((answer, index) => `
+                <div class="result-item ${answer.isCorrect ? 'correct' : 'partially'}">
+                  <p><strong>Frage ${index + 1}:</strong> ${answer.questionTitle}</p>
+                  <p>${answer.isCorrect 
+                    ? 'Alle Zuordnungen korrekt!' 
+                    : `${answer.correctCount} von ${answer.totalCount} Zuordnungen korrekt`}</p>
+                </div>
+              `).join('')}
+            </div>
+            
+            <button class="btn" id="restart-button">Quiz neu starten</button>
+          </div>
+        `;
+        
+        quizContentElement.innerHTML = resultHTML;
+        
+        // Event-Listener für Neustart
+        document.getElementById('restart-button').addEventListener('click', restartQuiz);
+        
+        // Animation für Ergebnis
+        setTimeout(() => {
+          document.getElementById('quiz-result').style.display = 'block';
+        }, 100);
+      }
+      
+      // Quiz neu starten
+      function restartQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        answeredQuestions = [];
+        matchedPairs = [];
+        
+        showQuestion(currentQuestionIndex);
+      }
+      
+      // Quiz starten
+      initQuiz();
+    });
+  </script>
 </body>
 </html>
