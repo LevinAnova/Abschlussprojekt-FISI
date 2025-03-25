@@ -10,6 +10,10 @@
   src: url('../fonts/VWHeadWeb-ExtraBold.ttf') format('truetype');
 }
 @font-face {
+  font-family: 'VW Head2';
+  src: url('../fonts/VWHeadWeb-Bold.ttf') format('truetype');
+}
+@font-face {
   font-family: 'VW Font';
   src: url('../fonts/vwfont.otf') format('opentype');
   font-weight: normal;
@@ -167,6 +171,7 @@
     opacity: 0;
     animation: pulseButton 2s infinite, fadeInUp 1s forwards ease-out;
     animation-delay: 0s, 1.5s;
+    font-family: 'VW Head2';
   }
   
   .cta-button:hover, .cta-button:focus {

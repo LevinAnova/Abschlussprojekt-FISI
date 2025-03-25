@@ -8,11 +8,21 @@
     --error-color: #dc3545;
   }
 
+  @font-face {
+    font-family: 'VW Font';
+    src: url('../fonts/vwfont.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'VW Head';
+    src: url('../fonts/VWHeadWeb-ExtraBold.ttf') format('truetype');
+  }
+
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Roboto', 'Arial', sans-serif;
   }
 
   body {
@@ -20,6 +30,7 @@
     color: var(--text-color);
     line-height: b.5;
     padding: 20px;
+    font-family: 'VW Font';
   }
 
   .container {
@@ -53,6 +64,7 @@
   header h1 {
     margin: 0;
     font-size: 1.8rem;
+      font-family: 'VW Head';
   }
 
   header p {
@@ -72,8 +84,12 @@
     background-color: #e8f4fd;
     border-radius: 8px;
     border-left: 4px solid var(--secondary-color);
+    font-family: 'VW Font';
   }
-
+  
+  .intro h2 {
+      font-family: 'VW Head';
+  }
   .question-container {
     margin-bottom: 30px;
     padding: 20px;
@@ -104,6 +120,7 @@
     font-size: 1.2rem;
     margin-bottom: 20px;
     font-weight: 500;
+      font-family: 'VW Head';
   }
 
   .answers {
@@ -216,6 +233,7 @@
     color: var(--primary-color);
     margin-bottom: 20px;
     font-size: 1.8rem;
+    font-family: 'VW Head';
   }
 
   .score {
