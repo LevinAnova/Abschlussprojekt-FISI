@@ -9,6 +9,11 @@ const fontSizeAdjustments = {
       title: '1.9rem',
       buttons: '0.85rem',
       text: '0.95rem'
+    },
+    bg: {
+      title: '1.0rem',
+      buttons: '0.85rem',
+      text: '0.95rem'
     }
   };
   

@@ -10,11 +10,23 @@
   --error-color: #ff0d00;
 }
 
+
+@font-face {
+  font-family: 'VW Font';
+  src: url('../fonts/vwfont.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'VW Head';
+  src: url('../fonts/VWHeadWeb-ExtraBold.ttf') format('truetype');
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Roboto', 'Arial', sans-serif;
+  /*font-family: 'VW Font';*/
 }
 
 body {
@@ -22,6 +34,7 @@ body {
   color: var(--text-color);
   overflow-x: hidden;
   scroll-behavior: smooth;
+  font-family: 'VW Font';
 }
 
 html {
@@ -59,9 +72,10 @@ header {
 .title {
   font-size: 1.8rem;
   color: var(--vw-blue);
-  font-weight: 700;
+ 
   text-align: center;
   position: relative;
+  font-family: 'VW Head';
   /*animation: glow 3s ease-in-out infinite; */
 }
 
@@ -103,10 +117,10 @@ header {
 .card-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px; /* Increased for better touch separation */
+  gap: 24px;
   margin-top: 20px;
-  padding-bottom: 30px; /* Add space at bottom for comfortable scrolling */
-  min-height: 300px; /* Space for loading indicator */
+  padding-bottom: 30px;
+  min-height: 300px;
   position: relative;
 }
 
@@ -142,6 +156,7 @@ header {
   font-size: 1.3rem; /* Larger for better readability on touch devices */
   margin-bottom: 8px;
   padding: 5px 0;
+  font-family: 'VW Head';
 }
 
 .card-category {
@@ -382,6 +397,7 @@ footer {
   color: var(--vw-blue);
   margin-bottom: 0.6rem;
   word-break: break-word;
+  font-family: 'VW Head';
 }
 
 .detail-category {

@@ -4,17 +4,29 @@
     --white: #ffffff;
   }
   
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Roboto', 'Arial', sans-serif;
-  }
+/* Schriftart einbinden */
+@font-face {
+  font-family: 'VW Head';
+  src: url('../fonts/VWHeadWeb-ExtraBold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'VW Font';
+  src: url('../fonts/vwfont.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
   
   body, html {
     height: 100%;
     overflow: hidden;
     background-color: var(--white);
+    font-family: 'VW Font';
   }
   
   .landing-container {
@@ -120,12 +132,12 @@
   
   .title {
     font-size: 4rem;
-    font-weight: 900;
     margin-bottom: 20px;
     line-height: 1.2;
     opacity: 0;
     animation: fadeInUp 1s forwards ease-out;
     animation-delay: 0.5s;
+    font-family: 'VW Head';
   }
   
   .subtitle {
