@@ -21,6 +21,10 @@
   font-family: 'VW Head';
   src: url('../fonts/VWHeadWeb-Bold.ttf') format('truetype');
 }
+@font-face {
+  font-family: 'VW ExtraHead';
+  src: url('../fonts/VWHeadWeb-ExtraBold.ttf') format('truetype');
+}
 
 * {
   box-sizing: border-box;
@@ -72,10 +76,9 @@ header {
 .title {
   font-size: 1.8rem;
   color: var(--vw-blue);
- 
   text-align: center;
   position: relative;
-  font-family: 'VW Head';
+  font-family: 'VW ExtraHead';
   /*animation: glow 3s ease-in-out infinite; */
 }
 
@@ -98,6 +101,7 @@ header {
   font-size: 1rem; /* Larger text */
   transform-origin: center;
   -webkit-tap-highlight-color: rgba(76,192,241,0.3); /* Better touch feedback */
+  font-family: 'VW ExtraHead';
 }
 
 .filter-btn:hover {
@@ -867,7 +871,7 @@ footer {
 }
 
 .warning-icon {
-  color: #ff3b30;
+  color: var(--error-color);
   font-size: 3rem;
   margin-bottom: 15px;
 }
@@ -876,6 +880,7 @@ footer {
   margin-bottom: 20px;
   font-size: 1.2rem;
   color: var(--text-color);
+  font-family: 'VW ExtraHead';
 }
 
 .countdown {

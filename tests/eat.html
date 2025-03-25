@@ -6,73 +6,107 @@
   <title>Wissenstest: Elektroniker für Automatisierungstechnik</title>
   <link rel="stylesheet" href="../style/test-styles.css">
   <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
+    
     .quiz-container {
-      max-width: 900px;
+      max-width: 100%;
+      width: 100%;
       margin: 0 auto;
-      padding: 20px;
+      padding: 10px;
+      padding-top: 70px; /* Platz für den festen Button */
+      box-sizing: border-box;
+      min-height: 100vh;
     }
     
     .quiz-header {
       background-color: #001e50;
       color: white;
-      padding: 15px;
+      padding: 20px;
       border-radius: 10px 10px 0 0;
       margin-bottom: 20px;
+      text-align: center;
     }
     
     .quiz-title {
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       margin: 0;
     }
     
     .quiz-intro {
       background-color: #f0f5ff;
-      padding: 15px;
+      padding: 20px;
       border-radius: 8px;
       margin-bottom: 20px;
-      border-left: 4px solid #001e50;
+      border-left: 6px solid #001e50;
+      font-size: 1.1rem;
     }
     
     .quiz-question {
       background-color: white;
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .terms-container, .images-container {
-      margin-top: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     
-    .term-item {
-      padding: 15px;
-      margin-bottom: 10px;
-      border: 2px dashed #ccc;
-      border-radius: 8px;
-      background-color: #f9f9f9;
-      min-height: 70px;
-      position: relative;
+    /* Layout gemäß Skizze */
+    .images-section {
+      margin-bottom: 30px;
     }
     
-    .term-item.matched {
-      border: 2px solid #4CC0F1;
-      background-color: #f0f9ff;
+    .images-label {
+      text-align: center;
+      font-size: 1.4rem;
+      color: #001e50;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    
+    .terms-label {
+      text-align: center;
+      font-size: 1.4rem;
+      color: #001e50;
+      font-weight: bold;
+      margin-bottom: 15px;
+      margin-top: 30px;
+    }
+    
+    /* Bildergalerie - 4 Bilder nebeneinander in einer Reihe */
+    .images-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
     }
     
     .image-item {
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      padding: 8px;
+      border: 1px solid #4cc0f1;
       background-color: white;
       text-align: center;
       cursor: move;
       transition: transform 0.2s, box-shadow 0.2s;
+      touch-action: manipulation;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 1/1;
     }
     
-    .image-item:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    .image-item:active {
+      transform: scale(0.95);
+      background-color: #f0f9ff;
+      border-color: #4CC0F1;
     }
     
     .image-item.matched {
@@ -81,17 +115,49 @@
     }
     
     .image-item img {
-      max-width: 100%;
-      height: auto;
-      max-height: 120px;
+      max-width: 90%;
+      width: auto;
+      max-height: 90%;
       object-fit: contain;
-      margin-bottom: 8px;
+    }
+    
+    /* Antworten untereinander */
+    .terms-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .term-item {
+      padding: 20px;
+      border: 2px solid #001e50;
+      background-color: #fff;
+      min-height: 60px;
+      position: relative;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      touch-action: manipulation;
+    }
+    
+    .term-item.matched {
+      border-color: #4CC0F1;
+      background-color: #f0f9ff;
+    }
+    
+    .term-item.drag-over {
+      border-color: #4CC0F1;
+      background-color: #eaf8ff;
     }
     
     .matched-image {
       position: absolute;
-      right: 15px;
-      top: 10px;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
       width: 60px;
       height: 60px;
       object-fit: contain;
@@ -101,83 +167,107 @@
       display: block;
       font-size: 0.8rem;
       color: #4CC0F1;
-      margin-top: 5px;
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
     }
     
     .feedback {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 8px;
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 12px;
       display: none;
+      font-size: 1.1rem;
     }
     
     .feedback.correct {
       background-color: #e7f6e7;
-      border: 1px solid #84d084;
+      border: 2px solid #84d084;
     }
     
     .feedback.incorrect {
       background-color: #fff0f0;
-      border: 1px solid #ffb6b6;
+      border: 2px solid #ffb6b6;
     }
     
     .explanation {
-      margin-top: 10px;
-      font-size: 0.9rem;
+      margin-top: 15px;
+      font-size: 1.1rem;
+      line-height: 1.5;
     }
     
     .quiz-controls {
-      margin-top: 20px;
+      margin-top: 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding-bottom: 30px;
     }
     
     .btn {
       background-color: #001e50;
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 15px 30px;
       border-radius: 30px;
       cursor: pointer;
       font-weight: bold;
+      font-size: 1.1rem;
       transition: background-color 0.3s;
+      touch-action: manipulation;
     }
     
-    .btn:hover {
+    .button.secondary {
       background-color: #4CC0F1;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1.1rem;
+      transition: background-color 0.3s;
+      text-decoration: none;
+      display: inline-block;
+      margin-left: 15px;
+    }
+    
+    .btn:active, .button.secondary:active {
+      transform: scale(0.98);
     }
     
     .progress {
-      font-size: 0.9rem;
+      font-size: 1.1rem;
       color: #666;
     }
     
     .quiz-result {
       background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       text-align: center;
       display: none;
     }
     
     .result-title {
       color: #001e50;
-      font-size: 1.6rem;
-      margin-bottom: 15px;
-    }
-    
-    .result-score {
-      font-size: 1.2rem;
+      font-size: 2rem;
       margin-bottom: 20px;
     }
     
-    .progress-bar {
-      height: 10px;
-      background-color: #eee;
-      border-radius: 5px;
+    .result-score {
+      font-size: 1.5rem;
       margin-bottom: 30px;
+    }
+    
+    .progress-bar {
+      height: 15px;
+      background-color: #eee;
+      border-radius: 8px;
+      margin-bottom: 40px;
       overflow: hidden;
     }
     
@@ -188,45 +278,70 @@
     }
     
     .result-details {
-      margin-top: 30px;
+      margin-top: 40px;
       text-align: left;
     }
     
     .result-item {
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      font-size: 1.1rem;
     }
     
     .result-item.correct {
-      background-color: #e7f6e7;
+      background-color: #3de23d;
     }
     
     .result-item.partially {
-      background-color: #fff8e7;
+      background-color: #ffa500;
     }
     
-    .columns {
+    /* Zurück-Button */
+    .back-to-jobs {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background-color: #001e50;
+      color: white;
       display: flex;
-      gap: 20px;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      text-decoration: none;
+      font-size: 1.1rem;
+      transition: background-color 0.3s;
+      touch-action: manipulation;
     }
     
-    .column {
-      flex: 1;
+    .back-to-jobs svg {
+      margin-right: 10px;
+      fill: currentColor;
     }
     
-    @media (max-width: 768px) {
-      .columns {
-        flex-direction: column;
-      }
+    .back-to-jobs:active {
+      background-color: #4CC0F1;
+      transform: scale(0.98);
     }
     
-    .hidden {
-      display: none;
+    /* Spezifische Touch-Optimierungen */
+    * {
+      -webkit-tap-highlight-color: transparent;
     }
   </style>
 </head>
 <body>
+  <a href="../index.html" class="back-to-jobs">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+      <path d="M10.4 12l5.3-5.3c0.4-0.4 0.4-1 0-1.4s-1-0.4-1.4 0l-6 6c-0.4 0.4-0.4 1 0 1.4l6 6c0.2 0.2 0.5 0.3 0.7 0.3s0.5-0.1 0.7-0.3c0.4-0.4 0.4-1 0-1.4L10.4 12z"/>
+    </svg>
+    Zur Berufsübersicht
+  </a>
+  
   <div class="quiz-container">
     <div class="quiz-header">
       <h1 class="quiz-title">Wissenstest: Elektroniker für Automatisierungstechnik</h1>
@@ -257,7 +372,7 @@
             { id: 'img-3', src: "../img/eat/temperaturfuehler.jpg", matchesId: 'term-3', alt: "Temperaturfühler PT100" },
             { id: 'img-4', src: "../img/eat/kapazitiver-sensor.jpg", matchesId: 'term-4', alt: "Kapazitiver Sensor" }
           ],
-          explanation: "Sensoren sind wesentliche Komponenten in der Automatisierungstechnik. Der induktive Näherungsschalter erkennt metallische Objekte ohne Berührung, der optische Sensor funktioniert mittels Lichtstrahlen, der PT100 misst Temperaturen über den elektrischen Widerstand und der kapazitive Sensor reagiert auf Veränderungen im elektrischen Feld und kann auch nicht-metallische Materialien detektieren."
+          explanation: "Sensoren sind wesentliche Komponenten in der Automatisierungstechnik. Der induktive Näherungsschalter erkennt metallische Objekte ohne Berührung, der optische Sensor funktioniert mittels Lichtstrahlen, der PT100 misst Temperaturen über den elektrischen Widerstand und der kapazitive Sensor reagiert auf Veränderungen im elektrischen Feld und kann auch nicht-metallische Materialien detektieren.<br></br>"
         },
         {
           id: 2,
@@ -275,7 +390,7 @@
             { id: 'img-3', src: "../img/eat/frequenzumrichter.jpg", matchesId: 'term-3', alt: "Frequenzumrichter" },
             { id: 'img-4', src: "../img/eat/ea-modul.jpg", matchesId: 'term-4', alt: "E/A-Modul" }
           ],
-          explanation: "Die SPS ist das Herzstück einer Automatisierungsanlage und führt das Steuerungsprogramm aus. HMI-Panels dienen zur Bedienung und Visualisierung der Prozesse. Frequenzumrichter regeln die Drehzahl von Elektromotoren. E/A-Module verbinden die physikalischen Ein- und Ausgangssignale mit der Steuerung."
+          explanation: "Die SPS ist das Herzstück einer Automatisierungsanlage und führt das Steuerungsprogramm aus. HMI-Panels dienen zur Bedienung und Visualisierung der Prozesse. Frequenzumrichter regeln die Drehzahl von Elektromotoren. E/A-Module verbinden die physikalischen Ein- und Ausgangssignale mit der Steuerung. <br></br>"
         },
         {
           id: 3,
@@ -293,7 +408,7 @@
             { id: 'img-3', src: "../img/eat/ethercat.jpg", matchesId: 'term-3', alt: "EtherCAT" },
             { id: 'img-4', src: "../img/eat/io-link.jpg", matchesId: 'term-4', alt: "IO-Link" }
           ],
-          explanation: "Feldbussysteme und industrielle Netzwerke sind für die Kommunikation in der Automatisierungstechnik entscheidend. PROFINET ist ein Industrial-Ethernet-Standard mit Echtzeitfähigkeit. PROFIBUS ist ein feldbusorientierter Standard für die Prozess- und Fertigungsautomatisierung. EtherCAT ist ein hochperformantes Echtzeit-Ethernet-System. IO-Link ist ein Punkt-zu-Punkt-Kommunikationsstandard für Sensoren und Aktoren."
+          explanation: "Feldbussysteme und industrielle Netzwerke sind für die Kommunikation in der Automatisierungstechnik entscheidend. PROFINET ist ein Industrial-Ethernet-Standard mit Echtzeitfähigkeit. PROFIBUS ist ein feldbusorientierter Standard für die Prozess- und Fertigungsautomatisierung. EtherCAT ist ein hochperformantes Echtzeit-Ethernet-System. IO-Link ist ein Punkt-zu-Punkt-Kommunikationsstandard für Sensoren und Aktoren. <br></br>"
         }
       ];
       
@@ -306,6 +421,12 @@
       
       // Quiz initialisieren
       function initQuiz() {
+        // Überprüfen, ob wir auf einem Touchscreen sind
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        if (isTouchDevice) {
+          document.body.classList.add('touch-device');
+        }
+        
         showQuestion(currentQuestionIndex);
       }
       
@@ -321,28 +442,24 @@
               <p>${question.intro}</p>
             </div>
             
-            <div class="columns">
-              <div class="column">
-                <h3>Begriffe:</h3>
-                <div class="terms-container">
-                  ${question.terms.map(term => `
-                    <div class="term-item" id="${term.id}" data-term-id="${term.id}">
-                      ${term.text}
-                    </div>
-                  `).join('')}
-                </div>
+            <div class="images-section">
+              <div class="images-label">Bilder</div>
+              <div class="images-container">
+                ${question.images.map(image => `
+                  <div class="image-item" id="${image.id}" draggable="true" data-image-id="${image.id}" data-matches-id="${image.matchesId}">
+                    <img src="${image.src}" alt="${image.alt}">
+                  </div>
+                `).join('')}
               </div>
-              
-              <div class="column">
-                <h3>Bilder:</h3>
-                <div class="images-container">
-                  ${question.images.map(image => `
-                    <div class="image-item" id="${image.id}" draggable="true" data-image-id="${image.id}" data-matches-id="${image.matchesId}">
-                      <img src="${image.src}" alt="${image.alt}">
-                    </div>
-                  `).join('')}
+            </div>
+            
+            <div class="terms-label">Antworten</div>
+            <div class="terms-container">
+              ${question.terms.map(term => `
+                <div class="term-item" id="${term.id}" data-term-id="${term.id}">
+                  ${term.text}
                 </div>
-              </div>
+              `).join('')}
             </div>
             
             <div class="feedback" id="feedback">
@@ -355,7 +472,9 @@
             
             <div class="quiz-controls">
               <div class="progress">Frage ${index + 1} von ${questions.length}</div>
-              <button class="btn" id="check-button" disabled>Antworten überprüfen</button>
+              <div>
+                <button class="btn" id="check-button" disabled>Antworten überprüfen</button>
+              </div>
             </div>
           </div>
         `;
@@ -375,8 +494,51 @@
         const termItems = document.querySelectorAll('.term-item');
         
         imageItems.forEach(item => {
+          // Standard Drag-Events
           item.addEventListener('dragstart', handleDragStart);
           item.addEventListener('dragend', handleDragEnd);
+          
+          // Touch-Events für mobile Geräte
+          item.addEventListener('touchstart', function(e) {
+            // Verhindere Standard-Scrolling
+            e.preventDefault();
+            handleDragStart.call(this, e);
+            
+            // Hervorhebung für aktiven Touch
+            this.classList.add('dragging');
+          });
+          
+          item.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            
+            // Finde das Element unter dem Touch-Punkt
+            const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            // Wenn es ein Term-Item ist, simuliere Drag-Enter
+            if (elemBelow && elemBelow.classList.contains('term-item')) {
+              // Entferne Drag-Over von allen anderen
+              termItems.forEach(t => t.classList.remove('drag-over'));
+              // Füge Drag-Over zum aktuellen Element hinzu
+              elemBelow.classList.add('drag-over');
+            }
+          });
+          
+          item.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragging');
+            
+            const touch = e.changedTouches[0];
+            const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            // Wenn wir über einem Term-Item sind, simuliere Drop
+            if (elemBelow && elemBelow.classList.contains('term-item')) {
+              handleDrop.call(elemBelow, e);
+            }
+            
+            // Entferne alle Drag-Over-Effekte
+            termItems.forEach(t => t.classList.remove('drag-over'));
+          });
         });
         
         termItems.forEach(item => {
@@ -389,12 +551,21 @@
       
       // Drag-Event Handler
       let draggedItem = null;
+      // Touch-Event-Variablen für Touch-Geräte
+      let touchStartX, touchStartY;
       
       function handleDragStart(e) {
         draggedItem = this;
         setTimeout(() => {
           this.classList.add('dragging');
         }, 0);
+        
+        // Für Touch-Ereignisse
+        if (e.type === 'touchstart') {
+          const touch = e.touches[0];
+          touchStartX = touch.clientX;
+          touchStartY = touch.clientY;
+        }
       }
       
       function handleDragEnd() {
@@ -568,7 +739,10 @@
               `).join('')}
             </div>
             
-            <button class="btn" id="restart-button">Quiz neu starten</button>
+            <div style="margin-top: 30px;">
+              <button class="btn" id="restart-button">Quiz neu starten</button>
+              <a href="../index.html" class="button secondary">Zurück zur Berufsübersicht</a>
+            </div>
           </div>
         `;
         
