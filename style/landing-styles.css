@@ -1,10 +1,15 @@
 :root {
-    --vw-blue: #001e50;
-    --vw-light-blue: #4cc0f1;
-    --white: #ffffff;
-  }
-  
-/* Schriftart einbinden */
+  --vw-blue: #001e50;
+  --vw-light-blue: #4cc0f1;
+  --vw-blue-glow: rgba(76, 192, 241, 0.5);
+  --white: #ffffff;
+  --black: #000000;
+  --dark-gradient: linear-gradient(135deg, var(--vw-blue) 0%, rgba(0,30,80,0.9) 100%);
+  --accent-color: #00b1eb;
+  --neon-glow: 0 0 10px rgba(76, 192, 241, 0.8), 0 0 20px rgba(76, 192, 241, 0.4), 0 0 30px rgba(76, 192, 241, 0.2);
+}
+
+/* Schriftarten einbinden */
 @font-face {
   font-family: 'VW Head';
   src: url('../fonts/VWHeadWeb-ExtraBold.ttf') format('truetype');
@@ -26,375 +31,745 @@
   padding: 0;
 }
   
-  body, html {
-    height: 100%;
-    overflow: hidden;
-    background-color: var(--white);
-    font-family: 'VW Font';
-  }
-  
-  .landing-container {
-    position: relative;
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(135deg, var(--vw-blue) 0%, rgba(0,30,80,0.9) 100%);
-    color: var(--white);
-    text-align: center;
-    overflow: hidden;
-  }
+body, html {
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--black);
+  font-family: 'VW Font';
+  cursor: default;
+}
 
-  .bg-animation {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    overflow: hidden;
+/* Haupt-Container */
+.landing-container {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: var(--dark-gradient);
+  color: var(--white);
+  text-align: center;
+  overflow: hidden;
+  perspective: 1000px;
+}
+
+/* ===== Hintergrund-Animationen ===== */
+.bg-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Hintergrund-Partikel */
+.particles-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.particle {
+  position: absolute;
+  background-color: rgba(76, 192, 241, 0.2);
+  border-radius: 50%;
+  width: 4px;
+  height: 4px;
+  animation: float 20s infinite ease-in-out;
+}
+
+.particle:nth-child(1) { top: 10%; left: 10%; width: 6px; height: 6px; animation-delay: 0s; }
+.particle:nth-child(2) { top: 20%; left: 20%; width: 8px; height: 8px; animation-delay: 1s; }
+.particle:nth-child(3) { top: 30%; left: 30%; width: 5px; height: 5px; animation-delay: 2s; }
+.particle:nth-child(4) { top: 40%; left: 80%; width: 7px; height: 7px; animation-delay: 3s; }
+.particle:nth-child(5) { top: 50%; left: 50%; width: 6px; height: 6px; animation-delay: 4s; }
+.particle:nth-child(6) { top: 60%; left: 60%; width: 9px; height: 9px; animation-delay: 5s; }
+.particle:nth-child(7) { top: 70%; left: 30%; width: 4px; height: 4px; animation-delay: 6s; }
+.particle:nth-child(8) { top: 80%; left: 80%; width: 8px; height: 8px; animation-delay: 7s; }
+.particle:nth-child(9) { top: 90%; left: 90%; width: 5px; height: 5px; animation-delay: 8s; }
+.particle:nth-child(10) { top: 15%; left: 75%; width: 6px; height: 6px; animation-delay: 9s; }
+.particle:nth-child(11) { top: 25%; left: 85%; width: 7px; height: 7px; animation-delay: 10s; }
+.particle:nth-child(12) { top: 35%; left: 15%; width: 5px; height: 5px; animation-delay: 11s; }
+.particle:nth-child(13) { top: 45%; left: 25%; width: 8px; height: 8px; animation-delay: 12s; }
+.particle:nth-child(14) { top: 55%; left: 85%; width: 4px; height: 4px; animation-delay: 13s; }
+.particle:nth-child(15) { top: 65%; left: 75%; width: 6px; height: 6px; animation-delay: 14s; }
+
+/* Elektronische Schaltkreislinien */
+.circuit-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+}
+
+.circuit-line {
+  position: absolute;
+  background-color: rgba(76, 192, 241, 0.15);
+  height: 2px;
+  transform-origin: left center;
+}
+
+.circuit-line:nth-child(1) {
+  top: 20%;
+  left: 0;
+  width: 50%;
+  animation: circuit-animation 20s infinite linear;
+}
+
+.circuit-line:nth-child(2) {
+  top: 40%;
+  left: 30%;
+  width: 70%;
+  animation: circuit-animation 25s infinite linear;
+  animation-delay: 2s;
+}
+
+.circuit-line:nth-child(3) {
+  top: 60%;
+  left: 0;
+  width: 60%;
+  animation: circuit-animation 15s infinite linear;
+  animation-delay: 5s;
+}
+
+.circuit-line:nth-child(4) {
+  top: 75%;
+  left: 20%;
+  width: 40%;
+  animation: circuit-animation 22s infinite linear;
+  animation-delay: 1s;
+}
+
+.circuit-line:nth-child(5) {
+  top: 85%;
+  left: 10%;
+  width: 80%;
+  animation: circuit-animation 18s infinite linear;
+  animation-delay: 3s;
+}
+
+/* Pulsierende Kreise */
+.pulse-circles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.pulse-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(76, 192, 241, 0.1) 0%, rgba(0, 30, 80, 0) 70%);
+  animation: pulse 3s infinite ease-out;
+}
+
+.pulse-circle:nth-child(1) {
+  top: 30%;
+  left: 30%;
+  width: 500px;
+  height: 500px;
+  animation-delay: 0s;
+}
+
+.pulse-circle:nth-child(2) {
+  top: 50%;
+  left: 60%;
+  width: 400px;
+  height: 400px;
+  animation-delay: 1s;
+}
+
+.pulse-circle:nth-child(3) {
+  top: 70%;
+  left: 40%;
+  width: 300px;
+  height: 300px;
+  animation-delay: 2s;
+}
+
+/* ===== Schwebende Technologie-Icons ===== */
+.tech-icons {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.tech-icon {
+  position: absolute;
+  color: rgba(76, 192, 241, 0.3);
+  font-size: 2rem;
+  animation: float-icons 10s infinite ease-in-out;
+}
+
+.tech-icon:nth-child(1) {
+  top: 20%;
+  left: 20%;
+  font-size: 3rem;
+  animation-delay: 0s;
+}
+
+.tech-icon:nth-child(2) {
+  top: 30%;
+  right: 25%;
+  font-size: 2.5rem;
+  animation-delay: 2s;
+}
+
+.tech-icon:nth-child(3) {
+  bottom: 30%;
+  left: 22%;
+  font-size: 2.8rem;
+  animation-delay: 4s;
+}
+
+.tech-icon:nth-child(4) {
+  bottom: 25%;
+  right: 20%;
+  font-size: 2.2rem;
+  animation-delay: 6s;
+}
+
+.tech-icon:nth-child(5) {
+  top: 60%;
+  left: 50%;
+  font-size: 2.6rem;
+  animation-delay: 8s;
+}
+
+/* ===== Logo mit Animation ===== */
+.logo-container {
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.logo {
+  width: 280px;
+  height: auto;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+  animation: logo-float 5s infinite ease-in-out;
+  position: relative;
+  z-index: 3;
+}
+
+.logo-aura {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(76, 192, 241, 0.3) 0%, rgba(0, 30, 80, 0) 70%);
+  border-radius: 50%;
+  z-index: 2;
+  animation: aura-pulse 4s infinite ease-in-out;
+}
+
+/* ===== Hauptinhalt ===== */
+.content {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title-container {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 4rem;
+  line-height: 1.2;
+  opacity: 0;
+  font-family: 'VW Head';
+  animation: fadeInScale 1s forwards ease-out;
+  animation-delay: 0.5s;
+  text-shadow: 0 0 15px rgba(0, 30, 80, 0.3);
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.title-underline {
+  width: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--vw-light-blue), transparent);
+  margin: 0 auto;
+  animation: line-grow 1.5s forwards ease-out;
+  animation-delay: 1.2s;
+}
+
+.subtitle {
+  font-size: 1.8rem;
+  font-weight: 300;
+  margin-bottom: 40px;
+  opacity: 0;
+  font-family: 'VW Font';
+  animation: fadeInUp 1s forwards ease-out;
+  animation-delay: 1s;
+  text-shadow: 0 0 10px rgba(0, 30, 80, 0.3);
+}
+
+/* CTA Button mit Effekten */
+.cta-container {
+  margin-bottom: 50px;
+  position: relative;
+}
+
+.cta-button {
+  display: inline-block;
+  background-color: var(--vw-light-blue);
+  color: var(--white);
+  text-decoration: none;
+  padding: 20px 60px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), var(--neon-glow);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeInUp 1s forwards ease-out, pulse-button 3s infinite;
+  animation-delay: 1.5s, 3s;
+  font-family: 'VW Head2';
+  z-index: 1;
+}
+
+.cta-button:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(76, 192, 241, 0.8);
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.cta-button span {
+  position: relative;
+  z-index: 3;
+}
+
+.button-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: button-shine 6s infinite;
+  z-index: 2;
+}
+
+/* Statistiken */
+.stats-container {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-top: 20px;
+  opacity: 0;
+  animation: fadeInUp 0.8s forwards ease-out;
+  animation-delay: 2s;
+}
+
+.stat-item {
+  text-align: center;
+  margin: 0 15px;
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--vw-light-blue);
+  font-family: 'VW Head';
+  text-shadow: 0 0 10px rgba(76, 192, 241, 0.5);
+}
+
+.stat-label {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 5px;
+}
+
+/* ===== Highway/Straße & Fahrzeuganimation ===== */
+.highway-scene {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 150px; /* Erhöhte Höhe für die Highway-Szene */
+  perspective: 400px;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.highway {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 80px;
+  background-color: rgba(20, 20, 20, 0.8);
+  transform: rotateX(60deg);
+  transform-origin: bottom;
+}
+
+.highway-line {
+  position: absolute;
+  height: 4px;
+  width: 50px;
+  background-color: rgba(255, 255, 255, 0.5);
+  top: 50%;
+  transform: translateY(-50%);
+  animation: highway-line-move 2s infinite linear;
+}
+
+.highway-line:nth-child(1) { left: 10%; animation-delay: 0s; }
+.highway-line:nth-child(2) { left: 40%; animation-delay: 0.66s; }
+.highway-line:nth-child(3) { left: 70%; animation-delay: 1.33s; }
+
+.car-animation {
+  position: absolute;
+  bottom: 5px;
+  width: 100%;
+  height: 80px;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.car {
+  position: absolute;
+  width: 180px;
+  height: auto;
+  bottom: 10px;
+  left: -200px;
+  opacity: 0;
+  filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.4));
+  transition: filter 0.3s ease;
+  max-height: 60px;
+  object-fit: contain;
+}
+
+.car.active {
+  animation: driveCar 6s linear forwards;
+  opacity: 1;
+}
+
+.car:hover {
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6)) brightness(1.1);
+}
+
+/* ===== Abzeichen/Auszeichnungen ===== */
+.badges-container {
+  position: absolute;
+  bottom: 100px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 3;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  background-color: rgba(0, 30, 80, 0.7);
+  padding: 10px 15px;
+  border-radius: 30px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transform: translateX(100px);
+  animation: slideInFromRight 0.5s forwards ease-out;
+  border: 1px solid rgba(76, 192, 241, 0.3);
+}
+
+.badge:nth-child(1) { animation-delay: 2.5s; }
+.badge:nth-child(2) { animation-delay: 2.7s; }
+.badge:nth-child(3) { animation-delay: 2.9s; }
+
+.badge i {
+  color: var(--vw-light-blue);
+  font-size: 1.4rem;
+  margin-right: 10px;
+}
+
+.badge span {
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+/* ===== Animationen ===== */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
   }
-  
-  .circle {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(76, 192, 241, 0.1);
-    animation: float 15s infinite ease-in-out;
+  25% {
+    transform: translateY(-20px) translateX(10px);
   }
-  
-  .circle:nth-child(1) {
-    width: 300px;
-    height: 300px;
-    top: -150px;
-    left: -150px;
-    animation-delay: 0s;
+  50% {
+    transform: translateY(0) translateX(20px);
   }
-  
-  .circle:nth-child(2) {
-    width: 500px;
-    height: 500px;
-    top: 50%;
-    right: -250px;
-    animation-delay: 2s;
+  75% {
+    transform: translateY(20px) translateX(10px);
   }
-  
-  .circle:nth-child(3) {
-    width: 400px;
-    height: 400px;
-    bottom: -200px;
-    left: 10%;
-    animation-delay: 1s;
+}
+
+@keyframes float-icons {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
   }
-  
-  .circle:nth-child(4) {
-    width: 200px;
-    height: 200px;
-    top: 15%;
-    right: 10%;
-    animation-delay: 3s;
-    background: rgba(76, 192, 241, 0.15);
+  25% {
+    transform: translateY(-15px) rotate(5deg);
   }
-  
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0) scale(1);
-    }
-    50% {
-      transform: translateY(20px) scale(1.05);
-    }
+  50% {
+    transform: translateY(0) rotate(0deg);
   }
-  
-  .logo-container {
-    margin-bottom: 40px;
-    position: relative;
-    z-index: 2;
+  75% {
+    transform: translateY(15px) rotate(-5deg);
   }
-  
-  .logo {
-    width: 300px;
-    height: auto;
-    animation: glow 5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
   }
-  
-  @keyframes glow {
-    0%, 100% {
-      filter: drop-shadow(0 0 5px rgb(255, 255, 255));
-    }
-    50% {
-      filter: drop-shadow(0 0 25px rgb(255, 255, 255));
-    }
+  50% {
+    transform: scale(1);
+    opacity: 0.4;
   }
-  
-  .content {
-    position: relative;
-    z-index: 2;
-    max-width: 800px;
-    padding: 0 20px;
+  100% {
+    transform: scale(0.8);
+    opacity: 0.8;
   }
-  
-  .title {
-    font-size: 4rem;
-    margin-bottom: 20px;
-    line-height: 1.2;
+}
+
+@keyframes circuit-animation {
+  0% {
+    opacity: 0.1;
+    transform: scaleX(0);
+  }
+  20% {
+    opacity: 0.4;
+  }
+  80% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0.1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes logo-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes aura-pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.5;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
     opacity: 0;
-    animation: fadeInUp 1s forwards ease-out;
-    animation-delay: 0.5s;
-    font-family: 'VW Head';
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes line-grow {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100px;
+  }
+}
+
+@keyframes pulse-button {
+  0%, 100% {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 10px rgba(76, 192, 241, 0.8);
+  }
+  50% {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(76, 192, 241, 0.8), 0 0 40px rgba(76, 192, 241, 0.4);
+  }
+}
+
+@keyframes button-shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  20%, 100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes driveCar {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(100vw + 200px));
+  }
+}
+
+@keyframes highway-line-move {
+  0% {
+    transform: translateY(-50%) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-50%) translateX(100vw);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ===== Responsive Anpassungen ===== */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2.8rem;
   }
   
   .subtitle {
-    font-size: 1.8rem;
-    font-weight: 300;
-    margin-bottom: 50px;
-    opacity: 0;
-    animation: fadeInUp 1s forwards ease-out;
-    animation-delay: 1s;
+    font-size: 1.4rem;
+    margin-bottom: 30px;
   }
   
   .cta-button {
-    display: inline-block;
-    background-color: var(--vw-light-blue);
-    color: var(--white);
-    text-decoration: none;
-    padding: 20px 60px;
-    font-size: 1.5rem;
-    font-weight: 700;
-    border-radius: 50px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    opacity: 0;
-    animation: pulseButton 2s infinite, fadeInUp 1s forwards ease-out;
-    animation-delay: 0s, 1.5s;
-    font-family: 'VW Head2';
+    padding: 15px 40px;
+    font-size: 1.2rem;
   }
   
-  .cta-button:hover, .cta-button:focus {
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+  .logo {
+    width: 200px;
   }
   
-  .cta-button::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 10px;
-    height: 10px;
-    background: rgba(255, 255, 255, 0.3);
-    opacity: 0;
-    border-radius: 100%;
-    transform: scale(1, 1) translate(-50%, -50%);
-    transform-origin: 50% 50%;
+  .stats-container {
+    flex-direction: column;
+    gap: 20px;
   }
   
-  .cta-button:hover::after {
-    animation: ripple 1s ease-out;
+  .badge {
+    padding: 8px 12px;
   }
   
-  @keyframes pulseButton {
-    0%, 100% {
-      transform: scale(1);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    }
-    50% {
-      transform: scale(1.05);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-    }
+  .badge i {
+    font-size: 1.1rem;
   }
   
-  @keyframes ripple {
-    0% {
-      opacity: 1;
-      transform: scale(0, 0);
-    }
-    100% {
-      opacity: 0;
-      transform: scale(25, 25);
-    }
+  .badge span {
+    font-size: 0.8rem;
   }
   
-  .car-animation {
-    position: absolute;
-    bottom: 30px;
-    width: 100%;
-    height: 100px;
-    z-index: 1;
-    overflow: hidden;
+  .badges-container {
+    bottom: 150px;
+    right: 20px;
   }
   
   .car {
-    position: absolute;
     width: 120px;
-    height: auto;
-    bottom: 0;
-    left: -150px;
-    opacity: 0; 
   }
-  
-  .car.active {
-    animation: driveCar 10s linear forwards;
-    opacity: 1;
-  }
-  
-  @keyframes driveCar {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(calc(100vw + 150px));
-    }
-  }
-  
-  .road {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 5px;
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-  
-  .road::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: repeating-linear-gradient(90deg, var(--white), var(--white) 50px, transparent 50px, transparent 100px);
-    animation: moveRoad 2s linear infinite;
-  }
-  
-  @keyframes moveRoad {
-    0% {
-      background-position: 0 0;
-    }
-    100% {
-      background-position: -100px 0;
-    }
-  }
-  
-  .floating-element {
-    position: absolute;
-    z-index: 1;
-    opacity: 0.7;
-    filter: blur(1px);
-  }
-  
-  .floating-element:nth-child(1) {
-    top: 20%;
-    left: 10%;
-    width: 50px;
-    height: 50px;
-    animation: floatElement 8s infinite ease-in-out;
-  }
-  
-  .floating-element:nth-child(2) {
-    top: 70%;
-    right: 15%;
-    width: 70px;
-    height: 70px;
-    animation: floatElement 10s infinite ease-in-out;
-    animation-delay: 1s;
-  }
-  
-  .floating-element:nth-child(3) {
-    top: 30%;
-    right: 20%;
-    width: 40px;
-    height: 40px;
-    animation: floatElement 7s infinite ease-in-out;
-    animation-delay: 2s;
-  }
-  
-  @keyframes floatElement {
-    0%, 100% {
-      transform: translate(0, 0) rotate(0deg);
-    }
-    25% {
-      transform: translate(10px, 15px) rotate(5deg);
-    }
-    50% {
-      transform: translate(5px, -10px) rotate(10deg);
-    }
-    75% {
-      transform: translate(-10px, 5px) rotate(5deg);
-    }
-  }
-  
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @keyframes slideInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-50px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateX(50px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
+}
 
-  @media (max-width: 768px) {
-    .title {
-      font-size: 3rem;
-    }
-    
-    .subtitle {
-      font-size: 1.4rem;
-    }
-    
-    .cta-button {
-      padding: 15px 40px;
-      font-size: 1.2rem;
-    }
-    
-    .logo {
-      width: 220px;
-    }
+@media (orientation: landscape) and (max-height: 600px) {
+  .logo-container {
+    margin-bottom: 20px;
   }
   
-  @media (orientation: landscape) {
-    .content {
-      max-width: 70%;
-    }
-    
-    .car {
-      width: 140px;
-    }
+  .logo {
+    width: 160px;
   }
   
-  @media (orientation: portrait) {
-    .content {
-      max-width: 90%;
-    }
-    
-    .logo-container {
-      margin-bottom: 20px;
-    }
+  .title {
+    font-size: 2.5rem;
   }
+  
+  .subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+  
+  .cta-button {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+  }
+  
+  .stats-container {
+    display: none;
+  }
+  
+  .badges-container {
+    bottom: 110px;
+  }
+}
+
+/* Print-Media-Anpassungen */
+@media print {
+  .landing-container {
+    background: white;
+    color: var(--vw-blue);
+  }
+  
+  .title, .subtitle {
+    color: var(--vw-blue);
+    text-shadow: none;
+  }
+}

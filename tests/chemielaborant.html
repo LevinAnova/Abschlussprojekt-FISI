@@ -21,9 +21,10 @@
         <h2>Willkommen zum Wissenstest!</h2>
         <p>Dieser Test enthält 5 Fragen rund um den Beruf des Chemielaboranten. Finde heraus, ob dieser spannende Ausbildungsberuf zu dir passen könnte.</p>
         <button class="button primary" id="startButton">Test starten</button>
+        <a href="../index.html" class="button secondary">Zurück zur Berufsübersicht</a>
       </div>
 
-      <!-- Question 1 -->
+      <!-- Frage 1 -->
       <div class="question-container" id="question1">
         <div class="question-number">Frage 1 von 5</div>
         <div class="question">Welche Schutzausrüstung muss im Labor immer getragen werden?</div>
@@ -42,7 +43,7 @@
         </div>
       </div>
 
-      <!-- Question 2 -->
+      <!-- Frage 2 -->
       <div class="question-container" id="question2">
         <div class="question-number">Frage 2 von 5</div>
         <div class="question">Wie sollte Schwefelsäure korrekt verdünnt werden?</div>
@@ -61,7 +62,7 @@
         </div>
       </div>
 
-      <!-- Question 3 -->
+      <!-- Frage 3 -->
       <div class="question-container" id="question3">
         <div class="question-number">Frage 3 von 5</div>
         <div class="question">Was ist ein Erlenmeyerkolben?</div>
@@ -80,7 +81,7 @@
         </div>
       </div>
 
-      <!-- Question 4 -->
+      <!-- Frage 4 -->
       <div class="question-container" id="question4">
         <div class="question-number">Frage 4 von 5</div>
         <div class="question">Was ist der pH-Wert?</div>
@@ -99,7 +100,7 @@
         </div>
       </div>
 
-      <!-- Question 5 -->
+      <!-- Frage 5 -->
       <div class="question-container" id="question5">
         <div class="question-number">Frage 5 von 5</div>
         <div class="question">Welche Methode wird zur Trennung von Stoffgemischen häufig eingesetzt?</div>
@@ -129,7 +130,7 @@
         <div class="message" id="resultMessage"></div>
         
         <div class="results-summary" id="resultsSummary">
-          <!-- Results summary will be inserted here -->
+  
         </div>
         
         <div class="action-buttons">
@@ -183,7 +184,7 @@
         showQuestion(1);
       });
       
-      // Event listeners for each question
+      // Event listeners
       quizConfig.questions.forEach(q => {
         const questionContainer = document.getElementById(`question${q.id}`);
         const answers = questionContainer.querySelectorAll('.answer-option');
@@ -191,7 +192,6 @@
         const nextButton = document.getElementById(`next${q.id}`);
         const prevButton = document.getElementById(`prev${q.id}`);
         
-        // Answer selection
         answers.forEach(answer => {
           answer.addEventListener('click', () => {
             // Prüfen, ob bereits eine Antwort gewählt wurde
