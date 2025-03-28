@@ -55,7 +55,7 @@ body, html {
   perspective: 1000px;
 }
 
-/* ===== Hintergrund-Animationen ===== */
+/* ===== Hintergrund ===== */
 .bg-animation {
   position: absolute;
   top: 0;
@@ -64,188 +64,6 @@ body, html {
   height: 100%;
   z-index: 0;
   overflow: hidden;
-}
-
-/* Hintergrund-Partikel */
-.particles-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.particle {
-  position: absolute;
-  background-color: rgba(76, 192, 241, 0.2);
-  border-radius: 50%;
-  width: 4px;
-  height: 4px;
-  animation: float 20s infinite ease-in-out;
-}
-
-.particle:nth-child(1) { top: 10%; left: 10%; width: 6px; height: 6px; animation-delay: 0s; }
-.particle:nth-child(2) { top: 20%; left: 20%; width: 8px; height: 8px; animation-delay: 1s; }
-.particle:nth-child(3) { top: 30%; left: 30%; width: 5px; height: 5px; animation-delay: 2s; }
-.particle:nth-child(4) { top: 40%; left: 80%; width: 7px; height: 7px; animation-delay: 3s; }
-.particle:nth-child(5) { top: 50%; left: 50%; width: 6px; height: 6px; animation-delay: 4s; }
-.particle:nth-child(6) { top: 60%; left: 60%; width: 9px; height: 9px; animation-delay: 5s; }
-.particle:nth-child(7) { top: 70%; left: 30%; width: 4px; height: 4px; animation-delay: 6s; }
-.particle:nth-child(8) { top: 80%; left: 80%; width: 8px; height: 8px; animation-delay: 7s; }
-.particle:nth-child(9) { top: 90%; left: 90%; width: 5px; height: 5px; animation-delay: 8s; }
-.particle:nth-child(10) { top: 15%; left: 75%; width: 6px; height: 6px; animation-delay: 9s; }
-.particle:nth-child(11) { top: 25%; left: 85%; width: 7px; height: 7px; animation-delay: 10s; }
-.particle:nth-child(12) { top: 35%; left: 15%; width: 5px; height: 5px; animation-delay: 11s; }
-.particle:nth-child(13) { top: 45%; left: 25%; width: 8px; height: 8px; animation-delay: 12s; }
-.particle:nth-child(14) { top: 55%; left: 85%; width: 4px; height: 4px; animation-delay: 13s; }
-.particle:nth-child(15) { top: 65%; left: 75%; width: 6px; height: 6px; animation-delay: 14s; }
-
-/* Elektronische Schaltkreislinien */
-.circuit-lines {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.5;
-}
-
-.circuit-line {
-  position: absolute;
-  background-color: rgba(76, 192, 241, 0.15);
-  height: 2px;
-  transform-origin: left center;
-}
-
-.circuit-line:nth-child(1) {
-  top: 20%;
-  left: 0;
-  width: 50%;
-  animation: circuit-animation 20s infinite linear;
-}
-
-.circuit-line:nth-child(2) {
-  top: 40%;
-  left: 30%;
-  width: 70%;
-  animation: circuit-animation 25s infinite linear;
-  animation-delay: 2s;
-}
-
-.circuit-line:nth-child(3) {
-  top: 60%;
-  left: 0;
-  width: 60%;
-  animation: circuit-animation 15s infinite linear;
-  animation-delay: 5s;
-}
-
-.circuit-line:nth-child(4) {
-  top: 75%;
-  left: 20%;
-  width: 40%;
-  animation: circuit-animation 22s infinite linear;
-  animation-delay: 1s;
-}
-
-.circuit-line:nth-child(5) {
-  top: 85%;
-  left: 10%;
-  width: 80%;
-  animation: circuit-animation 18s infinite linear;
-  animation-delay: 3s;
-}
-
-/* Pulsierende Kreise */
-.pulse-circles {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-}
-
-.pulse-circle {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(76, 192, 241, 0.1) 0%, rgba(0, 30, 80, 0) 70%);
-  animation: pulse 3s infinite ease-out;
-}
-
-.pulse-circle:nth-child(1) {
-  top: 30%;
-  left: 30%;
-  width: 500px;
-  height: 500px;
-  animation-delay: 0s;
-}
-
-.pulse-circle:nth-child(2) {
-  top: 50%;
-  left: 60%;
-  width: 400px;
-  height: 400px;
-  animation-delay: 1s;
-}
-
-.pulse-circle:nth-child(3) {
-  top: 70%;
-  left: 40%;
-  width: 300px;
-  height: 300px;
-  animation-delay: 2s;
-}
-
-/* ===== Schwebende Technologie-Icons ===== */
-.tech-icons {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.tech-icon {
-  position: absolute;
-  color: rgba(76, 192, 241, 0.3);
-  font-size: 2rem;
-  animation: float-icons 10s infinite ease-in-out;
-}
-
-.tech-icon:nth-child(1) {
-  top: 20%;
-  left: 20%;
-  font-size: 3rem;
-  animation-delay: 0s;
-}
-
-.tech-icon:nth-child(2) {
-  top: 30%;
-  right: 25%;
-  font-size: 2.5rem;
-  animation-delay: 2s;
-}
-
-.tech-icon:nth-child(3) {
-  bottom: 30%;
-  left: 22%;
-  font-size: 2.8rem;
-  animation-delay: 4s;
-}
-
-.tech-icon:nth-child(4) {
-  bottom: 25%;
-  right: 20%;
-  font-size: 2.2rem;
-  animation-delay: 6s;
-}
-
-.tech-icon:nth-child(5) {
-  top: 60%;
-  left: 50%;
-  font-size: 2.6rem;
-  animation-delay: 8s;
 }
 
 /* ===== Logo mit Animation ===== */
@@ -473,46 +291,6 @@ body, html {
   filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6)) brightness(1.1);
 }
 
-/* ===== Abzeichen/Auszeichnungen ===== */
-.badges-container {
-  position: absolute;
-  bottom: 100px;
-  right: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  z-index: 3;
-}
-
-.badge {
-  display: flex;
-  align-items: center;
-  background-color: rgba(0, 30, 80, 0.7);
-  padding: 10px 15px;
-  border-radius: 30px;
-  backdrop-filter: blur(5px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  transform: translateX(100px);
-  animation: slideInFromRight 0.5s forwards ease-out;
-  border: 1px solid rgba(76, 192, 241, 0.3);
-}
-
-.badge:nth-child(1) { animation-delay: 2.5s; }
-.badge:nth-child(2) { animation-delay: 2.7s; }
-.badge:nth-child(3) { animation-delay: 2.9s; }
-
-.badge i {
-  color: var(--vw-light-blue);
-  font-size: 1.4rem;
-  margin-right: 10px;
-}
-
-.badge span {
-  color: white;
-  font-weight: bold;
-  font-size: 0.9rem;
-}
-
 /* ===== Animationen ===== */
 @keyframes float {
   0%, 100% {
@@ -526,21 +304,6 @@ body, html {
   }
   75% {
     transform: translateY(20px) translateX(10px);
-  }
-}
-
-@keyframes float-icons {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  25% {
-    transform: translateY(-15px) rotate(5deg);
-  }
-  50% {
-    transform: translateY(0) rotate(0deg);
-  }
-  75% {
-    transform: translateY(15px) rotate(-5deg);
   }
 }
 
@@ -707,23 +470,6 @@ body, html {
     gap: 20px;
   }
   
-  .badge {
-    padding: 8px 12px;
-  }
-  
-  .badge i {
-    font-size: 1.1rem;
-  }
-  
-  .badge span {
-    font-size: 0.8rem;
-  }
-  
-  .badges-container {
-    bottom: 150px;
-    right: 20px;
-  }
-  
   .car {
     width: 120px;
   }
@@ -754,22 +500,5 @@ body, html {
   
   .stats-container {
     display: none;
-  }
-  
-  .badges-container {
-    bottom: 110px;
-  }
-}
-
-/* Print-Media-Anpassungen */
-@media print {
-  .landing-container {
-    background: white;
-    color: var(--vw-blue);
-  }
-  
-  .title, .subtitle {
-    color: var(--vw-blue);
-    text-shadow: none;
   }
 }
