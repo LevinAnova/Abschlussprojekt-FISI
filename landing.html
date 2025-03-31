@@ -118,38 +118,7 @@
       
       // Initiale Verzögerung, damit erst alle anderen Animationen geladen sind
       setTimeout(startRandomCar, 1000);
-      
-      // Parallax-Effekt für Hintergrund-Elemente
-      document.addEventListener('mousemove', (e) => {
-        const x = e.clientX / window.innerWidth;
-        const y = e.clientY / window.innerHeight;
-        
-        const techIcons = document.querySelectorAll('.tech-icon');
-        const particles = document.querySelectorAll('.particle');
-        const circuitLines = document.querySelectorAll('.circuit-line');
-        
-        techIcons.forEach((icon, index) => {
-          const depth = 1 + index * 0.2;
-          const moveX = (x - 0.5) * 40 * depth;
-          const moveY = (y - 0.5) * 40 * depth;
-          icon.style.transform = `translate(${moveX}px, ${moveY}px)`;
-        });
-        
-        particles.forEach((particle, index) => {
-          const depth = 0.5 + index * 0.1;
-          const moveX = (x - 0.5) * 20 * depth;
-          const moveY = (y - 0.5) * 20 * depth;
-          particle.style.transform = `translate(${moveX}px, ${moveY}px)`;
-        });
-        
-        circuitLines.forEach((line, index) => {
-          const depth = 0.3 + index * 0.05;
-          const moveX = (x - 0.5) * 10 * depth;
-          const moveY = (y - 0.5) * 10 * depth;
-          line.style.transform = `translate(${moveX}px, ${moveY}px)`;
-        });
-      });
-      
+
       // Interaktive Elemente
       const ctaButton = document.querySelector('.cta-button');
       
