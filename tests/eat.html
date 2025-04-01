@@ -174,22 +174,74 @@
       max-width: 100%;
     }
     
-    .feedback {
-      margin-top: 30px;
-      padding: 20px;
-      border-radius: 12px;
+    /* Feedback als Overlay */
+    .feedback-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.85);
       display: none;
+      z-index: 2000;
+    }
+    
+    .feedback-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 500px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+      z-index: 2001;
+      padding: 25px;
+    }
+    
+    .feedback-modal.correct {
+      border-left: 8px solid #2ecc71;
+    }
+    
+    .feedback-modal.incorrect {
+      border-left: 8px solid #e74c3c;
+    }
+    
+    .feedback-title {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: #001e50;
+      font-weight: bold;
+    }
+    
+    .feedback-explanation {
       font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      color: #333;
     }
     
-    .feedback.correct {
-      background-color: #e7f6e7;
-      border: 2px solid #84d084;
+    .next-button {
+      background-color: #001e50;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: block;
+      margin: 20px auto 0;
+      transition: background-color 0.3s, transform 0.2s;
     }
     
-    .feedback.incorrect {
-      background-color: #fff0f0;
-      border: 2px solid #ffb6b6;
+    .next-button:hover {
+      background-color: #4CC0F1;
+    }
+    
+    .next-button:active {
+      transform: scale(0.97);
     }
     
     .explanation {
@@ -299,7 +351,7 @@
     
     /* Zurück-Button */
     .back-to-jobs {
-      position: absolute;
+      position: fixed;
       top: 10px;
       left: 10px;
       z-index: 1000;
@@ -341,6 +393,15 @@
     </svg>
     Zur Berufsübersicht
   </a>
+  
+  <!-- Vollständig überarbeitetes Feedback-Overlay -->
+  <div class="feedback-overlay" id="feedback-overlay">
+    <div class="feedback-modal" id="feedback">
+      <h3 class="feedback-title" id="feedback-title"></h3>
+      <div class="feedback-explanation" id="feedback-explanation"></div>
+      <button class="next-button" id="next-button">Nächste Frage</button>
+    </div>
+  </div>
   
   <div class="quiz-container">
     <div class="quiz-header">
@@ -394,21 +455,21 @@
         },
         {
           id: 3,
-          title: "Feldbus-Systeme und industrielle Netzwerke",
-          intro: "Ordne die Bilder den richtigen Netzwerksystemen zu. Ziehe die Bilder auf die entsprechenden Begriffe.",
+          title: "Grundlegende Elektrotechnische Größen",
+          intro: "Ordne die Formelzeichen den richtigen elektrotechnischen Größen zu. Ziehe die Bilder auf die entsprechenden Begriffe.",
           terms: [
-            { id: 'term-1', text: "PROFINET" },
-            { id: 'term-2', text: "PROFIBUS" },
-            { id: 'term-3', text: "EtherCAT" },
-            { id: 'term-4', text: "IO-Link" }
+            { id: 'term-1', text: "Spannung (Volt)" },
+            { id: 'term-2', text: "Stromstärke (Ampere)" },
+            { id: 'term-3', text: "Widerstand (Ohm)" },
+            { id: 'term-4', text: "Leistung (Watt)" }
           ],
           images: [
-            { id: 'img-1', src: "../img/eat/profinet.jpg", matchesId: 'term-1', alt: "PROFINET" },
-            { id: 'img-2', src: "../img/eat/profibus.jpg", matchesId: 'term-2', alt: "PROFIBUS" },
-            { id: 'img-3', src: "../img/eat/ethercat.jpg", matchesId: 'term-3', alt: "EtherCAT" },
-            { id: 'img-4', src: "../img/eat/io-link.jpg", matchesId: 'term-4', alt: "IO-Link" }
+            { id: 'img-1', src: "../img/eat/volt.png", matchesId: 'term-1', alt: "Spannungssymbol U" },
+            { id: 'img-2', src: "../img/eat/amp.png", matchesId: 'term-2', alt: "Stromsymbol I" },
+            { id: 'img-3', src: "../img/eat/res.png", matchesId: 'term-3', alt: "Widerstandssymbol R" },
+            { id: 'img-4', src: "../img/eat/power.png", matchesId: 'term-4', alt: "Leistungssymbol P" }
           ],
-          explanation: "Feldbussysteme und industrielle Netzwerke sind für die Kommunikation in der Automatisierungstechnik entscheidend. PROFINET ist ein Industrial-Ethernet-Standard mit Echtzeitfähigkeit. PROFIBUS ist ein feldbusorientierter Standard für die Prozess- und Fertigungsautomatisierung. EtherCAT ist ein hochperformantes Echtzeit-Ethernet-System. IO-Link ist ein Punkt-zu-Punkt-Kommunikationsstandard für Sensoren und Aktoren. <br></br>"
+          explanation: "Die grundlegenden elektrotechnischen Größen sind essenziell für jeden Elektroniker: <br>- U ist das Formelzeichen für die elektrische Spannung, gemessen in Volt (V).<br>- I bezeichnet die elektrische Stromstärke, gemessen in Ampere (A).<br>- R steht für den elektrischen Widerstand, gemessen in Ohm (Ω).<br>- P ist das Formelzeichen für die elektrische Leistung, gemessen in Watt (W).<br><br>Diese Größen sind durch das Ohmsche Gesetz (U = R × I) und die Leistungsformel (P = U × I) miteinander verknüpft."
         }
       ];
       
@@ -418,6 +479,8 @@
       let matchedPairs = [];
       
       const quizContentElement = document.getElementById('quiz-content');
+      const feedbackOverlay = document.getElementById('feedback-overlay');
+      const feedback = document.getElementById('feedback');
       
       // Quiz initialisieren
       function initQuiz() {
@@ -427,6 +490,12 @@
           document.body.classList.add('touch-device');
         }
         
+        // Event-Listener für den Next-Button im Feedback-Overlay
+        document.getElementById('next-button').addEventListener('click', handleNextQuestion);
+        
+        // Zusätzlichen Padding für den oberen Bereich hinzufügen, um Platz für den festen Button zu schaffen
+        document.querySelector('.quiz-container').style.paddingTop = '80px';
+        
         showQuestion(currentQuestionIndex);
       }
       
@@ -434,6 +503,9 @@
       function showQuestion(index) {
         const question = questions[index];
         matchedPairs = [];
+        
+        // Bilder in zufälliger Reihenfolge anzeigen
+        const shuffledImages = [...question.images].sort(() => Math.random() - 0.5);
         
         const questionHTML = `
           <div class="quiz-question" id="question-${question.id}">
@@ -445,7 +517,7 @@
             <div class="images-section">
               <div class="images-label">Bilder</div>
               <div class="images-container">
-                ${question.images.map(image => `
+                ${shuffledImages.map(image => `
                   <div class="image-item" id="${image.id}" draggable="true" data-image-id="${image.id}" data-matches-id="${image.matchesId}">
                     <img src="${image.src}" alt="${image.alt}">
                   </div>
@@ -462,14 +534,6 @@
               `).join('')}
             </div>
             
-            <div class="feedback" id="feedback">
-              <h3 id="feedback-title"></h3>
-              <p class="explanation">${question.explanation}</p>
-              <button class="btn" id="next-button">
-                ${index < questions.length - 1 ? 'Nächste Frage' : 'Ergebnis anzeigen'}
-              </button>
-            </div>
-            
             <div class="quiz-controls">
               <div class="progress">Frage ${index + 1} von ${questions.length}</div>
               <div>
@@ -481,11 +545,17 @@
         
         quizContentElement.innerHTML = questionHTML;
         
+        // Den Text für den Next-Button im Feedback-Overlay aktualisieren
+        const nextButton = document.getElementById('next-button');
+        nextButton.textContent = index < questions.length - 1 ? 'Nächste Frage' : 'Ergebnis anzeigen';
+        
+        // Feedback-Button mit dem richtigen Text vorbereiten
+        document.getElementById('next-button').textContent = index < questions.length - 1 ? 'Nächste Frage' : 'Ergebnis anzeigen';
+        
         // Event-Listener hinzufügen
         setupDragAndDrop();
         
         document.getElementById('check-button').addEventListener('click', checkAnswers);
-        document.getElementById('next-button').addEventListener('click', handleNextQuestion);
       }
       
       // Drag-and-Drop einrichten
@@ -678,16 +748,18 @@
           }
         });
         
-        // Feedback anzeigen
-        const feedbackElement = document.getElementById('feedback');
+        // Feedback vorbereiten
         const feedbackTitleElement = document.getElementById('feedback-title');
+        const feedbackExplanation = document.getElementById('feedback-explanation');
         
         if (allCorrect) {
-          feedbackElement.classList.add('correct');
+          feedback.classList.add('correct');
+          feedback.classList.remove('incorrect');
           feedbackTitleElement.textContent = 'Sehr gut! Alle Zuordnungen sind korrekt.';
           score++;
         } else {
-          feedbackElement.classList.add('incorrect');
+          feedback.classList.add('incorrect');
+          feedback.classList.remove('correct');
           feedbackTitleElement.textContent = `Fast! Du hast ${correctCount} von ${question.images.length} Zuordnungen richtig.`;
         }
         
@@ -699,8 +771,11 @@
           totalCount: question.images.length
         });
         
-        // Feedback einblenden
-        feedbackElement.style.display = 'block';
+        // Erklärungstext einfügen
+        feedbackExplanation.innerHTML = question.explanation;
+        
+        // Feedback-Overlay einblenden
+        feedbackOverlay.style.display = 'block';
         
         // Check-Button ausblenden
         document.getElementById('check-button').style.display = 'none';
@@ -708,9 +783,18 @@
       
       // Nächste Frage oder Ergebnis anzeigen
       function handleNextQuestion() {
+        // Feedback-Overlay ausblenden
+        feedbackOverlay.style.display = 'none';
+        
+        // Eventuelle CSS-Klassen entfernen
+        feedback.classList.remove('correct', 'incorrect');
+        
         if (currentQuestionIndex < questions.length - 1) {
           currentQuestionIndex++;
           showQuestion(currentQuestionIndex);
+          
+          // Nach oben scrollen für die neue Frage
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           showResult();
         }
