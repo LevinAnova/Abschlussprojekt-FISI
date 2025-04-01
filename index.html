@@ -85,17 +85,31 @@
     
     <span id="detailCategory" class="detail-category">Kategorie</span>
     
-
-    <div class="detail-sidebar">
-      <div class="qr-code-container">
-        <div class="qr-title">Direkt bewerben</div>
-        <div class="qr-text">Scanne den QR-Code, um dich für diesen Ausbildungsberuf zu bewerben.</div>
-        <div class="qr-code" id="berufQrCode">
-          <img id="qrCodeImage" src="" alt="QR-Code für die Bewerbung">
-          <div class="qr-beruf-id"></div>
-        </div>
-      </div>
-      
+<!-- Angepasste HTML-Struktur für die Bildergalerie -->
+<div class="image-gallery-container">
+  <h3 class="gallery-title">Einblicke in den Beruf</h3>
+  <div class="image-gallery">
+    <div class="gallery-wrapper">
+      <!-- Bilder werden dynamisch eingefügt -->
+    </div>
+  </div>
+  <div class="gallery-navigation">
+    <button class="gallery-button prev-button">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
+      </svg>
+    </button>
+    <div class="gallery-dots">
+      <!-- Dots werden dynamisch eingefügt -->
+    </div>
+    <button class="gallery-button next-button">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
+      </svg>
+    </button>
+  </div>
+</div>
+<br></br>
       <div class="knowledge-test-container" id="knowledgeTestContainer">
         <a id="testKnowledgeLink" href="#" class="knowledge-test-button">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -135,8 +149,17 @@
           <div id="detailLocations"></div>
         </div>
       </div>
-      
+    </div>
+  </div>
 
+  <!-- Fullscreen-Overlay für Bildvergrößerung -->
+  <div class="fullscreen-overlay">
+    <img src="" alt="" class="fullscreen-image">
+    <div class="close-fullscreen">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
     </div>
   </div>
 
@@ -564,96 +587,96 @@
     }
 
     function openDetailPage(berufId) {
-      const detailPage = document.getElementById('detailPage');
-      const beruf = findBerufById(berufId);
+  const detailPage = document.getElementById('detailPage');
+  const beruf = findBerufById(berufId);
+  
+  if (!beruf) {
+    console.error(`Beruf with ID ${berufId} not found`);
+    return;
+  }
+  
+  const detailTitle = document.getElementById('detailTitle');
+  const detailCategory = document.getElementById('detailCategory');
+  const detailDescription = document.getElementById('detailDescription');
+  const detailDuration = document.getElementById('detailDuration');
+  const detailRequirements = document.getElementById('detailRequirements');
+  const detailCareer = document.getElementById('detailCareer');
+  const detailLocations = document.getElementById('detailLocations');
+  const knowledgeTestLink = document.getElementById('testKnowledgeLink');
+  const knowledgeTestContainer = document.getElementById('knowledgeTestContainer');
+
+  detailTitle.textContent = beruf.title;
+  // Speichern der Berufs-ID für den Wissenstest
+  detailTitle.dataset.berufId = berufId;
+  
+  detailCategory.textContent = getCategoryName(beruf.category);
+  detailDescription.innerHTML = `<p>${beruf.description}</p>`;
+  detailDuration.innerHTML = `<p>${beruf.duration}</p>`;
+
+  if (beruf.requirements && beruf.requirements.length > 0) {
+    detailRequirements.innerHTML = `<ul>${beruf.requirements.map(req => `<li>${req}</li>`).join('')}</ul>`;
+  } else {
+    detailRequirements.innerHTML = '<p>Keine Angaben</p>';
+  }
+
+  if (beruf.career_options && beruf.career_options.length > 0) {
+    detailCareer.innerHTML = `<ul>${beruf.career_options.map(career => `<li>${career}</li>`).join('')}</ul>`;
+  } else {
+    detailCareer.innerHTML = '<p>Keine Angaben</p>';
+  }
+
+  if (beruf.locations && beruf.locations.length > 0) {
+    detailLocations.innerHTML = `<ul>${beruf.locations.map(location => `<li>${location}</li>`).join('')}</ul>`;
+  } else {
+    detailLocations.innerHTML = '<p>Keine Angaben</p>';
+  }
       
-      if (!beruf) {
-        console.error(`Beruf with ID ${berufId} not found`);
-        return;
-      }
+  // Bilder für die Galerie basierend auf berufId laden
+  loadGalleryImages(berufId);
+  
+  // Wissenstest-Link Konfiguration
+  // Prüfen, ob für diesen Beruf ein Wissenstest verfügbar ist
+  const hasKnowledgeTest = checkIfKnowledgeTestExists(berufId);
+  
+  if (hasKnowledgeTest) {
+    // Setze den richtigen Link für den Test
+    const testUrl = getKnowledgeTestUrl(berufId);
+    knowledgeTestLink.href = testUrl;
+    knowledgeTestLink.classList.remove('disabled');
+    knowledgeTestLink.title = `Teste dein Wissen über ${beruf.title}`;
+    knowledgeTestContainer.style.display = 'flex';
+    
+    // Event-Listener für Inaktivitätstimer-Reset
+    knowledgeTestLink.addEventListener('click', resetInactivityTimer);
+  } else {
+    // Wenn kein Wissenstest verfügbar ist, Button ausblenden
+    knowledgeTestContainer.style.display = 'none';
+  }
+
+  const detailSections = document.querySelectorAll('.detail-section');
+  detailSections.forEach((section, index) => {
+    section.style.animationDelay = `${0.3 + (index * 0.1)}s`;
+  });
+
+  detailPage.style.display = 'flex';
+  document.body.style.overflow = 'hidden'; 
+
+  detailPage.style.animation = 'none';
+  setTimeout(() => {
+    detailPage.style.animation = 'slideIn 0.5s ease forwards';
+  }, 10);
+  
+  // Initialisiere die Galerie mit einem kleinen Delay, 
+  // damit die Bilder Zeit haben, geladen zu werden
+  setTimeout(() => {
+    if (document.querySelector('.gallery-wrapper')) {
+      const gallery = initializeGallery();
       
-      const detailTitle = document.getElementById('detailTitle');
-      const detailCategory = document.getElementById('detailCategory');
-      const detailDescription = document.getElementById('detailDescription');
-      const detailDuration = document.getElementById('detailDuration');
-      const detailRequirements = document.getElementById('detailRequirements');
-      const detailCareer = document.getElementById('detailCareer');
-      const detailLocations = document.getElementById('detailLocations');
-      const qrBerufId = document.querySelector('.qr-beruf-id');
-      const qrCodeImage = document.getElementById('qrCodeImage');
-      const knowledgeTestLink = document.getElementById('testKnowledgeLink');
-      const knowledgeTestContainer = document.getElementById('knowledgeTestContainer');
-
-      detailTitle.textContent = beruf.title;
-      // Speichern der Berufs-ID für den Wissenstest
-      detailTitle.dataset.berufId = berufId;
-      
-      detailCategory.textContent = getCategoryName(beruf.category);
-      detailDescription.innerHTML = `<p>${beruf.description}</p>`;
-      detailDuration.innerHTML = `<p>${beruf.duration}</p>`;
-
-      if (beruf.requirements && beruf.requirements.length > 0) {
-        detailRequirements.innerHTML = `<ul>${beruf.requirements.map(req => `<li>${req}</li>`).join('')}</ul>`;
-      } else {
-        detailRequirements.innerHTML = '<p>Keine Angaben</p>';
-      }
-
-      if (beruf.career_options && beruf.career_options.length > 0) {
-        detailCareer.innerHTML = `<ul>${beruf.career_options.map(career => `<li>${career}</li>`).join('')}</ul>`;
-      } else {
-        detailCareer.innerHTML = '<p>Keine Angaben</p>';
-      }
-
-      if (beruf.locations && beruf.locations.length > 0) {
-        detailLocations.innerHTML = `<ul>${beruf.locations.map(location => `<li>${location}</li>`).join('')}</ul>`;
-      } else {
-        detailLocations.innerHTML = '<p>Keine Angaben</p>';
-      }
-          
-      // QR-Code-Bild laden
-      qrCodeImage.src = `img/qrcodes/qr-${beruf.id}.png`;
-      qrCodeImage.alt = `QR-Code für ${beruf.title}`;
-      
-      // Fallback für nicht vorhandene QR-Codes
-      qrCodeImage.onerror = function() {
-        // Bei Fehler ein Platzhalter-QR-Code anzeigen
-        this.src = 'img/qrcodes/platzhalter.jpeg';
-        this.alt = 'Platzhalter QR-Code';
-        console.warn(`QR-Code für ${beruf.id} nicht gefunden, verwende Platzhalter.`);
-      };
-      
-      // Wissenstest-Link Konfiguration
-      // Prüfen, ob für diesen Beruf ein Wissenstest verfügbar ist
-      const hasKnowledgeTest = checkIfKnowledgeTestExists(berufId);
-      
-      if (hasKnowledgeTest) {
-        // Setze den richtigen Link für den Test
-        const testUrl = getKnowledgeTestUrl(berufId);
-        knowledgeTestLink.href = testUrl;
-        knowledgeTestLink.classList.remove('disabled');
-        knowledgeTestLink.title = `Teste dein Wissen über ${beruf.title}`;
-        knowledgeTestContainer.style.display = 'flex';
-        
-        // Event-Listener für Inaktivitätstimer-Reset
-        knowledgeTestLink.addEventListener('click', resetInactivityTimer);
-      } else {
-        // Wenn kein Wissenstest verfügbar ist, Button ausblenden
-        knowledgeTestContainer.style.display = 'none';
-      }
-
-      const detailSections = document.querySelectorAll('.detail-section');
-      detailSections.forEach((section, index) => {
-        section.style.animationDelay = `${0.3 + (index * 0.1)}s`;
-      });
-
-      detailPage.style.display = 'flex';
-      document.body.style.overflow = 'hidden'; 
-
-      detailPage.style.animation = 'none';
-      setTimeout(() => {
-        detailPage.style.animation = 'slideIn 0.5s ease forwards';
-      }, 10);
+      // Speichern der Galerie-Referenz für spätere Aktualisierungen
+      window.currentGallery = gallery;
     }
+  }, 500);
+}
 
     function closeDetailPage() {
       // Benutzerinteraktion - Timer zurücksetzen
@@ -811,9 +834,8 @@
         'mousedown', 'mousemove', 'keypress', 
         'scroll', 'touchstart', 'click', 'keydown'
       ];
-      
-      // Event-Listener für jedes Event hinzufügen
-      events.forEach(eventName => {
+// Event-Listener für jedes Event hinzufügen
+events.forEach(eventName => {
         document.addEventListener(eventName, resetInactivityTimer, true);
       });
       
@@ -829,7 +851,6 @@
         'fachkraft-metalltechnik',
         'fachinformatiker-systemintegration',
         'elektroniker-automatisierung'
-
       ];
       
       return availableTests.includes(berufId);
@@ -843,13 +864,434 @@
         'fachkraft-metalltechnik': 'tests/metalltechnik.html',
         'fachinformatiker-systemintegration' : 'tests/blank.html',
         'elektroniker-automatisierung' : 'tests/eat.html'
-
       };
       
       // Rückgabe des Pfads oder eines Fallbacks
       return testPaths[berufId] || '#';
     }
 
+    // JavaScript für die Bildgalerie und Vergrößerungsfunktion
+    function initializeGallery() {
+      const galleryWrapper = document.querySelector('.gallery-wrapper');
+      const slides = document.querySelectorAll('.gallery-slide');
+      const dots = document.querySelectorAll('.gallery-dot');
+      const prevButton = document.querySelector('.prev-button');
+      const nextButton = document.querySelector('.next-button');
+      const fullscreenOverlay = document.querySelector('.fullscreen-overlay');
+      const fullscreenImage = document.querySelector('.fullscreen-image');
+      const closeFullscreen = document.querySelector('.close-fullscreen');
+      const totalSlides = slides.length;
+      
+      let currentIndex = 0;
+      let startX = 0;
+      let currentX = 0;
+      let isDragging = false;
+      let autoplayInterval = null;
+      
+      // Galerie aktualisieren
+      function updateGallery() {
+        galleryWrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
+        
+        dots.forEach((dot, index) => {
+          if (index === currentIndex) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+      
+      // Navigation
+      prevButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+        updateGallery();
+        resetAutoplay();
+      });
+      
+      nextButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentIndex = (currentIndex + 1) % totalSlides;
+        updateGallery();
+        resetAutoplay();
+      });
+      
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          currentIndex = index;
+          updateGallery();
+          resetAutoplay();
+        });
+      });
+      
+      // Touch-Events
+      galleryWrapper.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+        galleryWrapper.style.transition = 'none';
+      });
+      
+      galleryWrapper.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        
+        currentX = e.touches[0].clientX;
+        const diffX = currentX - startX;
+        
+        if ((currentIndex === 0 && diffX > 0) || (currentIndex === totalSlides - 1 && diffX < 0)) {
+          galleryWrapper.style.transform = `translateX(calc(-${currentIndex * 100}% + ${diffX / 3}px))`;
+        } else {
+          galleryWrapper.style.transform = `translateX(calc(-${currentIndex * 100}% + ${diffX}px))`;
+        }
+      });
+      
+      galleryWrapper.addEventListener('touchend', (e) => {
+        if (!isDragging) return;
+        
+        isDragging = false;
+        galleryWrapper.style.transition = 'transform 0.3s ease-in-out';
+        
+        const diffX = currentX - startX;
+        const threshold = galleryWrapper.offsetWidth * 0.2;
+        
+        if (Math.abs(diffX) > threshold) {
+          if (diffX > 0 && currentIndex > 0) {
+            currentIndex--;
+          } else if (diffX < 0 && currentIndex < totalSlides - 1) {
+            currentIndex++;
+          }
+        }
+        
+        updateGallery();
+        resetAutoplay();
+      });
+      
+      // Vergrößerungsfunktion
+      slides.forEach((slide) => {
+        slide.addEventListener('click', () => {
+          const img = slide.querySelector('img');
+          fullscreenImage.src = img.src;
+          fullscreenImage.alt = img.alt;
+          fullscreenOverlay.classList.add('active');
+          document.body.style.overflow = 'hidden';
+          clearInterval(autoplayInterval);
+        });
+      });
+      
+      closeFullscreen.addEventListener('click', () => {
+        fullscreenOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+        startAutoplay();
+      });
+      
+      fullscreenOverlay.addEventListener('click', (e) => {
+        if (e.target === fullscreenOverlay) {
+          fullscreenOverlay.classList.remove('active');
+          document.body.style.overflow = '';
+          startAutoplay();
+        }
+      });
+      
+      // Autoplay
+      function startAutoplay() {
+        autoplayInterval = setInterval(() => {
+          currentIndex = (currentIndex + 1) % totalSlides;
+          updateGallery();
+        }, 5000);
+      }
+      
+      function resetAutoplay() {
+        if (autoplayInterval) {
+          clearInterval(autoplayInterval);
+        }
+        startAutoplay();
+      }
+      
+      startAutoplay();
+      updateGallery();
+    }
+    // Testdaten für die Galerie - Diese würden später vom CMS kommen
+function getGalleryImagesForBeruf(berufId) {
+  // Standardbilder für alle Berufe, die (noch) keine eigenen Bilder haben
+  const defaultImages = [
+    { 
+      src: "img/gallery/default1.png",
+      alt: "Ausbildung bei Volkswagen" 
+    },
+    { 
+      src: "img/gallery/default2.png",
+      alt: "Praktische Übungen" 
+    },
+    { 
+      src: "img/gallery/default3.png",
+      alt: "Team-Arbeit" 
+    },
+    { 
+      src: "img/gallery/default4.jpg", 
+      alt: "Moderner Arbeitsplatz" 
+    }
+  ];
+  
+  // Bilder für spezifische Berufe
+  const berufImages = {
+    "chemielaborant": [
+      { 
+        src: "img/gallery/chemie1.jpg", 
+        alt: "Chemielabor Arbeitsplatz" 
+      },
+      { 
+        src: "img/gallery/chemie2.jpg", 
+        alt: "Analysen im Labor" 
+      },
+      { 
+        src: "img/gallery/chemie3.jpg", 
+        alt: "Experimente durchführen" 
+      },
+      { 
+        src: "img/gallery/chemie4.jpg", 
+        alt: "Teamarbeit im Labor" 
+      }
+    ],
+    "fachkraft-metalltechnik": [
+      { 
+        src: "img/gallery/metall1.jpg", 
+        alt: "Metallbearbeitung" 
+      },
+      { 
+        src: "img/gallery/metall2.jpg", 
+        alt: "CNC-Maschine" 
+      },
+      { 
+        src: "img/gallery/metall3.jpg", 
+        alt: "Präzisionsarbeit mit Metall" 
+      },
+      { 
+        src: "img/gallery/metall4.jpg", 
+        alt: "Teamarbeit in der Werkstatt" 
+      }
+    ],
+    // Weitere Berufe können hier hinzugefügt werden
+  };
+  
+  // Wenn Bilder für diesen Beruf existieren, verwende diese, ansonsten Standardbilder
+  return berufImages[berufId] || defaultImages;
+}
+
+// Neue Funktion zum Laden der Bilder für die Galerie
+function loadGalleryImages(berufId) {
+  const galleryWrapper = document.querySelector('.gallery-wrapper');
+  
+  // Zurücksetzen der Galerie
+  galleryWrapper.innerHTML = '';
+  
+  // In der fertigen CMS-Version würde hier ein API-Aufruf stehen,
+  // der die Bilder für den spezifischen Beruf lädt
+  const galleryImages = getGalleryImagesForBeruf(berufId);
+  
+  // Erstelle die Galerie-Slides mit den Bildern
+  galleryImages.forEach((image, index) => {
+    const slide = document.createElement('div');
+    slide.className = 'gallery-slide';
+    
+    const img = document.createElement('img');
+    img.src = image.src;
+    img.alt = image.alt;
+    img.className = 'gallery-image';
+    
+    slide.appendChild(img);
+    galleryWrapper.appendChild(slide);
+  });
+  
+  // Aktualisiere die Dots entsprechend der Anzahl der Bilder
+  updateGalleryDots(galleryImages.length);
+}
+
+// Funktion zum Aktualisieren der Navigationspunkte
+function updateGalleryDots(imageCount) {
+  const dotsContainer = document.querySelector('.gallery-dots');
+  dotsContainer.innerHTML = '';
+  
+  for (let i = 0; i < imageCount; i++) {
+    const dot = document.createElement('span');
+    dot.className = i === 0 ? 'gallery-dot active' : 'gallery-dot';
+    dot.setAttribute('data-index', i);
+    
+    // Klick-Event hinzufügen
+    dot.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const index = parseInt(dot.getAttribute('data-index'));
+      // Diese Funktion müsste in initializeGallery() aufgerufen werden
+      if (window.galleryNavigation) {
+        window.galleryNavigation.goToSlide(index);
+      }
+    });
+    
+    dotsContainer.appendChild(dot);
+  }
+}
+
+// Modifizierte Gallery-Initialisierung, um mit dynamisch geladenen Bildern zu arbeiten
+function initializeGallery() {
+  const galleryWrapper = document.querySelector('.gallery-wrapper');
+  const prevButton = document.querySelector('.prev-button');
+  const nextButton = document.querySelector('.next-button');
+  const fullscreenOverlay = document.querySelector('.fullscreen-overlay');
+  const fullscreenImage = document.querySelector('.fullscreen-image');
+  const closeFullscreen = document.querySelector('.close-fullscreen');
+  
+  // Slides werden jetzt dynamisch geladen, also hier abrufen
+  const slides = document.querySelectorAll('.gallery-slide');
+  const totalSlides = slides.length;
+  
+  let currentIndex = 0;
+  let startX = 0;
+  let currentX = 0;
+  let isDragging = false;
+  let autoplayInterval = null;
+  
+  // Galerie aktualisieren
+  function updateGallery() {
+    galleryWrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
+    
+    const currentDots = document.querySelectorAll('.gallery-dot');
+    currentDots.forEach((dot, index) => {
+      if (index === currentIndex) {
+        dot.classList.add('active');
+      } else {
+        dot.classList.remove('active');
+      }
+    });
+  }
+
+  // Navigation
+  function goToSlide(index) {
+    currentIndex = index;
+    updateGallery();
+    resetAutoplay();
+  }
+  
+  prevButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+    updateGallery();
+    resetAutoplay();
+  });
+  
+  nextButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentIndex = (currentIndex + 1) % totalSlides;
+    updateGallery();
+    resetAutoplay();
+  });
+  
+  // Touch-Events
+  galleryWrapper.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    isDragging = true;
+    galleryWrapper.style.transition = 'none';
+  });
+  
+  galleryWrapper.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    
+    currentX = e.touches[0].clientX;
+    const diffX = currentX - startX;
+    
+    if ((currentIndex === 0 && diffX > 0) || (currentIndex === totalSlides - 1 && diffX < 0)) {
+      galleryWrapper.style.transform = `translateX(calc(-${currentIndex * 100}% + ${diffX / 3}px))`;
+    } else {
+      galleryWrapper.style.transform = `translateX(calc(-${currentIndex * 100}% + ${diffX}px))`;
+    }
+  });
+  
+  galleryWrapper.addEventListener('touchend', (e) => {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    galleryWrapper.style.transition = 'transform 0.3s ease-in-out';
+    
+    const diffX = currentX - startX;
+    const threshold = galleryWrapper.offsetWidth * 0.2;
+    
+    if (Math.abs(diffX) > threshold) {
+      if (diffX > 0 && currentIndex > 0) {
+        currentIndex--;
+      } else if (diffX < 0 && currentIndex < totalSlides - 1) {
+        currentIndex++;
+      }
+    }
+    
+    updateGallery();
+    resetAutoplay();
+  });
+  
+  // Vergrößerungsfunktion hinzufügen
+  function setupVergroesserung() {
+    const currentSlides = document.querySelectorAll('.gallery-slide');
+    
+    currentSlides.forEach((slide) => {
+      slide.addEventListener('click', () => {
+        const img = slide.querySelector('img');
+        fullscreenImage.src = img.src;
+        fullscreenImage.alt = img.alt;
+        fullscreenOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        clearInterval(autoplayInterval);
+      });
+    });
+  }
+  
+  closeFullscreen.addEventListener('click', () => {
+    fullscreenOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+    startAutoplay();
+  });
+  
+  fullscreenOverlay.addEventListener('click', (e) => {
+    if (e.target === fullscreenOverlay) {
+      fullscreenOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+      startAutoplay();
+    }
+  });
+  
+  // Autoplay
+  function startAutoplay() {
+    autoplayInterval = setInterval(() => {
+      currentIndex = (currentIndex + 1) % totalSlides;
+      updateGallery();
+    }, 5000);
+  }
+  
+  function resetAutoplay() {
+    if (autoplayInterval) {
+      clearInterval(autoplayInterval);
+    }
+    startAutoplay();
+  }
+  
+  setupVergroesserung();
+  startAutoplay();
+  updateGallery();
+  
+  // Stellt die Navigation für externe Nutzung zur Verfügung
+  window.galleryNavigation = {
+    goToSlide: goToSlide
+  };
+  
+  // Wenn die Galerie neu initialisiert wird, brauchen wir diese Funktionen zur Verfügung
+  return {
+    reinitialize: () => {
+      setupVergroesserung();
+      updateGallery();
+    }
+  };
+}
+
+
+
+
+    
     document.addEventListener('DOMContentLoaded', () => {
       initializeApp();
       setupTouchEvents();

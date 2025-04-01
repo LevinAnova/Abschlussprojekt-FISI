@@ -52,6 +52,7 @@
         <div class="highway-line"></div>
         <div class="highway-line"></div>
         <div class="highway-line"></div>
+        <div class="highway-line"></div>
       </div>
       
       <!-- Vereinfachte Fahrzeuganimation für vertikalen Bildschirm -->
@@ -74,7 +75,7 @@
         const finalValue = parseInt(number.getAttribute('data-count'));
         let currentValue = 0;
         const duration = 2000; // 2 Sekunden
-        const stepTime = 10; // Alle 50ms aktualisieren
+        const stepTime = 10; // Alle 10ms aktualisieren
         const totalSteps = duration / stepTime;
         const increment = finalValue / totalSteps;
         

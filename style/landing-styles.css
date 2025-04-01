@@ -36,7 +36,7 @@ body, html {
   overflow: hidden;
   background-color: var(--black);
   font-family: 'VW Font';
-  cursor: no-drop;
+  cursor: default;
 }
 
 /* Haupt-Container */
@@ -242,12 +242,13 @@ body, html {
   background-color: var(--white);
   top: 50%;
   transform: translateY(-50%);
-  animation: highway-line-move 10s infinite linear;
+  /*animation: highway-line-move 10s infinite linear; */
 }
 
 .highway-line:nth-child(1) { left: 10%; animation-delay: 0s; }
-.highway-line:nth-child(2) { left: 40%; animation-delay: 0.66s; }
-.highway-line:nth-child(3) { left: 70%; animation-delay: 1.33s; }
+.highway-line:nth-child(2) { left: 36.67%; animation-delay: 0.66s; }
+.highway-line:nth-child(3) { left: 63.33%; animation-delay: 1.33s; }
+.highway-line:nth-child(4) { left: 90%; animation-delay: 1.66s; }
 
 .car-animation {
   position: absolute;

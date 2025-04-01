@@ -818,6 +818,7 @@ footer {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   border-left: 5px solid #ff3b30;
   animation: pulse-warning 2s infinite;
+  font-family: 'VW Font';
 }
 
 @keyframes pulse-warning {
@@ -943,4 +944,200 @@ footer {
   .language-selector label {
     display: none;
   }
+}
+/* Neuer Flex-Container für QR-Code und Galerie */
+.sidebar-flex-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+/* QR-Code und Galerie Container anpassen */
+.sidebar-flex-container .qr-code-container,
+.sidebar-flex-container .image-gallery-container {
+  flex: 1;
+  width: 48%;
+  margin: 0;
+  max-width: none;
+}
+
+/* Bildgalerie-Container Styles */
+.image-gallery-container {
+  background-color: var(--card-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  animation: fadeIn 0.5s ease forwards;
+  animation-delay: 0.5s;
+  opacity: 0;
+  border-top: 4px solid var(--vw-light-blue);
+}
+
+.gallery-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--vw-blue);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.image-gallery {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.gallery-wrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease-in-out;
+}
+
+.gallery-slide {
+  flex: 0 0 100%;
+  height: 100%;
+  position: relative;
+  cursor: pointer;
+}
+
+.gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+}
+
+/* Vergrößerungseffekt beim Klicken/Antippen */
+.gallery-slide:hover .gallery-image,
+.gallery-slide:active .gallery-image {
+  transform: scale(1.05);
+}
+
+/* Fullscreen-Overlay für die Bildvergrößerung */
+.fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 30, 0.9);
+  z-index: 1100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.fullscreen-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.fullscreen-image {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.fullscreen-overlay.active .fullscreen-image {
+  transform: scale(1);
+}
+
+.close-fullscreen {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.close-fullscreen:hover {
+  transform: rotate(90deg);
+}
+
+/* Navigation */
+.gallery-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.gallery-button {
+  background-color: var(--vw-blue);
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.gallery-button:hover {
+  background-color: var(--vw-light-blue);
+  transform: scale(1.1);
+}
+
+.gallery-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.gallery-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ccc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gallery-dot.active {
+  background-color: var(--vw-blue);
+  transform: scale(1.2);
+}
+
+/* Responsive Anpassungen */
+@media (max-width: 767px) {
+  .sidebar-flex-container {
+    flex-direction: column;
+  }
+  
+  .sidebar-flex-container .qr-code-container,
+  .sidebar-flex-container .image-gallery-container {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
+
+/* Touch-freundliche Anpassungen */
+.image-gallery {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }

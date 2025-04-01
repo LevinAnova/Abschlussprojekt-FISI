@@ -1,4 +1,4 @@
-// Spezielle Sonderzeichen und Schriftgrößenanpassungen für Sprachen mit nicht-lateinischen Alphabeten
+
 const fontSizeAdjustments = {
     ar: {
       title: '1.8rem',
