@@ -84,44 +84,6 @@
     </div>
     
     <span id="detailCategory" class="detail-category">Kategorie</span>
-    
-<!-- Angepasste HTML-Struktur für die Bildergalerie -->
-<div class="image-gallery-container">
-  <h3 class="gallery-title">Einblicke in den Beruf</h3>
-  <div class="image-gallery">
-    <div class="gallery-wrapper">
-      <!-- Bilder werden dynamisch eingefügt -->
-    </div>
-  </div>
-  <div class="gallery-navigation">
-    <button class="gallery-button prev-button">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
-      </svg>
-    </button>
-    <div class="gallery-dots">
-      <!-- Dots werden dynamisch eingefügt -->
-    </div>
-    <button class="gallery-button next-button">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
-      </svg>
-    </button>
-  </div>
-</div>
-<br></br>
-      <div class="knowledge-test-container" id="knowledgeTestContainer">
-        <a id="testKnowledgeLink" href="#" class="knowledge-test-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-          </svg>
-          Teste dein Wissen
-        </a>
-        <p class="knowledge-test-info">Finde heraus, ob dieser Beruf zu dir passt!</p>
-      </div>
-    </div>
-
     <div class="detail-container">
       <div class="detail-main">
         <div class="detail-section">
@@ -151,6 +113,42 @@
       </div>
     </div>
   </div>
+
+<!-- Angepasste HTML-Struktur für die Bildergalerie -->
+<div class="image-gallery-container">
+  <h3 class="gallery-title">Einblicke in den Beruf</h3>
+  <div class="image-gallery">
+    <div class="gallery-wrapper">
+      <!-- Bilder werden dynamisch eingefügt -->
+    </div>
+  </div>
+  <div class="gallery-navigation">
+    <button class="gallery-button prev-button">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
+      </svg>
+    </button>
+    <div class="gallery-dots">
+      <!-- Dots werden dynamisch eingefügt -->
+    </div>
+    <button class="gallery-button next-button">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
+      </svg>
+    </button>
+  </div>
+</div>
+      <div class="knowledge-test-container" id="knowledgeTestContainer">
+        <a id="testKnowledgeLink" href="#" class="knowledge-test-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          Teste dein Wissen
+        </a>
+        <p class="knowledge-test-info">Finde heraus, ob dieser Beruf zu dir passt!</p>
+      </div>
+    </div>
 
   <!-- Fullscreen-Overlay für Bildvergrößerung -->
   <div class="fullscreen-overlay">
@@ -1070,7 +1068,7 @@ function getGalleryImagesForBeruf(berufId) {
         alt: "Teamarbeit in der Werkstatt" 
       }
     ],
-    // Weitere Berufe können hier hinzugefügt werden
+    // Weitere Berufe hier hinzufügen
   };
   
   // Wenn Bilder für diesen Beruf existieren, verwende diese, ansonsten Standardbilder

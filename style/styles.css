@@ -1130,14 +1130,18 @@ footer {
   }
   
   .sidebar-flex-container .qr-code-container,
-  .sidebar-flex-container .image-gallery-container {
+  .sidebar-flex-container {
     width: 100%;
     margin-bottom: 20px;
   }
 }
-
+.image-gallery-container {
+  width: 100%;
+  margin-bottom: 25px;
+}
 /* Touch-freundliche Anpassungen */
 .image-gallery {
+  height: 500px;
   touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
 }
