@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Volkswagen Ausbildungsberufe</title>
   <link rel="stylesheet" href="style/styles.css">
-  
+  <link rel="manifest" href="manifest.json">
 </head>
 <body>
   <div class="animated-background"></div>
@@ -72,431 +72,189 @@
     </div>
   </div>
 
-  <!-- Detail Seite HTML-Struktur für index.html -->
-<div id="detailPage" class="detail-page">
-  <!-- Header und Navigation bleiben bestehen -->
-  <div class="detail-header">
-    <button id="backButton" class="back-button">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M19 12H5M12 19l-7-7 7-7"/>
-      </svg>
-    </button>
-    <h2 id="detailTitle" class="detail-title">Ausbildungsberuf</h2>
-    <div style="width: 40px;"></div>
-  </div>
-  
-  <span id="detailCategory" class="detail-category">Kategorie</span>
-  
-  <!-- Neues flexibles Container-Layout -->
-  <div class="detail-container">
-    <!-- Oberer Bereich: QR-Code und Galerie nebeneinander -->
-    <div class="flex-container top-section">
-      <!-- QR-Code Container -->
-      <div class="qr-code-container">
-        <h3 class="qr-title">Direkt bewerben</h3>
-        <p class="qr-text">Scanne den QR-Code, um dich für diesen Ausbildungsberuf zu bewerben.</p>
-        <div class="qr-code">
-          <!-- Platzhalter für QR-Code -->
-          <img src="/api/placeholder/250/250" alt="QR-Code für Bewerbung">
-          <div class="qr-beruf-id" id="qrBerufId"></div>
-        </div>
-      </div>
-      
-      <!-- Bildergalerie Container -->
-      <div class="image-gallery-container">
-        <h3 class="gallery-title">Einblicke in den Beruf</h3>
-        <div class="image-gallery">
-          <div class="gallery-wrapper">
-            <!-- Bilder werden dynamisch eingefügt -->
-          </div>
-        </div>
-        <div class="gallery-navigation">
-          <button class="gallery-button prev-button">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
-            </svg>
-          </button>
-          <div class="gallery-dots">
-            <!-- Dots werden dynamisch eingefügt -->
-          </div>
-          <button class="gallery-button next-button">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Mittlerer Bereich: Wissenstest-Button -->
-    <div class="knowledge-test-container" id="knowledgeTestContainer">
-      <a id="testKnowledgeLink" href="#" class="knowledge-test-button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+  <!-- Detail Seite HTML-Struktur -->
+  <div id="detailPage" class="detail-page">
+    <!-- Header und Navigation bleiben bestehen -->
+    <div class="detail-header">
+      <button id="backButton" class="back-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
-        Teste dein Wissen
-      </a>
-      <p class="knowledge-test-info">Finde heraus, ob dieser Beruf zu dir passt!</p>
+      </button>
+      <h2 id="detailTitle" class="detail-title">Ausbildungsberuf</h2>
+      <div style="width: 40px;"></div>
     </div>
     
-    <!-- Unterer Bereich: Berufsinfos -->
-    <div class="detail-main">
-      <div class="detail-section">
-        <h3>Beschreibung</h3>
-        <div id="detailDescription"></div>
+    <span id="detailCategory" class="detail-category">Kategorie</span>
+    
+    <!-- Neues flexibles Container-Layout -->
+    <div class="detail-container">
+      <!-- Oberer Bereich: QR-Code und Galerie nebeneinander -->
+      <div class="flex-container top-section">
+        <!-- QR-Code Container -->
+        <div class="qr-code-container">
+          <h3 class="qr-title">Direkt bewerben</h3>
+          <p class="qr-text">Scanne den QR-Code, um dich für diesen Ausbildungsberuf zu bewerben.</p>
+          <div class="qr-code">
+            <!-- Platzhalter für QR-Code -->
+            <img src="/api/placeholder/250/250" alt="QR-Code für Bewerbung">
+            <div class="qr-beruf-id" id="qrBerufId"></div>
+          </div>
+        </div>
+        
+        <!-- Bildergalerie Container -->
+        <div class="image-gallery-container">
+          <h3 class="gallery-title">Einblicke in den Beruf</h3>
+          <div class="image-gallery">
+            <div class="gallery-wrapper">
+              <!-- Bilder werden dynamisch eingefügt -->
+            </div>
+          </div>
+          <div class="gallery-navigation">
+            <button class="gallery-button prev-button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="gallery-dots">
+              <!-- Dots werden dynamisch eingefügt -->
+            </div>
+            <button class="gallery-button next-button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
       
-      <div class="detail-section">
-        <h3>Ausbildungsdauer</h3>
-        <div id="detailDuration"></div>
+      <!-- Mittlerer Bereich: Wissenstest-Button -->
+      <div class="knowledge-test-container" id="knowledgeTestContainer">
+        <a id="testKnowledgeLink" href="#" class="knowledge-test-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          Teste dein Wissen
+        </a>
+        <p class="knowledge-test-info">Finde heraus, ob dieser Beruf zu dir passt!</p>
       </div>
       
-      <div class="detail-section">
-        <h3>Anforderungen</h3>
-        <div id="detailRequirements"></div>
-      </div>
-      
-      <div class="detail-section">
-        <h3>Karrieremöglichkeiten</h3>
-        <div id="detailCareer"></div>
-      </div>
-      
-      <div class="detail-section">
-        <h3>Standorte</h3>
-        <div id="detailLocations"></div>
+      <!-- Unterer Bereich: Berufsinfos -->
+      <div class="detail-main">
+        <div class="detail-section">
+          <h3>Beschreibung</h3>
+          <div id="detailDescription"></div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Ausbildungsdauer</h3>
+          <div id="detailDuration"></div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Anforderungen</h3>
+          <div id="detailRequirements"></div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Karrieremöglichkeiten</h3>
+          <div id="detailCareer"></div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Standorte</h3>
+          <div id="detailLocations"></div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Fullscreen-Overlay für Bildvergrößerung (bleibt bestehen) -->
-<div class="fullscreen-overlay">
-  <img src="" alt="" class="fullscreen-image">
-  <div class="close-fullscreen">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="18" y1="6" x2="6" y2="18"></line>
-      <line x1="6" y1="6" x2="18" y2="18"></line>
-    </svg>
+  <!-- Fullscreen-Overlay für Bildvergrößerung -->
+  <div class="fullscreen-overlay">
+    <img src="" alt="" class="fullscreen-image">
+    <div class="close-fullscreen">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </div>
   </div>
-</div>
 
   <script>
+    // CMS-Konfiguration für die Direktus-API
     const cmsConfig = {
-      apiUrl: 'api/content',
-      imageBasePath: 'images/',
-      refreshInterval: 3600000,
-      cacheName: 'vw-ausbildung-cache',
-      useMockData: true
+      apiUrl: 'http://localhost/api', // Direktus API über Nginx Proxy
+      imageBasePath: 'http://localhost/assets', // Pfad zu Bildern/Assets
+      refreshInterval: 3600000, // 1 Stunde Aktualisierungsintervall
+      cacheName: 'vw-ausbildung-cache', // Cache-Name für Offline-Funktionalität
+      useMockData: false, // CMS-Daten verwenden
+      offlineEnabled: true // Offline-Funktionalität aktivieren
     };
     
+    // Cache für die geladenen Daten
     let contentCache = {
       categories: [],
       berufe: []
     };
 
-    const mockData = {
-  categories: [
-    { id: "all", name: "Alle" },
-    { id: "produkt-technik", name: "Produkt & Technik" },
-    { id: "it-elektronik", name: "IT & Elektronik" },
-    { id: "service", name: "Service" },
-    { id: "organisation", name: "Organisation" },
-    { id: "schutz-sicherheit", name: "Schutz & Sicherheit" }
-  ],
-
-  berufe: [
-    // Produkt & Technik
-    {
-      id: "chemielaborant",
-      title: "Chemielaborant/-in",
-      description: "Durchführung chemischer Analysen und Experimente in Laboren",
-      duration: "3,5 Jahre",
-      category: "produkt-technik",
-      requirements: ["Interesse an Chemie und Naturwissenschaften", "Präzise und sorgfältige Arbeitsweise", "Gutes technisches Verständnis"],
-      career_options: ["Techniker/-in für Chemietechnik", "Studium Chemie oder Chemieingenieurwesen", "Laborleiter/-in"],
-      locations: ["Wolfsburg", "Kassel", "Salzgitter"]
-    },
-    {
-      id: "fachkraft-metalltechnik",
-      title: "Fachkraft für Metalltechnik",
-      description: "Bearbeitung von Metallteilen und Montage von Baugruppen für die Fahrzeugproduktion",
-      duration: "2 Jahre",
-      category: "produkt-technik",
-      requirements: ["Handwerkliches Geschick", "Technisches Verständnis", "Sorgfältige Arbeitsweise"],
-      career_options: ["Industriemechaniker/-in", "Zerspanungsmechaniker/-in", "Werkzeugmechaniker/-in"],
-      locations: ["Wolfsburg", "Hannover", "Emden", "Kassel"]
-    },
-    {
-      id: "fahrzeuglackierer",
-      title: "Fahrzeuglackierer/-in",
-      description: "Vorbereitung, Lackierung und Oberflächenbehandlung von Fahrzeugen und Fahrzeugteilen",
-      duration: "3 Jahre",
-      category: "produkt-technik",
-      requirements: ["Guter Farbsinn", "Handwerkliches Geschick", "Sorgfältige und genaue Arbeitsweise"],
-      career_options: ["Meister/-in für Fahrzeuglackierung", "Techniker/-in für Farb- und Lacktechnik", "Ausbilder/-in"],
-      locations: ["Wolfsburg", "Emden", "Osnabrück", "Zwickau"]
-    },
-    {
-      id: "giesereimechaniker",
-      title: "Gießereimechaniker/-in",
-      description: "Herstellung von Bauteilen durch Gießverfahren für den Motorenbau und andere Komponenten",
-      duration: "3,5 Jahre",
-      category: "produkt-technik",
-      requirements: ["Technisches Verständnis", "Handwerkliches Geschick", "Körperliche Belastbarkeit"],
-      career_options: ["Techniker/-in für Gießereitechnik", "Meister/-in für Gießerei", "Produktionsspezialist/-in"],
-      locations: ["Hannover", "Kassel", "Braunschweig"]
-    },
-    {
-      id: "industriemechaniker",
-      title: "Industriemechaniker/-in",
-      description: "Herstellung, Wartung und Instandhaltung von Maschinen und Produktionsanlagen",
-      duration: "3,5 Jahre",
-      category: "produkt-technik",
-      requirements: ["Handwerkliches Geschick", "Sorgfältige Arbeitsweise", "Technisches Verständnis"],
-      career_options: ["Techniker/-in für Maschinenbau", "Meister/-in für Industriemechanik", "Studium Maschinenbau"],
-      locations: ["Wolfsburg", "Hannover", "Emden", "Salzgitter", "Braunschweig"]
-    },
-    {
-      id: "produktionstechnologe",
-      title: "Produktionstechnologe/-in",
-      description: "Optimierung von Fertigungsprozessen und Produktionsanlagen in der Automobilfertigung",
-      duration: "3 Jahre",
-      category: "produkt-technik",
-      requirements: ["Technisches Verständnis", "Analytisches Denken", "Interesse an Automatisierung"],
-      career_options: ["Techniker/-in für Produktionstechnik", "Studium Produktionstechnik", "Prozessingenieur/-in"],
-      locations: ["Wolfsburg", "Emden", "Zwickau"]
-    },
-    {
-      id: "technischer-produktdesigner",
-      title: "Technische/r Produktdesigner/-in",
-      description: "Entwicklung und Konstruktion technischer Produkte und Komponenten mit modernen CAD-Systemen",
-      duration: "3,5 Jahre",
-      category: "produkt-technik",
-      requirements: ["Räumliches Vorstellungsvermögen", "Technisches Zeichnen", "CAD-Kenntnisse"],
-      career_options: ["Techniker/-in für Konstruktion", "Studium Produktdesign", "Konstrukteur/-in"],
-      locations: ["Wolfsburg", "Osnabrück", "Dresden"]
-    },
-    {
-      id: "werkstoffpruefer",
-      title: "Werkstoffprüfer/-in",
-      description: "Prüfung und Analyse von Werkstoffen auf Qualität und Eigenschaften für die Fahrzeugproduktion",
-      duration: "3,5 Jahre",
-      category: "produkt-technik",
-      requirements: ["Genaue Arbeitsweise", "Interesse an Physik und Chemie", "Technisches Verständnis"],
-      career_options: ["Techniker/-in für Werkstofftechnik", "Studium Materialwissenschaften", "Qualitätsprüfer/-in"],
-      locations: ["Wolfsburg", "Kassel", "Braunschweig"]
-    },
-    {
-      id: "werkzeugmechaniker",
-      title: "Werkzeugmechaniker/-in",
-      description: "Herstellung von Werkzeugen, Vorrichtungen und Spezialmaschinen für die Produktion",
-      duration: "3,5 Jahre",
-      category: "produkt-technik",
-      requirements: ["Präzises Arbeiten", "Handwerkliches Geschick", "Technisches Verständnis"],
-      career_options: ["Techniker/-in für Werkzeugbau", "Meister/-in für Werkzeugbau", "Spezialist/-in für Werkzeugkonstruktion"],
-      locations: ["Wolfsburg", "Braunschweig", "Kassel", "Emden"]
-    },
-    {
-      id: "zerspanungsmechaniker",
-      title: "Zerspanungsmechaniker/-in",
-      description: "Herstellung von Präzisionsbauteilen mit CNC-Maschinen für den Fahrzeugbau",
-      duration: "3,5 Jahre",
-      category: "produkt-technik",
-      requirements: ["Technisches Verständnis", "Präzises Arbeiten", "Räumliches Vorstellungsvermögen"],
-      career_options: ["Techniker/-in für Maschinenbau", "Meister/-in für Zerspanungstechnik", "CNC-Programmierer/-in"],
-      locations: ["Wolfsburg", "Hannover", "Salzgitter", "Kassel"]
-    },
-    
-    // IT & Elektronik
-    {
-      id: "elektroniker-automatisierung",
-      title: "Elektroniker/-in für Automatisierungstechnik",
-      description: "Installation, Programmierung und Wartung von Automatisierungssystemen in der Produktion",
-      duration: "3,5 Jahre",
-      category: "it-elektronik",
-      requirements: ["Interesse an Elektronik", "Technisches Verständnis", "Logisches Denkvermögen"],
-      career_options: ["Techniker/-in für Automatisierungstechnik", "Studium Elektrotechnik", "SPS-Programmierer/-in"],
-      locations: ["Wolfsburg", "Kassel", "Emden", "Zwickau"]
-    },
-    {
-      id: "elektroniker-informationstechnik",
-      title: "Elektroniker/-in für Informations- und Systemtechnik",
-      description: "Entwicklung und Wartung von IT-Systemen und elektronischen Anlagen im Automobilbereich",
-      duration: "3,5 Jahre",
-      category: "it-elektronik",
-      requirements: ["Interesse an IT und Elektronik", "Logisches Denkvermögen", "Technisches Verständnis"],
-      career_options: ["Techniker/-in für Informationstechnik", "Studium Informationstechnik", "IT-Systemspezialist/-in"],
-      locations: ["Wolfsburg", "Hannover", "Braunschweig"]
-    },
-    {
-      id: "fachinformatiker-anwendungsentwicklung",
-      title: "Fachinformatiker/-in Anwendungsentwicklung",
-      description: "Entwicklung und Programmierung von Software-Anwendungen für Volkswagen",
-      duration: "3 Jahre",
-      category: "it-elektronik",
-      requirements: ["Programmierkenntnisse", "Logisches Denkvermögen", "Gute Englischkenntnisse"],
-      career_options: ["Softwareentwickler/-in", "Studium Informatik", "Web-Entwickler/-in"],
-      locations: ["Wolfsburg", "Berlin", "München", "Hannover"]
-    },
-    {
-      id: "fachinformatiker-datenanalyse",
-      title: "Fachinformatiker/-in Daten und Prozessanalyse",
-      description: "Analyse und Optimierung von Daten und IT-Prozessen in der Fahrzeugproduktion",
-      duration: "3 Jahre",
-      category: "it-elektronik",
-      requirements: ["Analytisches Denken", "Interesse an Datenverarbeitung", "Gute Englischkenntnisse"],
-      career_options: ["Data Analyst", "Business Intelligence Spezialist/-in", "Studium Wirtschaftsinformatik"],
-      locations: ["Wolfsburg", "Berlin", "Hannover"]
-    },
-    {
-      id: "fachinformatiker-systemintegration",
-      title: "Fachinformatiker/-in Systemintegration",
-      description: "Planung, Konfiguration und Administration von IT-Systemen bei Volkswagen",
-      duration: "3 Jahre",
-      category: "it-elektronik",
-      requirements: ["Interesse an IT-Systemen", "Logisches Denkvermögen", "Gute Englischkenntnisse"],
-      career_options: ["IT-Systemadministrator/-in", "IT-Projektmanager/-in", "Studium Informatik"],
-      locations: ["Wolfsburg", "Hannover", "Berlin", "Zwickau"]
-    },
-    {
-      id: "it-systemelektroniker",
-      title: "IT-Systemelektroniker/-in",
-      description: "Installation und Wartung von IT-Hardware und -Systemen im gesamten Konzern",
-      duration: "3 Jahre",
-      category: "it-elektronik",
-      requirements: ["Technisches Verständnis", "Interesse an IT-Hardware", "Handwerkliches Geschick"],
-      career_options: ["IT-Techniker/-in", "Netzwerktechniker/-in", "Studium Informationstechnik"],
-      locations: ["Wolfsburg", "Hannover", "Dresden"]
-    },
-    {
-      id: "kaufmann-digitalisierungsmanagement",
-      title: "Kauffrau / Kaufmann für Digitalisierungsmanagement",
-      description: "Planung und Umsetzung von Digitalisierungsprojekten im Volkswagen-Konzern",
-      duration: "3 Jahre",
-      category: "it-elektronik",
-      requirements: ["Interesse an IT und Digitalisierung", "Organisationstalent", "Kommunikationsfähigkeit"],
-      career_options: ["Projektmanager/-in Digitalisierung", "Studium Wirtschaftsinformatik", "Digital Transformation Manager/-in"],
-      locations: ["Wolfsburg", "Berlin", "München"]
-    },
-    {
-      id: "kfz-mechatroniker-hochvolt",
-      title: "Kraftfahrzeugmechatroniker/-in System- und Hochvolttechnik",
-      description: "Wartung, Diagnose und Reparatur von Elektro- und Hybridfahrzeugen",
-      duration: "3,5 Jahre",
-      category: "it-elektronik",
-      requirements: ["Technisches Verständnis", "Interesse an E-Mobilität", "Sorgfältige Arbeitsweise"],
-      career_options: ["Techniker/-in für Elektromobilität", "Meister/-in für Kraftfahrzeugtechnik", "Diagnosespezialist/-in E-Fahrzeuge"],
-      locations: ["Wolfsburg", "Emden", "Zwickau", "Dresden"]
-    },
-    {
-      id: "mechatroniker",
-      title: "Mechatroniker/-in",
-      description: "Aufbau, Wartung und Programmierung mechatronischer Systeme und Anlagen",
-      duration: "3,5 Jahre",
-      category: "it-elektronik",
-      requirements: ["Interesse an Elektronik und Mechanik", "Technisches Verständnis", "Sorgfältige Arbeitsweise"],
-      career_options: ["Techniker/-in für Mechatronik", "Studium Mechatronik", "Automatisierungstechniker/-in"],
-      locations: ["Wolfsburg", "Hannover", "Braunschweig", "Kassel"]
-    },
-    
-    // Service
-    {
-      id: "fachkraft-systemgastronomie",
-      title: "Fachkraft für Systemgastronomie",
-      description: "Organisation und Durchführung gastronomischer Dienstleistungen in den Volkswagen-Betriebsrestaurants",
-      duration: "3 Jahre",
-      category: "service",
-      requirements: ["Kundenorientierung", "Organisationstalent", "Teamfähigkeit"],
-      career_options: ["Betriebswirt/-in für Systemgastronomie", "Restaurant-Manager/-in", "Ausbilder/-in"],
-      locations: ["Wolfsburg", "Hannover", "Braunschweig"]
-    },
-    {
-      id: "koch",
-      title: "Köchin / Koch",
-      description: "Zubereitung von Speisen und Gerichten in den Großküchen von Volkswagen",
-      duration: "3 Jahre",
-      category: "service",
-      requirements: ["Kreativität", "Sorgfältige Arbeitsweise", "Belastbarkeit"],
-      career_options: ["Küchenchef/-in", "Betriebswirt/-in für Catering", "Diätkoch/-köchin"],
-      locations: ["Wolfsburg", "Hannover", "Berlin", "Stuttgart"]
-    },
-    
-    // Organisation
-    {
-      id: "fachkraft-lagerlogistik",
-      title: "Fachkraft für Lagerlogistik",
-      description: "Organisation und Verwaltung des Warenflusses in den Logistikzentren",
-      duration: "3 Jahre",
-      category: "organisation",
-      requirements: ["Organisationsfähigkeit", "Sorgfältige Arbeitsweise", "Technisches Verständnis"],
-      career_options: ["Logistikmeister/-in", "Fachwirt/-in für Logistik", "Supply Chain Manager/-in"],
-      locations: ["Wolfsburg", "Hannover", "Kassel", "Emden"]
-    },
-    {
-      id: "industriekaufmann",
-      title: "Industriekauffrau / Industriekaufmann",
-      description: "Kaufmännische und betriebswirtschaftliche Tätigkeiten in verschiedenen Abteilungen",
-      duration: "3 Jahre",
-      category: "organisation",
-      requirements: ["Gute Kommunikationsfähigkeit", "Organisationsfähigkeit", "Wirtschaftliches Denken"],
-      career_options: ["Betriebswirt/-in", "Studium BWL", "Fachwirt/-in für Industrie"],
-      locations: ["Wolfsburg", "Hannover", "Stuttgart", "Berlin"]
-    },
-    {
-      id: "kaufmann-bueromanagement",
-      title: "Kauffrau / Kaufmann für Büromanagement",
-      description: "Organisation und Durchführung von Büroprozessen in allen Unternehmensbereichen",
-      duration: "3 Jahre",
-      category: "organisation",
-      requirements: ["Organisationstalent", "Kommunikationsfähigkeit", "EDV-Kenntnisse"],
-      career_options: ["Fachwirt/-in für Büro- und Projektorganisation", "Office Manager/-in", "Personalreferent/-in"],
-      locations: ["Wolfsburg", "Hannover", "Berlin", "München"]
-    },
-    
-    // Schutz & Sicherheit
-    {
-      id: "fachkraft-schutz-sicherheit",
-      title: "Fachkraft für Schutz und Sicherheit",
-      description: "Durchführung von Sicherheits- und Schutzmaßnahmen auf dem Werksgelände",
-      duration: "3 Jahre",
-      category: "schutz-sicherheit",
-      requirements: ["Körperliche Fitness", "Verantwortungsbewusstsein", "Konfliktfähigkeit"],
-      career_options: ["Meister/-in für Schutz und Sicherheit", "Werkschutzleiter/-in", "Sicherheitsbeauftragter/-in"],
-      locations: ["Wolfsburg", "Hannover", "Emden", "Kassel"]
-    },
-    {
-      id: "werkfeuerwehrmann",
-      title: "Werkfeuerwehrfrau / Werkfeuerwehrmann",
-      description: "Brandschutz, Notfallrettung und Gefahrenabwehr auf dem Werksgelände",
-      duration: "3 Jahre",
-      category: "schutz-sicherheit",
-      requirements: ["Körperliche Fitness", "Belastbarkeit", "Technisches Verständnis"],
-      career_options: ["Gruppenführer/-in", "Zugführer/-in", "Werksfeuerwehrleiter/-in"],
-      locations: ["Wolfsburg", "Emden", "Hannover", "Kassel"]
-    }
-  ]
-};
-    
+    // Daten vom CMS laden
     async function fetchCmsData() {
       const loadingIndicator = document.getElementById('loadingIndicator');
       loadingIndicator.style.display = 'flex';
       
       try {
-        if (cmsConfig.useMockData) {
-          // Simulate API delay
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          return mockData;
-        } else {
-          // Real API fetch
-          const response = await fetch(cmsConfig.apiUrl);
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return await response.json();
+        // Kategorien laden
+        const categoriesResponse = await fetch(`${cmsConfig.apiUrl}/items/categories`, { 
+          headers: {
+            'Accept': 'application/json'
+          },
+          cache: 'no-cache'
+        });
+        
+        if (!categoriesResponse.ok) {
+          throw new Error('Fehler beim Laden der Kategorien');
         }
+        
+        const categoriesData = await categoriesResponse.json();
+        
+        // Berufe mit allen verknüpften Daten laden
+        const professionsResponse = await fetch(`${cmsConfig.apiUrl}/items/professions?fields=*.*`, { 
+          headers: {
+            'Accept': 'application/json'
+          },
+          cache: 'no-cache'
+        });
+        
+        if (!professionsResponse.ok) {
+          throw new Error('Fehler beim Laden der Berufe');
+        }
+        
+        const professionsData = await professionsResponse.json();
+        
+        // Daten transformieren
+        const transformedData = {
+          categories: transformCategories(categoriesData.data),
+          berufe: transformProfessions(professionsData.data)
+        };
+        
+        // Daten für Offline-Nutzung im LocalStorage speichern
+        if (cmsConfig.offlineEnabled) {
+          localStorage.setItem('cms_data', JSON.stringify(transformedData));
+          localStorage.setItem('cms_last_update', new Date().toISOString());
+        }
+        
+        return transformedData;
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Fehler beim Laden der Daten:', error);
+        
+        // Bei Netzwerkfehlern die gespeicherten Daten aus dem LocalStorage laden
+        if (cmsConfig.offlineEnabled && localStorage.getItem('cms_data')) {
+          console.log('Offline-Modus: Lade gespeicherte Daten');
+          return JSON.parse(localStorage.getItem('cms_data'));
+        }
+        
+        // Fehleranzeige
         const cardContainer = document.getElementById('cardContainer');
         cardContainer.innerHTML = `
           <div class="error-message">
@@ -511,6 +269,63 @@
       }
     }
     
+    // Kategorien aus dem Direktus-Format transformieren
+    function transformCategories(categoriesData) {
+      const categories = [
+        { id: "all", name: "Alle" } // Standard-Kategorie "Alle" beibehalten
+      ];
+      
+      categoriesData.forEach(category => {
+        categories.push({
+          id: category.slug,
+          name: category.name
+        });
+      });
+      
+      return categories;
+    }
+    
+    // Berufe aus dem Direktus-Format transformieren
+    function transformProfessions(professionsData) {
+      return professionsData.map(profession => {
+        // Anforderungen aus JSON extrahieren
+        const requirements = Array.isArray(profession.requirements) 
+          ? profession.requirements.map(item => item.text || item) 
+          : [];
+        
+        // Karriereoptionen aus JSON extrahieren
+        const careerOptions = Array.isArray(profession.career_options) 
+          ? profession.career_options.map(item => item.text || item) 
+          : [];
+        
+        // Standorte aus JSON extrahieren
+        const locations = Array.isArray(profession.locations) 
+          ? profession.locations.map(item => item.text || item) 
+          : [];
+        
+        // Bilder für die Galerie
+        const galleryImages = profession.gallery_images?.map(img => ({
+          src: `${cmsConfig.imageBasePath}/${img.id}`,
+          alt: img.title || profession.title
+        })) || [];
+        
+        return {
+          id: profession.slug,
+          title: profession.title,
+          description: profession.description,
+          duration: profession.duration,
+          category: profession.category?.slug || "all",
+          requirements: requirements,
+          career_options: careerOptions,
+          locations: locations,
+          hasKnowledgeTest: profession.has_knowledge_test || false,
+          knowledgeTestUrl: profession.knowledge_test_url || null,
+          gallery_images: galleryImages
+        };
+      });
+    }
+    
+    // Filter initialisieren
     function initializeFilters(categories) {
       const filterContainer = document.getElementById('filterContainer');
       filterContainer.innerHTML = '';
@@ -543,6 +358,7 @@
       });
     }
 
+    // Karten erstellen
     function createCards(berufe) {
       const container = document.getElementById('cardContainer');
       container.innerHTML = '';
@@ -575,15 +391,18 @@
       });
     }
 
+    // Kategoriename aus der ID ermitteln
     function getCategoryName(categoryId) {
       const category = contentCache.categories.find(cat => cat.id === categoryId);
       return category ? category.name : categoryId;
     }
 
+    // Beruf anhand der ID finden
     function findBerufById(id) {
       return contentCache.berufe.find(beruf => beruf.id === id);
     }
 
+    // Karten nach Kategorie filtern
     function filterCards(categoryId) {
       const cards = document.querySelectorAll('.card');
       
@@ -604,95 +423,97 @@
       });
     }
 
-// Angepasste Funktion zum Öffnen der Detailseite
-function openDetailPage(berufId) {
-  const detailPage = document.getElementById('detailPage');
-  const beruf = findBerufById(berufId);
-  
-  if (!beruf) {
-    console.error(`Beruf with ID ${berufId} not found`);
-    return;
-  }
-  
-  // Set title and category
-  const detailTitle = document.getElementById('detailTitle');
-  const detailCategory = document.getElementById('detailCategory');
-  detailTitle.textContent = beruf.title;
-  detailTitle.dataset.berufId = berufId;
-  
-  detailCategory.textContent = getCategoryName(beruf.category);
-  
-  // Set detail sections
-  document.getElementById('detailDescription').innerHTML = `<p>${beruf.description}</p>`;
-  document.getElementById('detailDuration').innerHTML = `<p>${beruf.duration}</p>`;
-
-  if (beruf.requirements && beruf.requirements.length > 0) {
-    document.getElementById('detailRequirements').innerHTML = `<ul>${beruf.requirements.map(req => `<li>${req}</li>`).join('')}</ul>`;
-  } else {
-    document.getElementById('detailRequirements').innerHTML = '<p>Keine Angaben</p>';
-  }
-
-  if (beruf.career_options && beruf.career_options.length > 0) {
-    document.getElementById('detailCareer').innerHTML = `<ul>${beruf.career_options.map(career => `<li>${career}</li>`).join('')}</ul>`;
-  } else {
-    document.getElementById('detailCareer').innerHTML = '<p>Keine Angaben</p>';
-  }
-
-  if (beruf.locations && beruf.locations.length > 0) {
-    document.getElementById('detailLocations').innerHTML = `<ul>${beruf.locations.map(location => `<li>${location}</li>`).join('')}</ul>`;
-  } else {
-    document.getElementById('detailLocations').innerHTML = '<p>Keine Angaben</p>';
-  }
-  
-  // QR-Code ID aktualisieren
-  const qrBerufId = document.getElementById('qrBerufId');
-  if (qrBerufId) {
-    qrBerufId.textContent = berufId;
-  }
+    // Detailseite öffnen
+    function openDetailPage(berufId) {
+      const detailPage = document.getElementById('detailPage');
+      const beruf = findBerufById(berufId);
       
-  // Bilder für die Galerie laden
-  loadGalleryImages(berufId);
-  
-  // Wissenstest-Link konfigurieren
-  const hasKnowledgeTest = checkIfKnowledgeTestExists(berufId);
-  const knowledgeTestLink = document.getElementById('testKnowledgeLink');
-  const knowledgeTestContainer = document.getElementById('knowledgeTestContainer');
-  
-  if (hasKnowledgeTest) {
-    const testUrl = getKnowledgeTestUrl(berufId);
-    knowledgeTestLink.href = testUrl;
-    knowledgeTestLink.classList.remove('disabled');
-    knowledgeTestLink.title = `Teste dein Wissen über ${beruf.title}`;
-    knowledgeTestContainer.style.display = 'flex';
-    
-    knowledgeTestLink.addEventListener('click', resetInactivityTimer);
-  } else {
-    knowledgeTestContainer.style.display = 'none';
-  }
+      if (!beruf) {
+        console.error(`Beruf with ID ${berufId} not found`);
+        return;
+      }
+      
+      // Set title and category
+      const detailTitle = document.getElementById('detailTitle');
+      const detailCategory = document.getElementById('detailCategory');
+      detailTitle.textContent = beruf.title;
+      detailTitle.dataset.berufId = berufId;
+      
+      detailCategory.textContent = getCategoryName(beruf.category);
+      
+      // Set detail sections
+      document.getElementById('detailDescription').innerHTML = `<p>${beruf.description}</p>`;
+      document.getElementById('detailDuration').innerHTML = `<p>${beruf.duration}</p>`;
 
-  // Animationen für die Detailsektionen
-  const detailSections = document.querySelectorAll('.detail-section');
-  detailSections.forEach((section, index) => {
-    section.style.animationDelay = `${0.3 + (index * 0.1)}s`;
-  });
+      if (beruf.requirements && beruf.requirements.length > 0) {
+        document.getElementById('detailRequirements').innerHTML = `<ul>${beruf.requirements.map(req => `<li>${req}</li>`).join('')}</ul>`;
+      } else {
+        document.getElementById('detailRequirements').innerHTML = '<p>Keine Angaben</p>';
+      }
 
-  // Detailseite anzeigen und Animation starten
-  detailPage.style.display = 'flex';
-  document.body.style.overflow = 'hidden'; 
+      if (beruf.career_options && beruf.career_options.length > 0) {
+        document.getElementById('detailCareer').innerHTML = `<ul>${beruf.career_options.map(career => `<li>${career}</li>`).join('')}</ul>`;
+      } else {
+        document.getElementById('detailCareer').innerHTML = '<p>Keine Angaben</p>';
+      }
 
-  detailPage.style.animation = 'none';
-  setTimeout(() => {
-    detailPage.style.animation = 'slideIn 0.5s ease forwards';
-  }, 10);
-  
-  // Galerie initialisieren
-  setTimeout(() => {
-    if (document.querySelector('.gallery-wrapper')) {
-      const gallery = initializeGallery();
-      window.currentGallery = gallery;
+      if (beruf.locations && beruf.locations.length > 0) {
+        document.getElementById('detailLocations').innerHTML = `<ul>${beruf.locations.map(location => `<li>${location}</li>`).join('')}</ul>`;
+      } else {
+        document.getElementById('detailLocations').innerHTML = '<p>Keine Angaben</p>';
+      }
+      
+      // QR-Code ID aktualisieren
+      const qrBerufId = document.getElementById('qrBerufId');
+      if (qrBerufId) {
+        qrBerufId.textContent = berufId;
+      }
+      
+      // Bilder für die Galerie laden
+      loadGalleryImages(berufId);
+      
+      // Wissenstest-Link konfigurieren
+      const hasKnowledgeTest = checkIfKnowledgeTestExists(berufId);
+      const knowledgeTestLink = document.getElementById('testKnowledgeLink');
+      const knowledgeTestContainer = document.getElementById('knowledgeTestContainer');
+      
+      if (hasKnowledgeTest) {
+        const testUrl = getKnowledgeTestUrl(berufId);
+        knowledgeTestLink.href = testUrl;
+        knowledgeTestLink.classList.remove('disabled');
+        knowledgeTestLink.title = `Teste dein Wissen über ${beruf.title}`;
+        knowledgeTestContainer.style.display = 'flex';
+        
+        knowledgeTestLink.addEventListener('click', resetInactivityTimer);
+      } else {
+        knowledgeTestContainer.style.display = 'none';
+      }
+
+      // Animationen für die Detailsektionen
+      const detailSections = document.querySelectorAll('.detail-section');
+      detailSections.forEach((section, index) => {
+        section.style.animationDelay = `${0.3 + (index * 0.1)}s`;
+      });
+
+      // Detailseite anzeigen und Animation starten
+      detailPage.style.display = 'flex';
+      document.body.style.overflow = 'hidden'; 
+
+      detailPage.style.animation = 'none';
+      setTimeout(() => {
+        detailPage.style.animation = 'slideIn 0.5s ease forwards';
+      }, 10);
+      
+      // Galerie initialisieren
+      setTimeout(() => {
+        if (document.querySelector('.gallery-wrapper')) {
+          const gallery = initializeGallery();
+          window.currentGallery = gallery;
+        }
+      }, 500);
     }
-  }, 500);
-}
+
+    // Detailseite schließen
     function closeDetailPage() {
       // Benutzerinteraktion - Timer zurücksetzen
       resetInactivityTimer();
@@ -705,6 +526,7 @@ function openDetailPage(berufId) {
       }, 500);
     }
 
+    // App initialisieren
     async function initializeApp() {
       const data = await fetchCmsData();
       
@@ -716,6 +538,7 @@ function openDetailPage(berufId) {
       }
     }
 
+    // Touch-Events einrichten
     function setupTouchEvents() {
       document.addEventListener('click', function(event) {
         if (event.target.closest('#backButton')) {
@@ -732,6 +555,7 @@ function openDetailPage(berufId) {
       });
     }
 
+    // Bildschirmorientierung behandeln
     function setupOrientationHandling() {
       window.addEventListener('orientationchange', function() {
         // Benutzerinteraktion - Timer zurücksetzen
@@ -755,6 +579,7 @@ function openDetailPage(berufId) {
       document.body.classList.toggle('portrait', !isLandscape);
     }
 
+    // Automatische Aktualisierung einrichten
     function setupAutoRefresh() {
       if (cmsConfig.refreshInterval > 0) {
         setInterval(async function() {
@@ -773,20 +598,19 @@ function openDetailPage(berufId) {
       }
     }
     
-    // Verbesserte Inaktivitäts-Timer-Funktionen
+    // Inaktivitäts-Timer-Funktionen
     let inactivityTimeout;
     let warningTimeout;
     let countdownInterval;
-    const inactivityTime = 2 * 60 * 1000; // 2 Minuten in Millisekunden
-    const warningTime = 10 * 1000; // 10 Sekunden vor Ablauf Warnung anzeigen
-    let remainingSeconds = 10; // Startwert für den Countdown
+    const inactivityTime = 2 * 60 * 1000; // 2 Minuten
+    const warningTime = 10 * 1000; // 10 Sekunden Warnung
+    let remainingSeconds = 10;
 
     // Countdown aktualisieren
     function updateCountdown() {
       const countdownElement = document.getElementById('countdown');
       countdownElement.textContent = remainingSeconds;
       
-      // Farbe ändern wenn weniger als 10 Sekunden
       if (remainingSeconds <= 10) {
         countdownElement.style.color = '#ff0000';
         countdownElement.style.fontSize = '2.2rem';
@@ -794,7 +618,6 @@ function openDetailPage(berufId) {
       
       remainingSeconds--;
       
-      // Stoppen wenn der Countdown bei 0 angelangt ist
       if (remainingSeconds < 0) {
         clearInterval(countdownInterval);
       }
@@ -804,63 +627,59 @@ function openDetailPage(berufId) {
     function showInactivityWarning() {
       document.getElementById('inactivityWarning').style.display = 'flex';
       
-      // Countdown zurücksetzen und starten
       remainingSeconds = Math.floor(warningTime / 1000);
       updateCountdown();
       
-      // Countdown-Interval starten (jede Sekunde aktualisieren)
       countdownInterval = setInterval(updateCountdown, 1000);
     }
 
     // Warnmeldung ausblenden
     function hideInactivityWarning() {
       document.getElementById('inactivityWarning').style.display = 'none';
-      // Countdown stoppen
       clearInterval(countdownInterval);
     }
 
-    // Funktion zum Zurücksetzen des Timers
+    // Timer zurücksetzen
     function resetInactivityTimer() {
-      // Timer zurücksetzen
       clearTimeout(inactivityTimeout);
       clearTimeout(warningTimeout);
       clearInterval(countdownInterval);
       
-      // Warnmeldung ausblenden (falls angezeigt)
       hideInactivityWarning();
       
-      // Neuen Timer für Warnung starten
       warningTimeout = setTimeout(() => {
-        // Warnmeldung anzeigen
         showInactivityWarning();
       }, inactivityTime - warningTime);
       
-      // Neuen Timer für Weiterleitung starten
       inactivityTimeout = setTimeout(() => {
-        // Nach Inaktivitätszeit zur Landing Page zurückkehren
         window.location.href = 'landing.html';
       }, inactivityTime);
     }
 
-    // Event-Listener für Benutzerinteraktionen einrichten
+    // Inaktivitätserkennung einrichten
     function setupInactivityDetection() {
-      // Liste der Events, die als "Aktivität" gelten
       const events = [
         'mousedown', 'mousemove', 'keypress', 
         'scroll', 'touchstart', 'click', 'keydown'
       ];
-// Event-Listener für jedes Event hinzufügen
-events.forEach(eventName => {
+      
+      events.forEach(eventName => {
         document.addEventListener(eventName, resetInactivityTimer, true);
       });
       
-      // Initial den Timer starten
       resetInactivityTimer();
     }
     
-    // Funktion zur Prüfung, ob für einen Beruf ein Wissenstest existiert
+    // Prüfen, ob ein Wissenstest existiert
     function checkIfKnowledgeTestExists(berufId) {
-      // Liste der Berufe, für die Wissenstests existieren
+      const beruf = findBerufById(berufId);
+      
+      // Wenn im CMS definiert ist, dass ein Test verfügbar ist
+      if (beruf && beruf.hasKnowledgeTest) {
+        return true;
+      }
+      
+      // Fallback zur Liste von bekannten Tests
       const availableTests = [
         'chemielaborant',
         'fachkraft-metalltechnik',
@@ -871,9 +690,16 @@ events.forEach(eventName => {
       return availableTests.includes(berufId);
     }
     
-    // Funktion zum Abrufen der korrekten URL für den Wissenstest
+    // URL für den Wissenstest abrufen
     function getKnowledgeTestUrl(berufId) {
-      // Pfad zu den externen Wissenstest-Dateien
+      const beruf = findBerufById(berufId);
+      
+      // Wenn im CMS eine spezifische URL definiert ist
+      if (beruf && beruf.knowledgeTestUrl) {
+        return beruf.knowledgeTestUrl;
+      }
+      
+      // Fallback auf lokale Tests
       const testPaths = {
         'chemielaborant': 'tests/chemielaborant.html',
         'fachkraft-metalltechnik': 'tests/metalltechnik.html',
@@ -881,20 +707,98 @@ events.forEach(eventName => {
         'elektroniker-automatisierung' : 'tests/eat.html'
       };
       
-      // Rückgabe des Pfads oder eines Fallbacks
       return testPaths[berufId] || '#';
     }
 
-    // JavaScript für die Bildgalerie und Vergrößerungsfunktion
+    // Bilder für die Galerie laden
+    function loadGalleryImages(berufId) {
+      const galleryWrapper = document.querySelector('.gallery-wrapper');
+      galleryWrapper.innerHTML = '';
+      
+      const beruf = findBerufById(berufId);
+      
+      // CMS-Bilder verwenden, wenn vorhanden
+      let galleryImages = [];
+      
+      if (beruf.gallery_images && beruf.gallery_images.length > 0) {
+        galleryImages = beruf.gallery_images;
+      } else {
+        // Fallback auf lokale Standardbilder
+        galleryImages = [
+          { 
+            src: "img/gallery/default1.png",
+            alt: "Ausbildung bei Volkswagen" 
+          },
+          { 
+            src: "img/gallery/default2.png",
+            alt: "Praktische Übungen" 
+          },
+          { 
+            src: "img/gallery/default3.png",
+            alt: "Team-Arbeit" 
+          },
+          { 
+            src: "img/gallery/default4.jpg", 
+            alt: "Moderner Arbeitsplatz" 
+          }
+        ];
+      }
+      
+      // Erstelle die Galerie-Slides
+      galleryImages.forEach((image) => {
+        const slide = document.createElement('div');
+        slide.className = 'gallery-slide';
+        
+        const img = document.createElement('img');
+        img.src = image.src;
+        img.alt = image.alt;
+        img.className = 'gallery-image';
+        
+        // Fehlerbehandlung für Bilder
+        img.onerror = function() {
+          this.src = 'img/placeholder.jpg';
+          console.warn(`Bild ${image.src} konnte nicht geladen werden.`);
+        };
+        
+        slide.appendChild(img);
+        galleryWrapper.appendChild(slide);
+      });
+      
+      updateGalleryDots(galleryImages.length);
+    }
+
+    // Navigationspunkte für die Galerie aktualisieren
+    function updateGalleryDots(imageCount) {
+      const dotsContainer = document.querySelector('.gallery-dots');
+      dotsContainer.innerHTML = '';
+      
+      for (let i = 0; i < imageCount; i++) {
+        const dot = document.createElement('span');
+        dot.className = i === 0 ? 'gallery-dot active' : 'gallery-dot';
+        dot.setAttribute('data-index', i);
+        
+        dot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const index = parseInt(dot.getAttribute('data-index'));
+          if (window.galleryNavigation) {
+            window.galleryNavigation.goToSlide(index);
+          }
+        });
+        
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    // Galerie initialisieren
     function initializeGallery() {
       const galleryWrapper = document.querySelector('.gallery-wrapper');
-      const slides = document.querySelectorAll('.gallery-slide');
-      const dots = document.querySelectorAll('.gallery-dot');
       const prevButton = document.querySelector('.prev-button');
       const nextButton = document.querySelector('.next-button');
       const fullscreenOverlay = document.querySelector('.fullscreen-overlay');
       const fullscreenImage = document.querySelector('.fullscreen-image');
       const closeFullscreen = document.querySelector('.close-fullscreen');
+      
+      const slides = document.querySelectorAll('.gallery-slide');
       const totalSlides = slides.length;
       
       let currentIndex = 0;
@@ -907,7 +811,8 @@ events.forEach(eventName => {
       function updateGallery() {
         galleryWrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
         
-        dots.forEach((dot, index) => {
+        const currentDots = document.querySelectorAll('.gallery-dot');
+        currentDots.forEach((dot, index) => {
           if (index === currentIndex) {
             dot.classList.add('active');
           } else {
@@ -915,8 +820,14 @@ events.forEach(eventName => {
           }
         });
       }
-      
+
       // Navigation
+      function goToSlide(index) {
+        currentIndex = index;
+        updateGallery();
+        resetAutoplay();
+      }
+      
       prevButton.addEventListener('click', (e) => {
         e.stopPropagation();
         currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
@@ -929,15 +840,6 @@ events.forEach(eventName => {
         currentIndex = (currentIndex + 1) % totalSlides;
         updateGallery();
         resetAutoplay();
-      });
-      
-      dots.forEach((dot, index) => {
-        dot.addEventListener('click', (e) => {
-          e.stopPropagation();
-          currentIndex = index;
-          updateGallery();
-          resetAutoplay();
-        });
       });
       
       // Touch-Events
@@ -982,16 +884,20 @@ events.forEach(eventName => {
       });
       
       // Vergrößerungsfunktion
-      slides.forEach((slide) => {
-        slide.addEventListener('click', () => {
-          const img = slide.querySelector('img');
-          fullscreenImage.src = img.src;
-          fullscreenImage.alt = img.alt;
-          fullscreenOverlay.classList.add('active');
-          document.body.style.overflow = 'hidden';
-          clearInterval(autoplayInterval);
+      function setupVergroesserung() {
+        const currentSlides = document.querySelectorAll('.gallery-slide');
+        
+        currentSlides.forEach((slide) => {
+          slide.addEventListener('click', () => {
+            const img = slide.querySelector('img');
+            fullscreenImage.src = img.src;
+            fullscreenImage.alt = img.alt;
+            fullscreenOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            clearInterval(autoplayInterval);
+          });
         });
-      });
+      }
       
       closeFullscreen.addEventListener('click', () => {
         fullscreenOverlay.classList.remove('active');
@@ -1022,297 +928,43 @@ events.forEach(eventName => {
         startAutoplay();
       }
       
-      startAutoplay();
-      updateGallery();
-    }
-    // Testdaten für die Galerie - Diese würden später vom CMS kommen
-function getGalleryImagesForBeruf(berufId) {
-  // Standardbilder für alle Berufe, die (noch) keine eigenen Bilder haben
-  const defaultImages = [
-    { 
-      src: "img/gallery/default1.png",
-      alt: "Ausbildung bei Volkswagen" 
-    },
-    { 
-      src: "img/gallery/default2.png",
-      alt: "Praktische Übungen" 
-    },
-    { 
-      src: "img/gallery/default3.png",
-      alt: "Team-Arbeit" 
-    },
-    { 
-      src: "img/gallery/default4.jpg", 
-      alt: "Moderner Arbeitsplatz" 
-    }
-  ];
-  
-  // Bilder für spezifische Berufe
-  const berufImages = {
-    "chemielaborant": [
-      { 
-        src: "img/gallery/chemie1.jpg", 
-        alt: "Chemielabor Arbeitsplatz" 
-      },
-      { 
-        src: "img/gallery/chemie2.jpg", 
-        alt: "Analysen im Labor" 
-      },
-      { 
-        src: "img/gallery/chemie3.jpg", 
-        alt: "Experimente durchführen" 
-      },
-      { 
-        src: "img/gallery/chemie4.jpg", 
-        alt: "Teamarbeit im Labor" 
-      }
-    ],
-    "fachkraft-metalltechnik": [
-      { 
-        src: "img/gallery/metall1.jpg", 
-        alt: "Metallbearbeitung" 
-      },
-      { 
-        src: "img/gallery/metall2.jpg", 
-        alt: "CNC-Maschine" 
-      },
-      { 
-        src: "img/gallery/metall3.jpg", 
-        alt: "Präzisionsarbeit mit Metall" 
-      },
-      { 
-        src: "img/gallery/metall4.jpg", 
-        alt: "Teamarbeit in der Werkstatt" 
-      }
-    ],
-    // Weitere Berufe hier hinzufügen
-  };
-  
-  // Wenn Bilder für diesen Beruf existieren, verwende diese, ansonsten Standardbilder
-  return berufImages[berufId] || defaultImages;
-}
-
-// Neue Funktion zum Laden der Bilder für die Galerie
-function loadGalleryImages(berufId) {
-  const galleryWrapper = document.querySelector('.gallery-wrapper');
-  
-  // Zurücksetzen der Galerie
-  galleryWrapper.innerHTML = '';
-  
-  // In der fertigen CMS-Version würde hier ein API-Aufruf stehen,
-  // der die Bilder für den spezifischen Beruf lädt
-  const galleryImages = getGalleryImagesForBeruf(berufId);
-  
-  // Erstelle die Galerie-Slides mit den Bildern
-  galleryImages.forEach((image, index) => {
-    const slide = document.createElement('div');
-    slide.className = 'gallery-slide';
-    
-    const img = document.createElement('img');
-    img.src = image.src;
-    img.alt = image.alt;
-    img.className = 'gallery-image';
-    
-    slide.appendChild(img);
-    galleryWrapper.appendChild(slide);
-  });
-  
-  // Aktualisiere die Dots entsprechend der Anzahl der Bilder
-  updateGalleryDots(galleryImages.length);
-}
-
-// Funktion zum Aktualisieren der Navigationspunkte
-function updateGalleryDots(imageCount) {
-  const dotsContainer = document.querySelector('.gallery-dots');
-  dotsContainer.innerHTML = '';
-  
-  for (let i = 0; i < imageCount; i++) {
-    const dot = document.createElement('span');
-    dot.className = i === 0 ? 'gallery-dot active' : 'gallery-dot';
-    dot.setAttribute('data-index', i);
-    
-    // Klick-Event hinzufügen
-    dot.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const index = parseInt(dot.getAttribute('data-index'));
-      // Diese Funktion müsste in initializeGallery() aufgerufen werden
-      if (window.galleryNavigation) {
-        window.galleryNavigation.goToSlide(index);
-      }
-    });
-    
-    dotsContainer.appendChild(dot);
-  }
-}
-
-// Modifizierte Gallery-Initialisierung, um mit dynamisch geladenen Bildern zu arbeiten
-function initializeGallery() {
-  const galleryWrapper = document.querySelector('.gallery-wrapper');
-  const prevButton = document.querySelector('.prev-button');
-  const nextButton = document.querySelector('.next-button');
-  const fullscreenOverlay = document.querySelector('.fullscreen-overlay');
-  const fullscreenImage = document.querySelector('.fullscreen-image');
-  const closeFullscreen = document.querySelector('.close-fullscreen');
-  
-  // Slides werden jetzt dynamisch geladen, also hier abrufen
-  const slides = document.querySelectorAll('.gallery-slide');
-  const totalSlides = slides.length;
-  
-  let currentIndex = 0;
-  let startX = 0;
-  let currentX = 0;
-  let isDragging = false;
-  let autoplayInterval = null;
-  
-  // Galerie aktualisieren
-  function updateGallery() {
-    galleryWrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
-    
-    const currentDots = document.querySelectorAll('.gallery-dot');
-    currentDots.forEach((dot, index) => {
-      if (index === currentIndex) {
-        dot.classList.add('active');
-      } else {
-        dot.classList.remove('active');
-      }
-    });
-  }
-
-  // Navigation
-  function goToSlide(index) {
-    currentIndex = index;
-    updateGallery();
-    resetAutoplay();
-  }
-  
-  prevButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-    updateGallery();
-    resetAutoplay();
-  });
-  
-  nextButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    currentIndex = (currentIndex + 1) % totalSlides;
-    updateGallery();
-    resetAutoplay();
-  });
-  
-  // Touch-Events
-  galleryWrapper.addEventListener('touchstart', (e) => {
-    startX = e.touches[0].clientX;
-    isDragging = true;
-    galleryWrapper.style.transition = 'none';
-  });
-  
-  galleryWrapper.addEventListener('touchmove', (e) => {
-    if (!isDragging) return;
-    
-    currentX = e.touches[0].clientX;
-    const diffX = currentX - startX;
-    
-    if ((currentIndex === 0 && diffX > 0) || (currentIndex === totalSlides - 1 && diffX < 0)) {
-      galleryWrapper.style.transform = `translateX(calc(-${currentIndex * 100}% + ${diffX / 3}px))`;
-    } else {
-      galleryWrapper.style.transform = `translateX(calc(-${currentIndex * 100}% + ${diffX}px))`;
-    }
-  });
-  
-  galleryWrapper.addEventListener('touchend', (e) => {
-    if (!isDragging) return;
-    
-    isDragging = false;
-    galleryWrapper.style.transition = 'transform 0.3s ease-in-out';
-    
-    const diffX = currentX - startX;
-    const threshold = galleryWrapper.offsetWidth * 0.2;
-    
-    if (Math.abs(diffX) > threshold) {
-      if (diffX > 0 && currentIndex > 0) {
-        currentIndex--;
-      } else if (diffX < 0 && currentIndex < totalSlides - 1) {
-        currentIndex++;
-      }
-    }
-    
-    updateGallery();
-    resetAutoplay();
-  });
-  
-  // Vergrößerungsfunktion hinzufügen
-  function setupVergroesserung() {
-    const currentSlides = document.querySelectorAll('.gallery-slide');
-    
-    currentSlides.forEach((slide) => {
-      slide.addEventListener('click', () => {
-        const img = slide.querySelector('img');
-        fullscreenImage.src = img.src;
-        fullscreenImage.alt = img.alt;
-        fullscreenOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        clearInterval(autoplayInterval);
-      });
-    });
-  }
-  
-  closeFullscreen.addEventListener('click', () => {
-    fullscreenOverlay.classList.remove('active');
-    document.body.style.overflow = '';
-    startAutoplay();
-  });
-  
-  fullscreenOverlay.addEventListener('click', (e) => {
-    if (e.target === fullscreenOverlay) {
-      fullscreenOverlay.classList.remove('active');
-      document.body.style.overflow = '';
-      startAutoplay();
-    }
-  });
-  
-  // Autoplay
-  function startAutoplay() {
-    autoplayInterval = setInterval(() => {
-      currentIndex = (currentIndex + 1) % totalSlides;
-      updateGallery();
-    }, 5000);
-  }
-  
-  function resetAutoplay() {
-    if (autoplayInterval) {
-      clearInterval(autoplayInterval);
-    }
-    startAutoplay();
-  }
-  
-  setupVergroesserung();
-  startAutoplay();
-  updateGallery();
-  
-  // Stellt die Navigation für externe Nutzung zur Verfügung
-  window.galleryNavigation = {
-    goToSlide: goToSlide
-  };
-  
-  // Wenn die Galerie neu initialisiert wird, brauchen wir diese Funktionen zur Verfügung
-  return {
-    reinitialize: () => {
       setupVergroesserung();
+      startAutoplay();
       updateGallery();
+      
+      // Navigation für externe Nutzung
+      window.galleryNavigation = {
+        goToSlide: goToSlide
+      };
+      
+      return {
+        reinitialize: () => {
+          setupVergroesserung();
+          updateGallery();
+        }
+      };
     }
-  };
-}
 
-
-
-
+    // Service Worker für Offline-Funktionalität registrieren
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => {
+            console.log('Service Worker erfolgreich registriert:', registration.scope);
+          })
+          .catch(error => {
+            console.error('Service Worker Registrierung fehlgeschlagen:', error);
+          });
+      });
+    }
     
+    // App starten, wenn DOM geladen ist
     document.addEventListener('DOMContentLoaded', () => {
       initializeApp();
       setupTouchEvents();
       setupOrientationHandling();
       setupAutoRefresh();
-      setupInactivityDetection(); // Inaktivitätserkennung starten
+      setupInactivityDetection();
     });
   </script>
   <script src="translation.js"></script>
