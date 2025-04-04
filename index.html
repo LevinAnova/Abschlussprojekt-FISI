@@ -72,94 +72,114 @@
     </div>
   </div>
 
-  <div id="detailPage" class="detail-page">
-    <div class="detail-header">
-      <button id="backButton" class="back-button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 12H5M12 19l-7-7 7-7"/>
-        </svg>
-      </button>
-      <h2 id="detailTitle" class="detail-title">Ausbildungsberuf</h2>
-      <div style="width: 40px;"></div>
+  <!-- Detail Seite HTML-Struktur für index.html -->
+<div id="detailPage" class="detail-page">
+  <!-- Header und Navigation bleiben bestehen -->
+  <div class="detail-header">
+    <button id="backButton" class="back-button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <h2 id="detailTitle" class="detail-title">Ausbildungsberuf</h2>
+    <div style="width: 40px;"></div>
+  </div>
+  
+  <span id="detailCategory" class="detail-category">Kategorie</span>
+  
+  <!-- Neues flexibles Container-Layout -->
+  <div class="detail-container">
+    <!-- Oberer Bereich: QR-Code und Galerie nebeneinander -->
+    <div class="flex-container top-section">
+      <!-- QR-Code Container -->
+      <div class="qr-code-container">
+        <h3 class="qr-title">Direkt bewerben</h3>
+        <p class="qr-text">Scanne den QR-Code, um dich für diesen Ausbildungsberuf zu bewerben.</p>
+        <div class="qr-code">
+          <!-- Platzhalter für QR-Code -->
+          <img src="/api/placeholder/250/250" alt="QR-Code für Bewerbung">
+          <div class="qr-beruf-id" id="qrBerufId"></div>
+        </div>
+      </div>
+      
+      <!-- Bildergalerie Container -->
+      <div class="image-gallery-container">
+        <h3 class="gallery-title">Einblicke in den Beruf</h3>
+        <div class="image-gallery">
+          <div class="gallery-wrapper">
+            <!-- Bilder werden dynamisch eingefügt -->
+          </div>
+        </div>
+        <div class="gallery-navigation">
+          <button class="gallery-button prev-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
+            </svg>
+          </button>
+          <div class="gallery-dots">
+            <!-- Dots werden dynamisch eingefügt -->
+          </div>
+          <button class="gallery-button next-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
     
-    <span id="detailCategory" class="detail-category">Kategorie</span>
-    <div class="detail-container">
-      <div class="detail-main">
-        <div class="detail-section">
-          <h3>Beschreibung</h3>
-          <div id="detailDescription"></div>
-        </div>
-        
-        <div class="detail-section">
-          <h3>Ausbildungsdauer</h3>
-          <div id="detailDuration"></div>
-        </div>
-        
-        <div class="detail-section">
-          <h3>Anforderungen</h3>
-          <div id="detailRequirements"></div>
-        </div>
-        
-        <div class="detail-section">
-          <h3>Karrieremöglichkeiten</h3>
-          <div id="detailCareer"></div>
-        </div>
-        
-        <div class="detail-section">
-          <h3>Standorte</h3>
-          <div id="detailLocations"></div>
-        </div>
+    <!-- Mittlerer Bereich: Wissenstest-Button -->
+    <div class="knowledge-test-container" id="knowledgeTestContainer">
+      <a id="testKnowledgeLink" href="#" class="knowledge-test-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        Teste dein Wissen
+      </a>
+      <p class="knowledge-test-info">Finde heraus, ob dieser Beruf zu dir passt!</p>
+    </div>
+    
+    <!-- Unterer Bereich: Berufsinfos -->
+    <div class="detail-main">
+      <div class="detail-section">
+        <h3>Beschreibung</h3>
+        <div id="detailDescription"></div>
+      </div>
+      
+      <div class="detail-section">
+        <h3>Ausbildungsdauer</h3>
+        <div id="detailDuration"></div>
+      </div>
+      
+      <div class="detail-section">
+        <h3>Anforderungen</h3>
+        <div id="detailRequirements"></div>
+      </div>
+      
+      <div class="detail-section">
+        <h3>Karrieremöglichkeiten</h3>
+        <div id="detailCareer"></div>
+      </div>
+      
+      <div class="detail-section">
+        <h3>Standorte</h3>
+        <div id="detailLocations"></div>
       </div>
     </div>
-  </div>
-
-<!-- Angepasste HTML-Struktur für die Bildergalerie -->
-<div class="image-gallery-container">
-  <h3 class="gallery-title">Einblicke in den Beruf</h3>
-  <div class="image-gallery">
-    <div class="gallery-wrapper">
-      <!-- Bilder werden dynamisch eingefügt -->
-    </div>
-  </div>
-  <div class="gallery-navigation">
-    <button class="gallery-button prev-button">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
-      </svg>
-    </button>
-    <div class="gallery-dots">
-      <!-- Dots werden dynamisch eingefügt -->
-    </div>
-    <button class="gallery-button next-button">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
-      </svg>
-    </button>
   </div>
 </div>
-      <div class="knowledge-test-container" id="knowledgeTestContainer">
-        <a id="testKnowledgeLink" href="#" class="knowledge-test-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-          </svg>
-          Teste dein Wissen
-        </a>
-        <p class="knowledge-test-info">Finde heraus, ob dieser Beruf zu dir passt!</p>
-      </div>
-    </div>
 
-  <!-- Fullscreen-Overlay für Bildvergrößerung -->
-  <div class="fullscreen-overlay">
-    <img src="" alt="" class="fullscreen-image">
-    <div class="close-fullscreen">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    </div>
+<!-- Fullscreen-Overlay für Bildvergrößerung (bleibt bestehen) -->
+<div class="fullscreen-overlay">
+  <img src="" alt="" class="fullscreen-image">
+  <div class="close-fullscreen">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
   </div>
+</div>
 
   <script>
     const cmsConfig = {
@@ -584,7 +604,8 @@
       });
     }
 
-    function openDetailPage(berufId) {
+// Angepasste Funktion zum Öffnen der Detailseite
+function openDetailPage(berufId) {
   const detailPage = document.getElementById('detailPage');
   const beruf = findBerufById(berufId);
   
@@ -593,69 +614,69 @@
     return;
   }
   
+  // Set title and category
   const detailTitle = document.getElementById('detailTitle');
   const detailCategory = document.getElementById('detailCategory');
-  const detailDescription = document.getElementById('detailDescription');
-  const detailDuration = document.getElementById('detailDuration');
-  const detailRequirements = document.getElementById('detailRequirements');
-  const detailCareer = document.getElementById('detailCareer');
-  const detailLocations = document.getElementById('detailLocations');
-  const knowledgeTestLink = document.getElementById('testKnowledgeLink');
-  const knowledgeTestContainer = document.getElementById('knowledgeTestContainer');
-
   detailTitle.textContent = beruf.title;
-  // Speichern der Berufs-ID für den Wissenstest
   detailTitle.dataset.berufId = berufId;
   
   detailCategory.textContent = getCategoryName(beruf.category);
-  detailDescription.innerHTML = `<p>${beruf.description}</p>`;
-  detailDuration.innerHTML = `<p>${beruf.duration}</p>`;
+  
+  // Set detail sections
+  document.getElementById('detailDescription').innerHTML = `<p>${beruf.description}</p>`;
+  document.getElementById('detailDuration').innerHTML = `<p>${beruf.duration}</p>`;
 
   if (beruf.requirements && beruf.requirements.length > 0) {
-    detailRequirements.innerHTML = `<ul>${beruf.requirements.map(req => `<li>${req}</li>`).join('')}</ul>`;
+    document.getElementById('detailRequirements').innerHTML = `<ul>${beruf.requirements.map(req => `<li>${req}</li>`).join('')}</ul>`;
   } else {
-    detailRequirements.innerHTML = '<p>Keine Angaben</p>';
+    document.getElementById('detailRequirements').innerHTML = '<p>Keine Angaben</p>';
   }
 
   if (beruf.career_options && beruf.career_options.length > 0) {
-    detailCareer.innerHTML = `<ul>${beruf.career_options.map(career => `<li>${career}</li>`).join('')}</ul>`;
+    document.getElementById('detailCareer').innerHTML = `<ul>${beruf.career_options.map(career => `<li>${career}</li>`).join('')}</ul>`;
   } else {
-    detailCareer.innerHTML = '<p>Keine Angaben</p>';
+    document.getElementById('detailCareer').innerHTML = '<p>Keine Angaben</p>';
   }
 
   if (beruf.locations && beruf.locations.length > 0) {
-    detailLocations.innerHTML = `<ul>${beruf.locations.map(location => `<li>${location}</li>`).join('')}</ul>`;
+    document.getElementById('detailLocations').innerHTML = `<ul>${beruf.locations.map(location => `<li>${location}</li>`).join('')}</ul>`;
   } else {
-    detailLocations.innerHTML = '<p>Keine Angaben</p>';
+    document.getElementById('detailLocations').innerHTML = '<p>Keine Angaben</p>';
+  }
+  
+  // QR-Code ID aktualisieren
+  const qrBerufId = document.getElementById('qrBerufId');
+  if (qrBerufId) {
+    qrBerufId.textContent = berufId;
   }
       
-  // Bilder für die Galerie basierend auf berufId laden
+  // Bilder für die Galerie laden
   loadGalleryImages(berufId);
   
-  // Wissenstest-Link Konfiguration
-  // Prüfen, ob für diesen Beruf ein Wissenstest verfügbar ist
+  // Wissenstest-Link konfigurieren
   const hasKnowledgeTest = checkIfKnowledgeTestExists(berufId);
+  const knowledgeTestLink = document.getElementById('testKnowledgeLink');
+  const knowledgeTestContainer = document.getElementById('knowledgeTestContainer');
   
   if (hasKnowledgeTest) {
-    // Setze den richtigen Link für den Test
     const testUrl = getKnowledgeTestUrl(berufId);
     knowledgeTestLink.href = testUrl;
     knowledgeTestLink.classList.remove('disabled');
     knowledgeTestLink.title = `Teste dein Wissen über ${beruf.title}`;
     knowledgeTestContainer.style.display = 'flex';
     
-    // Event-Listener für Inaktivitätstimer-Reset
     knowledgeTestLink.addEventListener('click', resetInactivityTimer);
   } else {
-    // Wenn kein Wissenstest verfügbar ist, Button ausblenden
     knowledgeTestContainer.style.display = 'none';
   }
 
+  // Animationen für die Detailsektionen
   const detailSections = document.querySelectorAll('.detail-section');
   detailSections.forEach((section, index) => {
     section.style.animationDelay = `${0.3 + (index * 0.1)}s`;
   });
 
+  // Detailseite anzeigen und Animation starten
   detailPage.style.display = 'flex';
   document.body.style.overflow = 'hidden'; 
 
@@ -664,18 +685,14 @@
     detailPage.style.animation = 'slideIn 0.5s ease forwards';
   }, 10);
   
-  // Initialisiere die Galerie mit einem kleinen Delay, 
-  // damit die Bilder Zeit haben, geladen zu werden
+  // Galerie initialisieren
   setTimeout(() => {
     if (document.querySelector('.gallery-wrapper')) {
       const gallery = initializeGallery();
-      
-      // Speichern der Galerie-Referenz für spätere Aktualisierungen
       window.currentGallery = gallery;
     }
   }, 500);
 }
-
     function closeDetailPage() {
       // Benutzerinteraktion - Timer zurücksetzen
       resetInactivityTimer();
