@@ -198,76 +198,76 @@
       berufe: []
     };
 
-    // Daten vom CMS laden
     async function fetchCmsData() {
-      const loadingIndicator = document.getElementById('loadingIndicator');
-      loadingIndicator.style.display = 'flex';
-      
-      try {
-        // Kategorien laden
-        const categoriesResponse = await fetch(`${cmsConfig.apiUrl}/items/categories`, { 
-          headers: {
-            'Accept': 'application/json'
-          },
-          cache: 'no-cache'
-        });
-        
-        if (!categoriesResponse.ok) {
-          throw new Error('Fehler beim Laden der Kategorien');
-        }
-        
-        const categoriesData = await categoriesResponse.json();
-        
-        // Berufe mit allen verknüpften Daten laden
-        const professionsResponse = await fetch(`${cmsConfig.apiUrl}/items/professions?fields=*.*`, { 
-          headers: {
-            'Accept': 'application/json'
-          },
-          cache: 'no-cache'
-        });
-        
-        if (!professionsResponse.ok) {
-          throw new Error('Fehler beim Laden der Berufe');
-        }
-        
-        const professionsData = await professionsResponse.json();
-        
-        // Daten transformieren
-        const transformedData = {
-          categories: transformCategories(categoriesData.data),
-          berufe: transformProfessions(professionsData.data)
-        };
-        
-        // Daten für Offline-Nutzung im LocalStorage speichern
-        if (cmsConfig.offlineEnabled) {
-          localStorage.setItem('cms_data', JSON.stringify(transformedData));
-          localStorage.setItem('cms_last_update', new Date().toISOString());
-        }
-        
-        return transformedData;
-      } catch (error) {
-        console.error('Fehler beim Laden der Daten:', error);
-        
-        // Bei Netzwerkfehlern die gespeicherten Daten aus dem LocalStorage laden
-        if (cmsConfig.offlineEnabled && localStorage.getItem('cms_data')) {
-          console.log('Offline-Modus: Lade gespeicherte Daten');
-          return JSON.parse(localStorage.getItem('cms_data'));
-        }
-        
-        // Fehleranzeige
-        const cardContainer = document.getElementById('cardContainer');
-        cardContainer.innerHTML = `
-          <div class="error-message">
-            <p>Fehler beim Laden der Daten. Bitte versuchen Sie es später erneut.</p>
-            <button id="retryButton">Erneut versuchen</button>
-          </div>
-        `;
-        document.getElementById('retryButton').addEventListener('click', initializeApp);
-        return null;
-      } finally {
-        loadingIndicator.style.display = 'none';
-      }
+  const loadingIndicator = document.getElementById('loadingIndicator');
+  loadingIndicator.style.display = 'flex';
+  
+  try {
+    // Daten vom Backend abrufen
+    const categoriesResponse = await fetch('http://localhost:3000/api/categories');
+    const professionsResponse = await fetch('http://localhost:3000/api/professions');
+    
+    if (!categoriesResponse.ok || !professionsResponse.ok) {
+      throw new Error('Fehler beim Laden der Daten');
     }
+    
+    const categories = await categoriesResponse.json();
+    const professions = await professionsResponse.json();
+    
+    // Daten transformieren
+    const transformedData = {
+      categories: [
+        { id: "all", name: "Alle" }, // Standard-Kategorie hinzufügen
+        ...categories.map(category => ({
+          id: category.id,
+          name: category.name
+        }))
+      ],
+      berufe: professions.map(profession => ({
+        id: profession.id,
+        title: profession.title,
+        description: profession.description,
+        duration: profession.duration,
+        category: profession.category_id,
+        requirements: profession.requirements,
+        career_options: profession.career_options,
+        locations: profession.locations,
+        hasKnowledgeTest: profession.has_knowledge_test,
+        gallery_images: profession.gallery_images,
+        qr_code: profession.qr_code
+      }))
+    };
+    
+    // Daten für Offline-Nutzung speichern
+    if (cmsConfig.offlineEnabled) {
+      localStorage.setItem('cms_data', JSON.stringify(transformedData));
+      localStorage.setItem('cms_last_update', new Date().toISOString());
+    }
+    
+    return transformedData;
+  } catch (error) {
+    console.error('Fehler beim Laden der Daten:', error);
+    
+    // Bei Netzwerkfehlern die gespeicherten Daten aus dem LocalStorage laden
+    if (cmsConfig.offlineEnabled && localStorage.getItem('cms_data')) {
+      console.log('Offline-Modus: Lade gespeicherte Daten');
+      return JSON.parse(localStorage.getItem('cms_data'));
+    }
+    
+    // Fehleranzeige
+    const cardContainer = document.getElementById('cardContainer');
+    cardContainer.innerHTML = `
+      <div class="error-message">
+        <p>Fehler beim Laden der Daten. Bitte versuchen Sie es später erneut.</p>
+        <button id="retryButton">Erneut versuchen</button>
+      </div>
+    `;
+    document.getElementById('retryButton').addEventListener('click', initializeApp);
+    return null;
+  } finally {
+    loadingIndicator.style.display = 'none';
+  }
+}
     
     // Kategorien aus dem Direktus-Format transformieren
     function transformCategories(categoriesData) {
