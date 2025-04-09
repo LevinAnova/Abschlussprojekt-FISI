@@ -945,18 +945,27 @@
       };
     }
 
-    // Service Worker für Offline-Funktionalität registrieren
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(registration => {
-            console.log('Service Worker erfolgreich registriert:', registration.scope);
-          })
-          .catch(error => {
-            console.error('Service Worker Registrierung fehlgeschlagen:', error);
-          });
+// Service Worker für Offline-Funktionalität registrieren
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+      .then(registration => {
+        console.log('Service Worker erfolgreich registriert:', registration.scope);
+        
+        // Nach dem Speichern eines neuen Berufs die Synchronisierung auslösen
+        document.addEventListener('cms-data-updated', () => {
+          if (registration.sync) {
+            registration.sync.register('sync-cms-data')
+              .then(() => console.log('Hintergrund-Sync für CMS-Daten registriert'))
+              .catch(err => console.error('Fehler bei der Sync-Registrierung:', err));
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Service Worker Registrierung fehlgeschlagen:', error);
       });
-    }
+  });
+}
     
     // App starten, wenn DOM geladen ist
     document.addEventListener('DOMContentLoaded', () => {

@@ -1,29 +1,17 @@
 // service-worker.js
-const CACHE_NAME = 'vw-ausbildung-cache-v1';
+const CACHE_NAME = 'vw-ausbildung-cache-v2'; // Versionsnummer erhöht
+const API_CACHE_NAME = 'vw-ausbildung-api-cache';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/landing.html',
-  '/style/styles.css',
-  '/style/landing-styles.css',
-  '/style/test-styles.css',
-  '/translation.js',
-  '/img/vwlogo.png',
-  '/img/vwlogoweiß.png',
-  '/img/placeholder.jpg',
-  // Standard-Bilder für die Galerie
-  '/img/gallery/default1.png',
-  '/img/gallery/default2.png',
-  '/img/gallery/default3.png',
-  '/img/gallery/default4.jpg',
-  // Wissenstests
-  '/tests/chemielaborant.html',
-  '/tests/metalltechnik.html',
-  '/tests/eat.html',
-  '/tests/blank.html'
+  '/admin.html', // CMS-Frontend
+  '/css/styles.css',
+  '/js/cms.js',
+  '/js/main.js',
+  // Weitere statische Assets
 ];
 
-// Installationsphase - Cache mit statischen Assets füllen
+// Installation - Cache mit statischen Assets füllen
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -35,13 +23,13 @@ self.addEventListener('install', event => {
   );
 });
 
-// Aktivierungsphase - Alte Caches löschen
+// Aktivierung - Alte Caches löschen
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
+          if (cacheName !== CACHE_NAME && cacheName !== API_CACHE_NAME) {
             console.log('Service Worker: Alter Cache wird gelöscht', cacheName);
             return caches.delete(cacheName);
           }
@@ -51,110 +39,142 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch-Event-Handler - Netzwerk-Requests abfangen und aus dem Cache bedienen
+// Fetch-Event-Handler - Netzwerk-Requests abfangen
 self.addEventListener('fetch', event => {
-  // Anfragen an die CMS-API
-  if (event.request.url.includes('/api/')) {
-    // Netzwerk-First-Strategie für API-Anfragen
+  const url = new URL(event.request.url);
+  
+  // API-Anfragen behandeln
+  if (url.pathname.startsWith('/api/')) {
+    // Network-first Strategie für API
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          // Cache-Copy erstellen und ins Cache schreiben
+          // Erfolgreiche Antwort im API-Cache speichern
           const clonedResponse = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
+          caches.open(API_CACHE_NAME).then(cache => {
             cache.put(event.request, clonedResponse);
           });
           return response;
         })
         .catch(() => {
           // Bei Netzwerkfehler aus dem Cache bedienen
-          return caches.match(event.request);
+          return caches.match(event.request)
+            .then(cachedResponse => {
+              if (cachedResponse) {
+                return cachedResponse;
+              }
+              
+              // Wenn keine Kategorie-Anfrage im Cache ist, leeres Array zurückgeben
+              if (url.pathname === '/api/categories') {
+                return new Response(JSON.stringify([]), {
+                  headers: { 'Content-Type': 'application/json' }
+                });
+              }
+              
+              // Wenn keine Berufe-Anfrage im Cache ist, leeres Array zurückgeben
+              if (url.pathname === '/api/professions') {
+                return new Response(JSON.stringify([]), {
+                  headers: { 'Content-Type': 'application/json' }
+                });
+              }
+              
+              // Fallback für andere API-Anfragen
+              return new Response(JSON.stringify({ error: 'Offline und nicht im Cache' }), {
+                status: 503,
+                headers: { 'Content-Type': 'application/json' }
+              });
+            });
         })
     );
   } 
-  // Bilder-Anfragen
-  else if (event.request.url.match(/\.(jpg|jpeg|png|gif|svg)$/)) {
-    // Cache-First-Strategie für Bilder
+  // Hochgeladene Bilder behandeln
+  else if (url.pathname.startsWith('/uploads/')) {
     event.respondWith(
-      caches.match(event.request).then(cachedResponse => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        return fetch(event.request)
-          .then(response => {
-            // Cache-Copy erstellen und ins Cache schreiben
-            const clonedResponse = response.clone();
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, clonedResponse);
-            });
-            return response;
-          })
-          .catch(error => {
-            // Fehlerbehandlung: Placeholder-Bild anzeigen
-            if (event.request.url.match(/\.(jpg|jpeg|png|gif|svg)$/)) {
+      caches.match(event.request)
+        .then(cachedResponse => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          
+          // Versuchen, das Bild zu laden und zu cachen
+          return fetch(event.request)
+            .then(response => {
+              if (!response || response.status !== 200) {
+                return response;
+              }
+              
+              const clonedResponse = response.clone();
+              caches.open(CACHE_NAME).then(cache => {
+                cache.put(event.request, clonedResponse);
+              });
+              return response;
+            })
+            .catch(() => {
+              // Wenn Bild nicht geladen werden kann, Platzhalter zurückgeben
               return caches.match('/img/placeholder.jpg');
-            }
-            throw error;
-          });
-      })
+            });
+        })
     );
   }
-  // HTML, CSS, JS und andere statische Assets
+  // Andere Anfragen (statische Assets, etc.)
   else {
-    // Cache-First-Strategie für statische Assets
     event.respondWith(
-      caches.match(event.request).then(cachedResponse => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        return fetch(event.request)
-          .then(response => {
-            // Nur erfolgreiche Antworten cachen
-            if (!response || response.status !== 200 || response.type !== 'basic') {
+      caches.match(event.request)
+        .then(cachedResponse => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          
+          return fetch(event.request)
+            .then(response => {
+              if (!response || response.status !== 200 || response.type !== 'basic') {
+                return response;
+              }
+              
+              const clonedResponse = response.clone();
+              caches.open(CACHE_NAME).then(cache => {
+                cache.put(event.request, clonedResponse);
+              });
               return response;
-            }
-            
-            // Cache-Copy erstellen und ins Cache schreiben
-            const clonedResponse = response.clone();
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, clonedResponse);
+            })
+            .catch(error => {
+              // Bei HTML-Anfragen zur Offline-Seite weiterleiten
+              if (event.request.headers.get('Accept')?.includes('text/html')) {
+                return caches.match('/offline.html');
+              }
+              throw error;
             });
-            return response;
-          });
-      })
-      .catch(error => {
-        // Bei HTML-Anfragen zur Offline-Seite weiterleiten
-        if (event.request.headers.get('Accept').includes('text/html')) {
-          return caches.match('/offline.html');
-        }
-        throw error;
-      })
+        })
     );
   }
 });
 
-// Hintergrund-Synchronisierung für Offline-Modus
+// Hintergrund-Synchronisierung einrichten
 self.addEventListener('sync', event => {
   if (event.tag === 'sync-cms-data') {
     event.waitUntil(syncCmsData());
   }
 });
 
-// Funktion zur Synchronisierung von CMS-Daten
+// Funktion zur Synchronisierung der CMS-Daten
 async function syncCmsData() {
   try {
-    const cache = await caches.open(CACHE_NAME);
+    const cache = await caches.open(API_CACHE_NAME);
+    
+    // Daten synchronisieren
+    const categoryRequest = new Request('/api/categories');
+    const professionsRequest = new Request('/api/professions');
     
     // Kategorien abrufen und cachen
-    const categoriesResponse = await fetch('/api/items/categories');
+    const categoriesResponse = await fetch(categoryRequest);
     if (categoriesResponse.ok) {
-      await cache.put('/api/items/categories', categoriesResponse.clone());
+      await cache.put(categoryRequest, categoriesResponse.clone());
     }
     
     // Berufe abrufen und cachen
-    const professionsResponse = await fetch('/api/items/professions?fields=*.*');
+    const professionsResponse = await fetch(professionsRequest);
     if (professionsResponse.ok) {
-      await cache.put('/api/items/professions?fields=*.*', professionsResponse.clone());
+      await cache.put(professionsRequest, professionsResponse.clone());
     }
     
     console.log('Service Worker: CMS-Daten wurden erfolgreich synchronisiert');
@@ -163,3 +183,17 @@ async function syncCmsData() {
     throw error;
   }
 }
+
+// Automatisches Caching von neu hochgeladenen Bildern
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'CACHE_NEW_IMAGE') {
+    const imageUrl = event.data.url;
+    
+    caches.open(CACHE_NAME).then(cache => {
+      fetch(imageUrl).then(response => {
+        cache.put(imageUrl, response);
+        console.log('Neues Bild gecacht:', imageUrl);
+      });
+    });
+  }
+});
