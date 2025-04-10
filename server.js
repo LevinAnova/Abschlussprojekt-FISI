@@ -34,9 +34,9 @@ function handleError(res, error, message = 'Ein Fehler ist aufgetreten', statusC
 
 // MariaDB/MySQL Connection Pool erstellen
 const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: 'password123', // Ändere dies entsprechend deinem Setup
+  host: '127.0.0.1',
+  user: 'vwapp',
+  password: 'fisi', // Ändere dies entsprechend deinem Setup
   database: 'vw_ausbildung',
   waitForConnections: true,
   connectionLimit: 10,
