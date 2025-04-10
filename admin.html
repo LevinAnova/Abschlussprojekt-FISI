@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volkswagen Ausbildungsberufe CMS</title>
+  <!-- Lokal gehostete CSS-Datei -->
+  <link rel="stylesheet" href="css/tailwind.min.css">
+  <!-- Lokal gehostete JS-Bibliotheken -->
+  <script src="js/lib/react.production.min.js"></script>
+  <script src="js/lib/react-dom.production.min.js"></script>
+  <script src="js/lib/babel.min.js"></script>
+  <script src="js/lib/axios.min.js"></script>
+  
+  <style>
+    @font-face {
+      font-family: 'VW Font';
+      src: url('fonts/vwfont.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'VW Head';
+      src: url('fonts/VWHeadWeb-Bold.ttf') format('truetype');
+    }
+    
+    body {
+      font-family: 'VW Font', sans-serif;
+    }
+    
+    h1, h2, h3 {
+      font-family: 'VW Head', sans-serif;
+    }
+    
+    .vw-blue {
+      background-color: #001e50;
+    }
+    
+    .vw-light-blue {
+      background-color: #4cc0f1;
+    }
+    
+    .image-upload {
+      position: relative;
+      width: 100%;
+      height: 150px;
+      border: 2px dashed #cccccc;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background-color: #f9f9f9;
+    }
+    
+    .image-upload input[type="file"] {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    // CMS-Hauptkomponente
+    function VWAusbildungCMS() {
+      const [activeTab, setActiveTab] = React.useState('jobs');
+      const [jobs, setJobs] = React.useState([]);
+      const [categories, setCategories] = React.useState([]);
+      const [loading, setLoading] = React.useState(true);
+      const [editMode, setEditMode] = React.useState(false);
+      const [currentJob, setCurrentJob] = React.useState(null);
+      const [currentCategory, setCurrentCategory] = React.useState(null);
+      const [error, setError] = React.useState(null);
+      const [notification, setNotification] = React.useState(null);
+      
+      // Beim Laden der Komponente Daten abrufen
+      React.useEffect(() => {
+        fetchData();
+      }, []);
+      
+      // Daten vom Server abrufen
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          // Kategorien abrufen
+          const categoriesResponse = await fetch('/api/categories');
+          const categoriesData = await categoriesResponse.json();
+          
+          // Berufe abrufen
+          const jobsResponse = await fetch('/api/professions');
+          const jobsData = await jobsResponse.json();
+          
+          setCategories(categoriesData);
+          setJobs(jobsData);
+        } catch (err) {
+          console.error('Fehler beim Laden der Daten:', err);
+          setError('Fehler beim Laden der Daten. Bitte später erneut versuchen.');
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      // Benachrichtigung anzeigen
+      const showNotification = (message, type = 'success') => {
+        setNotification({ message, type });
+        setTimeout(() => setNotification(null), 3000);
+      };
+      
+      // Beruf bearbeiten
+      const editJob = (job) => {
+        setCurrentJob({...job});
+        setEditMode(true);
+      };
+      
+      // Neuen Beruf erstellen
+      const createNewJob = () => {
+        setCurrentJob({
+          id: "",
+          title: "",
+          description: "",
+          duration: "",
+          category_id: categories[0]?.id || "",
+          requirements: [],
+          career_options: [],
+          locations: [],
+          gallery_images: []
+        });
+        setEditMode(true);
+      };
+      
+      // Bearbeitung abbrechen
+      const cancelEdit = () => {
+        setCurrentJob(null);
+        setEditMode(false);
+      };
+      
+      // Feld eines Berufs aktualisieren
+      const updateJobField = (field, value) => {
+        setCurrentJob({
+          ...currentJob,
+          [field]: value
+        });
+      };
+      
+      // Listen-Feld eines Berufs aktualisieren
+      const updateJobList = (field, value) => {
+        const newList = typeof value === 'string' 
+          ? value.split('\n').filter(item => item.trim() !== '')
+          : value;
+          
+        setCurrentJob({
+          ...currentJob,
+          [field]: newList
+        });
+      };
+      
+      // Beruf speichern
+      const saveJob = async () => {
+        try {
+          const response = await fetch('/api/professions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(currentJob)
+          });
+          
+          if (!response.ok) {
+            throw new Error('Fehler beim Speichern des Berufs');
+          }
+          
+          await fetchData();
+          setCurrentJob(null);
+          setEditMode(false);
+          showNotification('Beruf wurde erfolgreich gespeichert!');
+        } catch (err) {
+          console.error('Fehler beim Speichern:', err);
+          showNotification(`Fehler beim Speichern: ${err.message}`, 'error');
+        }
+      };
+      
+      // Beruf löschen
+      const deleteJob = async (jobId) => {
+        if (!window.confirm('Möchten Sie diesen Beruf wirklich löschen?')) {
+          return;
+        }
+        
+        try {
+          const response = await fetch(`/api/professions/${jobId}`, {
+            method: 'DELETE'
+          });
+          
+          if (!response.ok) {
+            throw new Error('Fehler beim Löschen des Berufs');
+          }
+          
+          await fetchData();
+          showNotification('Beruf wurde erfolgreich gelöscht!');
+        } catch (err) {
+          console.error('Fehler beim Löschen:', err);
+          showNotification(`Fehler beim Löschen: ${err.message}`, 'error');
+        }
+      };
+      
+      // Bild hochladen
+      const uploadImage = async (event, isQrCode = false) => {
+        const file = event.target.files[0];
+        if (!file || !currentJob) return;
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('alt_text', currentJob.title);
+        
+        try {
+          const response = await fetch(`/api/professions/${currentJob.id}/images/${isQrCode ? 'qr' : ''}`, {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (!response.ok) {
+            throw new Error('Fehler beim Hochladen des Bildes');
+          }
+          
+          const imageData = await response.json();
+          
+          if (isQrCode) {
+            setCurrentJob({
+              ...currentJob,
+              qr_code: imageData.url
+            });
+          } else {
+            const updatedImages = [...(currentJob.gallery_images || []), imageData];
+            setCurrentJob({
+              ...currentJob,
+              gallery_images: updatedImages
+            });
+          }
+          
+          showNotification(`${isQrCode ? 'QR-Code' : 'Bild'} wurde erfolgreich hochgeladen!`);
+        } catch (err) {
+          console.error('Fehler beim Hochladen:', err);
+          showNotification(`Fehler beim Hochladen: ${err.message}`, 'error');
+        }
+      };
+      
+      // Bild löschen
+      const deleteImage = async (imageId) => {
+        if (!window.confirm('Möchten Sie dieses Bild wirklich löschen?')) {
+          return;
+        }
+        
+        try {
+          const response = await fetch(`/api/gallery-images/${imageId}`, {
+            method: 'DELETE'
+          });
+          
+          if (!response.ok) {
+            throw new Error('Fehler beim Löschen des Bildes');
+          }
+          
+          const updatedImages = currentJob.gallery_images.filter(img => img.id !== imageId);
+          setCurrentJob({
+            ...currentJob,
+            gallery_images: updatedImages
+          });
+          
+          showNotification('Bild wurde erfolgreich gelöscht!');
+        } catch (err) {
+          console.error('Fehler beim Löschen des Bildes:', err);
+          showNotification(`Fehler beim Löschen: ${err.message}`, 'error');
+        }
+      };
+      
+      // Kategorie bearbeiten
+      const editCategory = (category) => {
+        setCurrentCategory({...category});
+      };
+      
+      // Neue Kategorie erstellen
+      const createNewCategory = () => {
+        setCurrentCategory({
+          id: "",
+          name: ""
+        });
+      };
+      
+      // Kategorie speichern
+      const saveCategory = async () => {
+        if (!currentCategory) return;
+        
+        try {
+          const isNew = !categories.some(cat => cat.id === currentCategory.id);
+          const method = isNew ? 'POST' : 'PUT';
+          const url = isNew 
+            ? `/api/categories` 
+            : `/api/categories/${currentCategory.id}`;
+          
+          const response = await fetch(url, {
+            method,
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              id: currentCategory.id,
+              name: currentCategory.name
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error('Fehler beim Speichern der Kategorie');
+          }
+          
+          await fetchData();
+          setCurrentCategory(null);
+          showNotification('Kategorie wurde erfolgreich gespeichert!');
+        } catch (err) {
+          console.error('Fehler beim Speichern der Kategorie:', err);
+          showNotification(`Fehler beim Speichern: ${err.message}`, 'error');
+        }
+      };
+      
+      // Kategorie löschen
+      const deleteCategory = async (categoryId) => {
+        // Prüfen, ob die Kategorie in Verwendung ist
+        const isUsed = jobs.some(job => job.category_id === categoryId);
+        
+        if (isUsed) {
+          alert('Diese Kategorie kann nicht gelöscht werden, da sie von Berufen verwendet wird.');
+          return;
+        }
+        
+        if (!window.confirm('Möchten Sie diese Kategorie wirklich löschen?')) {
+          return;
+        }
+        
+        try {
+          const response = await fetch(`/api/categories/${categoryId}`, {
+            method: 'DELETE'
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Fehler beim Löschen der Kategorie');
+          }
+          
+          await fetchData();
+          showNotification('Kategorie wurde erfolgreich gelöscht!');
+        } catch (err) {
+          console.error('Fehler beim Löschen der Kategorie:', err);
+          showNotification(`Fehler beim Löschen: ${err.message}`, 'error');
+        }
+      };
+      
+      // Wenn Daten geladen werden, zeige einen Ladeindikator
+      if (loading) {
+        return (
+          <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-900"></div>
+          </div>
+        );
+      }
+      
+      // Benachrichtigungs-Komponente
+      const Notification = () => {
+        if (!notification) return null;
+        
+        return (
+          <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg ${
+            notification.type === 'success' ? 'bg-green-100 border-l-4 border-green-500 text-green-700' :
+            'bg-red-100 border-l-4 border-red-500 text-red-700'
+          }`}>
+            <div className="flex items-center">
+              <div className="mr-3">
+                {notification.type === 'success' ? (
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                )}
+              </div>
+              <p>{notification.message}</p>
+            </div>
+          </div>
+        );
+      };
+      
+      return (
+        <div className="bg-gray-100 min-h-screen">
+          <Notification />
+          
+          <header className="bg-blue-900 text-white p-4 shadow-md">
+            <div className="container mx-auto flex justify-between items-center">
+              <h1 className="text-2xl font-bold">Volkswagen Ausbildungsberufe CMS</h1>
+              <div className="flex">
+                <button 
+                  className="bg-blue-700 px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                  onClick={fetchData}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                <a 
+                  href="/" 
+                  className="bg-green-600 px-4 py-2 rounded hover:bg-green-500 transition-colors ml-2"
+                >
+                  Webseite öffnen
+                </a>
+              </div>
+            </div>
+          </header>
+          
+          <div className="container mx-auto p-4">
+            <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+              <div className="flex border-b">
+                <button 
+                  className={`px-6 py-3 font-medium ${activeTab === 'jobs' ? 'bg-blue-100 text-blue-900 border-b-2 border-blue-900' : 'text-gray-600 hover:bg-gray-50'}`}
+                  onClick={() => setActiveTab('jobs')}
+                >
+                  Ausbildungsberufe
+                </button>
+                <button 
+                  className={`px-6 py-3 font-medium ${activeTab === 'categories' ? 'bg-blue-100 text-blue-900 border-b-2 border-blue-900' : 'text-gray-600 hover:bg-gray-50'}`}
+                  onClick={() => setActiveTab('categories')}
+                >
+                  Kategorien
+                </button>
+              </div>
+              
+              {/* Berufe-Ansicht */}
+              {activeTab === 'jobs' && !editMode && (
+                <div className="p-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold">Alle Ausbildungsberufe</h2>
+                    <button 
+                      className="bg-green-600 text-white px-4 py-2 rounded flex items-center hover:bg-green-500 transition-colors"
+                      onClick={createNewJob}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                      </svg>
+                      Neuen Beruf anlegen
+                    </button>
+                  </div>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titel</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategorie</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dauer</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aktionen</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {jobs.map(job => {
+                          const category = categories.find(cat => cat.id === job.category_id);
+                          return (
+                            <tr key={job.id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm font-medium text-gray-900">{job.title}</div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-500">{job.id}</div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                  {category ? category.name : 'Keine Kategorie'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {job.duration}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button 
+                                  className="text-blue-600 hover:text-blue-900 mr-3"
+                                  onClick={() => editJob(job)}
+                                >
+                                  Bearbeiten
+                                </button>
+                                <button 
+                                  className="text-red-600 hover:text-red-900"
+                                  onClick={() => deleteJob(job.id)}
+                                >
+                                  Löschen
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              
+              {/* Beruf-Bearbeitungsformular */}
+              {activeTab === 'jobs' && editMode && currentJob && (
+                <div className="p-4">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-bold">
+                      {currentJob.id && jobs.some(j => j.id === currentJob.id) 
+                        ? `Beruf bearbeiten: ${currentJob.title}` 
+                        : 'Neuen Beruf anlegen'
+                      }
+                    </h2>
+                    <div>
+                      <button 
+                        className="bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400 transition-colors"
+                        onClick={cancelEdit}
+                      >
+                        Abbrechen
+                      </button>
+                      <button 
+                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 transition-colors"
+                        onClick={saveJob}
+                      >
+                        Speichern
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Titel</label>
+                        <input 
+                          type="text" 
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          value={currentJob.title}
+                          onChange={(e) => updateJobField('title', e.target.value)}
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Slug (URL-freundlicher Name)</label>
+                        <input 
+                          type="text" 
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          value={currentJob.id}
+                          onChange={(e) => updateJobField('id', e.target.value)}
+                          disabled={currentJob.id && jobs.some(j => j.id === currentJob.id)}
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Nur Kleinbuchstaben, Zahlen und Bindestriche verwenden</p>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Kategorie</label>
+                        <select 
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          value={currentJob.category_id}
+                          onChange={(e) => updateJobField('category_id', e.target.value)}
+                        >
+                          <option value="">-- Kategorie wählen --</option>
+                          {categories.map(category => (
+                            <option key={category.id} value={category.id}>
+                              {category.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Ausbildungsdauer</label>
+                        <input 
+                          type="text" 
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          value={currentJob.duration}
+                          onChange={(e) => updateJobField('duration', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Beschreibung</label>
+                        <textarea 
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          rows="4"
+                          value={currentJob.description}
+                          onChange={(e) => updateJobField('description', e.target.value)}
+                        ></textarea>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Anforderungen (eine pro Zeile)</label>
+                        <textarea 
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          rows="4"
+                          value={currentJob.requirements ? currentJob.requirements.join('\n') : ''}
+                          onChange={(e) => updateJobList('requirements', e.target.value)}
+                        ></textarea>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Karrieremöglichkeiten (eine pro Zeile)</label>
+                        <textarea 
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          rows="4"
+                          value={currentJob.career_options ? currentJob.career_options.join('\n') : ''}
+                          onChange={(e) => updateJobList('career_options', e.target.value)}
+                        ></textarea>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Standorte (einer pro Zeile)</label>
+                        <textarea 
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          rows="3"
+                          value={currentJob.locations ? currentJob.locations.join('\n') : ''}
+                          onChange={(e) => updateJobList('locations', e.target.value)}
+                        ></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Bilder-Upload-Sektion (nur bei Bearbeitung vorhandener Berufe) */}
+                  {currentJob.id && jobs.some(j => j.id === currentJob.id) && (
+                    <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+                      <h3 className="text-lg font-medium mb-4">Bilder & QR-Code</h3>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        {/* Vorhandene Bilder anzeigen */}
+                        {currentJob.gallery_images && currentJob.gallery_images.map((image, index) => (
+                          <div key={index} className="border rounded-lg p-4 bg-white flex flex-col items-center justify-center">
+                            <div className="w-full h-32 mb-2 rounded-md flex items-center justify-center relative">
+                              <img 
+                                src={image.url} 
+                                alt={image.alt_text || currentJob.title}
+                                className="max-h-full max-w-full object-contain rounded"
+                              />
+                              <button 
+                                className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 transform translate-x-1/2 -translate-y-1/2"
+                                onClick={() => deleteImage(image.id)}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                </svg>
+                              </button>
+                            </div>
+                            <div className="text-xs text-gray-500 truncate w-full text-center">
+                              {image.alt_text || 'Kein Alternativtext'}
+                            </div>
+                          </div>
+                        ))}
+                        
+                        {/* Platzhalter für neue Bilder */}
+                        {(!currentJob.gallery_images || currentJob.gallery_images.length < 4) && (
+                          <div className="border border-dashed rounded-lg p-4 bg-white flex flex-col items-center justify-center">
+                            <div className="w-full h-32 bg-gray-200 mb-2 rounded-md flex items-center justify-center text-gray-500">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              </svg>
+                            </div>
+                            <label className="text-sm text-blue-600 cursor-pointer">
+                              Bild hochladen
+                              <input 
+                                type="file" 
+                                className="hidden"
+                                accept="image/*"
+                                onChange={(e) => uploadImage(e, false)}
+                              />
+                            </label>
+                          </div>
+                        )}
+                        
+                        {/* QR-Code */}
+                        <div className="border border-dashed rounded-lg p-4 bg-white flex flex-col items-center justify-center">
+                          <div className="w-full h-32 mb-2 rounded-md flex items-center justify-center relative">
+                            {currentJob.qr_code ? (
+                              <>
+                                <img 
+                                  src={currentJob.qr_code} 
+                                  alt="QR-Code"
+                                  className="max-h-full max-w-full object-contain rounded"
+                                />
+                                <button 
+                                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 transform translate-x-1/2 -translate-y-1/2"
+                                  onClick={() => updateJobField('qr_code', null)}
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                              </>
+                            ) : (
+                              <div className="bg-gray-200 w-full h-full flex items-center justify-center text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                                </svg>
+                              </div>
+                            )}
+                          </div>
+                          <label className="text-sm text-blue-600 cursor-pointer">
+                            QR-Code hochladen
+                            <input 
+                              type="file" 
+                              className="hidden"
+                              accept="image/*"
+                              onChange={(e) => uploadImage(e, true)}
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Kategorien-Verwaltung */}
+              {activeTab === 'categories' && (
+                <div className="p-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold">Kategorien verwalten</h2>
+                    <button 
+                      className="bg-green-600 text-white px-4 py-2 rounded flex items-center hover:bg-green-500 transition-colors"
+                      onClick={createNewCategory}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                      </svg>
+                      Neue Kategorie
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aktionen</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {categories.map(category => (
+                            <tr key={category.id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm font-medium text-gray-900">{category.name}</div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-500">{category.id}</div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button 
+                                  className="text-blue-600 hover:text-blue-900 mr-3"
+                                  onClick={() => editCategory(category)}
+                                >
+                                  Bearbeiten
+                                </button>
+                                <button 
+                                  className="text-red-600 hover:text-red-900"
+                                  onClick={() => deleteCategory(category.id)}
+                                >
+                                  Löschen
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    {currentCategory && (
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h3 className="text-lg font-medium mb-4">
+                          {currentCategory.id && categories.some(c => c.id === currentCategory.id) 
+                            ? 'Kategorie bearbeiten' 
+                            : 'Neue Kategorie anlegen'
+                          }
+                        </h3>
+                        
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                            <input 
+                              type="text" 
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              value={currentCategory.name}
+                              onChange={(e) => setCurrentCategory({...currentCategory, name: e.target.value})}
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+                            <input 
+                              type="text" 
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              value={currentCategory.id}
+                              onChange={(e) => setCurrentCategory({...currentCategory, id: e.target.value})}
+                              disabled={currentCategory.id && categories.some(c => c.id === currentCategory.id)}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Nur Kleinbuchstaben, Zahlen und Bindestriche verwenden</p>
+                          </div>
+                          
+                          <div className="flex justify-end mt-4 pt-2">
+                            <button 
+                              className="bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400 transition-colors"
+                              onClick={() => setCurrentCategory(null)}
+                            >
+                              Abbrechen
+                            </button>
+                            <button 
+                              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 transition-colors"
+                              onClick={saveCategory}
+                            >
+                              Speichern
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <footer className="bg-gray-100 border-t border-gray-200 py-4 text-center text-gray-600 text-sm">
+            © Volkswagen AG 2025 | Ausbildungsberufe CMS
+          </footer>
+        </div>
+      );
+    }
+    
+    // Haupt-App initialisieren und in das Root-Element rendern
+    const rootElement = document.getElementById('root');
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(<VWAusbildungCMS />);
+  </script>
+</body>
+</html>
