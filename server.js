@@ -5,38 +5,73 @@ const path = require('path');
 const fs = require('fs').promises;
 const cors = require('cors');
 
+// Express App initialisieren
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*', // In Produktion sollte dies eingeschränkt werden
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
-app.use(express.static('public')); // Für statische Dateien
+app.use(express.static(path.join(__dirname, 'public')));
 
-// MariaDB Connection Pool erstellen
+// Debug-Modus aktivieren (auf false setzen in Produktion)
+const DEBUG = true;
+
+// Verbesserte Fehlerbehandlung
+function handleError(res, error, message = 'Ein Fehler ist aufgetreten', statusCode = 500) {
+  if (DEBUG) {
+    console.error(`[ERROR] ${message}:`, error);
+  }
+  res.status(statusCode).json({ 
+    error: message, 
+    details: DEBUG ? error.message : undefined 
+  });
+}
+
+// MariaDB/MySQL Connection Pool erstellen
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
-  password: 'deinpasswort',
+  password: 'password123', // Ändere dies entsprechend deinem Setup
   database: 'vw_ausbildung',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  // Debug-Optionen
+  debug: false
 });
 
-// Upload-Konfiguration
-const uploadDir = path.join(__dirname, 'public', 'uploads');
-// Stelle sicher, dass das Upload-Verzeichnis existiert
+// Datenbank-Verbindung testen
 (async () => {
   try {
-    await fs.mkdir(uploadDir, { recursive: true });
-    await fs.mkdir(path.join(uploadDir, 'qr_codes'), { recursive: true });
-    await fs.mkdir(path.join(uploadDir, 'gallery'), { recursive: true });
+    const connection = await pool.getConnection();
+    console.log('✅ Datenbankverbindung erfolgreich hergestellt');
+    connection.release();
   } catch (err) {
-    console.error('Fehler beim Erstellen der Upload-Verzeichnisse:', err);
+    console.error('❌ Fehler beim Verbinden zur Datenbank:', err.message);
+    console.error('Bitte stelle sicher, dass MySQL/MariaDB läuft und die Zugangsdaten korrekt sind');
   }
 })();
 
+// Upload-Konfiguration
+const uploadDir = path.join(__dirname, 'public', 'uploads');
+
+// Stelle sicher, dass die Upload-Verzeichnisse existieren
+(async () => {
+  try {
+    await fs.mkdir(path.join(uploadDir, 'gallery'), { recursive: true });
+    await fs.mkdir(path.join(uploadDir, 'qr_codes'), { recursive: true });
+    console.log('✅ Upload-Verzeichnisse erfolgreich erstellt');
+  } catch (err) {
+    console.error('❌ Fehler beim Erstellen der Upload-Verzeichnisse:', err);
+  }
+})();
+
+// Multer-Konfiguration für Datei-Uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const type = req.params.type || 'gallery';
@@ -50,48 +85,113 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limit 5MB
+  fileFilter: function (req, file, cb) {
+    const allowedTypes = [
+      'image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'
+    ];
+    if (!allowedTypes.includes(file.mimetype)) {
+      return cb(new Error('Nur Bilddateien erlaubt!'), false);
+    }
+    cb(null, true);
+  }
+});
 
-// API-Routen
+// Logging-Middleware
+app.use((req, res, next) => {
+  if (DEBUG) {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  }
+  next();
+});
+
+// Fehlerbehandlungs-Middleware
+app.use((err, req, res, next) => {
+  console.error('Unbehandelte Ausnahme:', err);
+  res.status(500).json({ error: 'Interner Serverfehler', details: DEBUG ? err.message : undefined });
+});
+
+// ===== API-Routen =====
+
+// Root-Endpoint für API-Tests
+app.get('/api', (req, res) => {
+  res.json({ 
+    message: 'VW Ausbildungsberufe API funktioniert!',
+    version: '1.0.0',
+    endpoints: ['/api/categories', '/api/professions']
+  });
+});
+
+// ===== Kategorien API =====
 
 // Alle Kategorien abrufen
 app.get('/api/categories', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM categories ORDER BY name');
+    if (DEBUG) {
+      console.log(`Kategorien geladen: ${rows.length}`);
+    }
     res.json(rows);
   } catch (err) {
-    console.error('Fehler beim Abrufen der Kategorien:', err);
-    res.status(500).json({ error: 'Datenbankfehler' });
+    handleError(res, err, 'Fehler beim Abrufen der Kategorien');
+  }
+});
+
+// Einzelne Kategorie abrufen
+app.get('/api/categories/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await pool.query('SELECT * FROM categories WHERE id = ?', [id]);
+    
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Kategorie nicht gefunden' });
+    }
+    
+    res.json(rows[0]);
+  } catch (err) {
+    handleError(res, err, 'Fehler beim Abrufen der Kategorie');
   }
 });
 
 // Kategorie erstellen
 app.post('/api/categories', async (req, res) => {
-  const { id, name } = req.body;
-  
-  if (!id || !name) {
-    return res.status(400).json({ error: 'ID und Name sind erforderlich' });
-  }
-  
   try {
+    const { id, name } = req.body;
+    
+    if (!id || !name) {
+      return res.status(400).json({ error: 'ID und Name sind erforderlich' });
+    }
+    
+    // Prüfen, ob die ID bereits existiert
+    const [existing] = await pool.query('SELECT id FROM categories WHERE id = ?', [id]);
+    if (existing.length > 0) {
+      return res.status(409).json({ error: 'Diese Kategorie-ID existiert bereits' });
+    }
+    
     await pool.query('INSERT INTO categories (id, name) VALUES (?, ?)', [id, name]);
+    
+    if (DEBUG) {
+      console.log(`Neue Kategorie erstellt: ${id} - ${name}`);
+    }
+    
     res.status(201).json({ id, name });
   } catch (err) {
-    console.error('Fehler beim Erstellen der Kategorie:', err);
-    res.status(500).json({ error: 'Datenbankfehler' });
+    handleError(res, err, 'Fehler beim Erstellen der Kategorie');
   }
 });
 
 // Kategorie aktualisieren
 app.put('/api/categories/:id', async (req, res) => {
-  const { id } = req.params;
-  const { name } = req.body;
-  
-  if (!name) {
-    return res.status(400).json({ error: 'Name ist erforderlich' });
-  }
-  
   try {
+    const { id } = req.params;
+    const { name } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ error: 'Name ist erforderlich' });
+    }
+    
     const [result] = await pool.query('UPDATE categories SET name = ? WHERE id = ?', [name, id]);
     
     if (result.affectedRows === 0) {
@@ -100,16 +200,15 @@ app.put('/api/categories/:id', async (req, res) => {
     
     res.json({ id, name });
   } catch (err) {
-    console.error('Fehler beim Aktualisieren der Kategorie:', err);
-    res.status(500).json({ error: 'Datenbankfehler' });
+    handleError(res, err, 'Fehler beim Aktualisieren der Kategorie');
   }
 });
 
 // Kategorie löschen
 app.delete('/api/categories/:id', async (req, res) => {
-  const { id } = req.params;
-  
   try {
+    const { id } = req.params;
+    
     // Prüfen, ob die Kategorie in Verwendung ist
     const [professions] = await pool.query('SELECT COUNT(*) as count FROM professions WHERE category_id = ?', [id]);
     
@@ -125,10 +224,11 @@ app.delete('/api/categories/:id', async (req, res) => {
     
     res.json({ message: 'Kategorie erfolgreich gelöscht' });
   } catch (err) {
-    console.error('Fehler beim Löschen der Kategorie:', err);
-    res.status(500).json({ error: 'Datenbankfehler' });
+    handleError(res, err, 'Fehler beim Löschen der Kategorie');
   }
 });
+
+// ===== Berufe API =====
 
 // Alle Berufe mit Details abrufen
 app.get('/api/professions', async (req, res) => {
@@ -137,73 +237,90 @@ app.get('/api/professions', async (req, res) => {
     const [professions] = await pool.query(`
       SELECT p.*, c.name as category_name
       FROM professions p
-      JOIN categories c ON p.category_id = c.id
+      LEFT JOIN categories c ON p.category_id = c.id
       ORDER BY p.title
     `);
     
     // Für jeden Beruf die Details abrufen
     const result = await Promise.all(professions.map(async (profession) => {
-      // Anforderungen
-      const [requirements] = await pool.query(
-        'SELECT text FROM requirements WHERE profession_id = ? ORDER BY sort_order',
-        [profession.id]
-      );
-      
-      // Karrieremöglichkeiten
-      const [careerOptions] = await pool.query(
-        'SELECT text FROM career_options WHERE profession_id = ? ORDER BY sort_order',
-        [profession.id]
-      );
-      
-      // Standorte
-      const [locations] = await pool.query(
-        'SELECT text FROM locations WHERE profession_id = ? ORDER BY sort_order',
-        [profession.id]
-      );
-      
-      // Bilder
-      const [images] = await pool.query(
-        'SELECT id, filename, alt_text FROM gallery_images WHERE profession_id = ? ORDER BY sort_order',
-        [profession.id]
-      );
-      
-      // QR-Code
-      const [qrCodes] = await pool.query(
-        'SELECT filename FROM qr_codes WHERE profession_id = ?',
-        [profession.id]
-      );
-      
-      return {
-        ...profession,
-        requirements: requirements.map(r => r.text),
-        career_options: careerOptions.map(c => c.text),
-        locations: locations.map(l => l.text),
-        gallery_images: images.map(img => ({
-          id: img.id,
-          url: `/uploads/gallery/${img.filename}`,
-          alt_text: img.alt_text || profession.title
-        })),
-        qr_code: qrCodes.length > 0 ? `/uploads/qr_codes/${qrCodes[0].filename}` : null
-      };
+      try {
+        // Anforderungen
+        const [requirements] = await pool.query(
+          'SELECT text FROM requirements WHERE profession_id = ? ORDER BY sort_order',
+          [profession.id]
+        );
+        
+        // Karrieremöglichkeiten
+        const [careerOptions] = await pool.query(
+          'SELECT text FROM career_options WHERE profession_id = ? ORDER BY sort_order',
+          [profession.id]
+        );
+        
+        // Standorte
+        const [locations] = await pool.query(
+          'SELECT text FROM locations WHERE profession_id = ? ORDER BY sort_order',
+          [profession.id]
+        );
+        
+        // Bilder
+        const [images] = await pool.query(
+          'SELECT id, filename, alt_text FROM gallery_images WHERE profession_id = ? ORDER BY sort_order',
+          [profession.id]
+        );
+        
+        // QR-Code
+        const [qrCodes] = await pool.query(
+          'SELECT filename FROM qr_codes WHERE profession_id = ?',
+          [profession.id]
+        );
+        
+        return {
+          ...profession,
+          requirements: requirements.map(r => r.text),
+          career_options: careerOptions.map(c => c.text),
+          locations: locations.map(l => l.text),
+          gallery_images: images.map(img => ({
+            id: img.id,
+            url: `/uploads/gallery/${img.filename}`,
+            alt_text: img.alt_text || profession.title
+          })),
+          qr_code: qrCodes.length > 0 ? `/uploads/qr_codes/${qrCodes[0].filename}` : null
+        };
+      } catch (err) {
+        console.error(`Fehler beim Laden der Details für Beruf ${profession.id}:`, err);
+        // Rückgabe des Berufs ohne Details bei Fehlern
+        return {
+          ...profession,
+          requirements: [],
+          career_options: [],
+          locations: [],
+          gallery_images: [],
+          qr_code: null,
+          error: 'Details konnten nicht geladen werden'
+        };
+      }
     }));
+    
+    if (DEBUG) {
+      console.log(`Berufe geladen: ${result.length}`);
+    }
     
     res.json(result);
   } catch (err) {
-    console.error('Fehler beim Abrufen der Berufe:', err);
-    res.status(500).json({ error: 'Datenbankfehler' });
+    handleError(res, err, 'Fehler beim Abrufen der Berufe');
   }
 });
 
 // Einzelnen Beruf abrufen
 app.get('/api/professions/:id', async (req, res) => {
-  const { id } = req.params;
-  
   try {
+    const { id } = req.params;
+    
     // Hauptdaten des Berufs abrufen
     const [professions] = await pool.query(`
       SELECT p.*, c.name as category_name
       FROM professions p
-      JOIN categories c ON p.category_id = c.id
+      LEFT JOIN categories c ON p.category_id = c.id
       WHERE p.id = ?
     `, [id]);
     
@@ -258,31 +375,36 @@ app.get('/api/professions/:id', async (req, res) => {
     
     res.json(result);
   } catch (err) {
-    console.error('Fehler beim Abrufen des Berufs:', err);
-    res.status(500).json({ error: 'Datenbankfehler' });
+    handleError(res, err, 'Fehler beim Abrufen des Berufs');
   }
 });
 
 // Beruf erstellen/aktualisieren (mit Transaktion)
 app.post('/api/professions', async (req, res) => {
-  const {
-    id,
-    title,
-    description,
-    duration,
-    category_id,
-    has_knowledge_test,
-    requirements,
-    career_options,
-    locations
-  } = req.body;
-  
-  if (!id || !title || !description || !duration || !category_id) {
-    return res.status(400).json({ error: 'Unvollständige Daten' });
-  }
-  
   let connection;
   try {
+    const {
+      id,
+      title,
+      description,
+      duration,
+      category_id,
+      has_knowledge_test,
+      requirements = [],
+      career_options = [],
+      locations = []
+    } = req.body;
+    
+    if (!id || !title || !description || !duration || !category_id) {
+      return res.status(400).json({ error: 'Unvollständige Daten. ID, Titel, Beschreibung, Dauer und Kategorie sind erforderlich' });
+    }
+    
+    // Prüfen, ob die Kategorie existiert
+    const [categoryExists] = await pool.query('SELECT id FROM categories WHERE id = ?', [category_id]);
+    if (categoryExists.length === 0) {
+      return res.status(400).json({ error: `Kategorie mit ID ${category_id} existiert nicht` });
+    }
+    
     connection = await pool.getConnection();
     await connection.beginTransaction();
     
@@ -295,12 +417,20 @@ app.post('/api/professions', async (req, res) => {
         'UPDATE professions SET title = ?, description = ?, duration = ?, category_id = ?, has_knowledge_test = ? WHERE id = ?',
         [title, description, duration, category_id, has_knowledge_test || false, id]
       );
+      
+      if (DEBUG) {
+        console.log(`Beruf aktualisiert: ${id} - ${title}`);
+      }
     } else {
       // Insert
       await connection.query(
         'INSERT INTO professions (id, title, description, duration, category_id, has_knowledge_test) VALUES (?, ?, ?, ?, ?, ?)',
         [id, title, description, duration, category_id, has_knowledge_test || false]
       );
+      
+      if (DEBUG) {
+        console.log(`Neuer Beruf erstellt: ${id} - ${title}`);
+      }
     }
     
     // Anforderungen aktualisieren
@@ -336,20 +466,23 @@ app.post('/api/professions', async (req, res) => {
     await connection.commit();
     res.status(201).json({ id, message: 'Beruf erfolgreich gespeichert' });
   } catch (err) {
-    if (connection) await connection.rollback();
-    console.error('Fehler beim Speichern des Berufs:', err);
-    res.status(500).json({ error: 'Datenbankfehler' });
+    if (connection) {
+      await connection.rollback();
+    }
+    handleError(res, err, 'Fehler beim Speichern des Berufs');
   } finally {
-    if (connection) connection.release();
+    if (connection) {
+      connection.release();
+    }
   }
 });
 
 // Beruf löschen (mit Transaktion)
 app.delete('/api/professions/:id', async (req, res) => {
-  const { id } = req.params;
-  
   let connection;
   try {
+    const { id } = req.params;
+    
     connection = await pool.getConnection();
     await connection.beginTransaction();
     
@@ -357,8 +490,13 @@ app.delete('/api/professions/:id', async (req, res) => {
     const [images] = await connection.query('SELECT filename FROM gallery_images WHERE profession_id = ?', [id]);
     const [qrCodes] = await connection.query('SELECT filename FROM qr_codes WHERE profession_id = ?', [id]);
     
-    // Verknüpfte Daten löschen (durch Foreign Keys mit CASCADE werden diese automatisch gelöscht)
-    await connection.query('DELETE FROM professions WHERE id = ?', [id]);
+    // Beruf löschen (durch Foreign Keys mit CASCADE werden verknüpfte Daten automatisch gelöscht)
+    const [result] = await connection.query('DELETE FROM professions WHERE id = ?', [id]);
+    
+    if (result.affectedRows === 0) {
+      await connection.rollback();
+      return res.status(404).json({ error: 'Beruf nicht gefunden' });
+    }
     
     await connection.commit();
     
@@ -379,34 +517,77 @@ app.delete('/api/professions/:id', async (req, res) => {
       }
     }
     
+    if (DEBUG) {
+      console.log(`Beruf gelöscht: ${id}`);
+    }
+    
     res.json({ message: 'Beruf erfolgreich gelöscht' });
   } catch (err) {
-    if (connection) await connection.rollback();
-    console.error('Fehler beim Löschen des Berufs:', err);
-    res.status(500).json({ error: 'Datenbankfehler' });
+    if (connection) {
+      await connection.rollback();
+    }
+    handleError(res, err, 'Fehler beim Löschen des Berufs');
   } finally {
-    if (connection) connection.release();
+    if (connection) {
+      connection.release();
+    }
   }
 });
 
+// ===== Bild-Upload und -Verwaltung =====
+
 // Bild hochladen
 app.post('/api/professions/:professionId/images/:type?', upload.single('file'), async (req, res) => {
-  const { professionId, type } = req.params;
-  const file = req.file;
-  const altText = req.body.alt_text || '';
-  
-  if (!file) {
-    return res.status(400).json({ error: 'Keine Datei hochgeladen' });
-  }
-  
   try {
+    const { professionId, type } = req.params;
+    const file = req.file;
+    const altText = req.body.alt_text || '';
+    
+    if (!file) {
+      return res.status(400).json({ error: 'Keine Datei hochgeladen' });
+    }
+    
+    // Prüfen, ob der Beruf existiert
+    const [professionExists] = await pool.query('SELECT id FROM professions WHERE id = ?', [professionId]);
+    if (professionExists.length === 0) {
+      // Datei löschen, wenn der Beruf nicht existiert
+      try {
+        await fs.unlink(file.path);
+      } catch (e) {
+        console.warn(`Konnte Datei nicht löschen: ${file.path}`, e);
+      }
+      return res.status(404).json({ error: `Beruf mit ID ${professionId} existiert nicht` });
+    }
+    
     if (type === 'qr') {
       // QR-Code hochladen (ersetze vorhandenen)
+      
+      // Alten QR-Code finden und löschen
+      const [oldQrCodes] = await pool.query('SELECT filename FROM qr_codes WHERE profession_id = ?', [professionId]);
+      for (const qr of oldQrCodes) {
+        try {
+          await fs.unlink(path.join(uploadDir, 'qr_codes', qr.filename));
+        } catch (e) {
+          console.warn(`Konnte alten QR-Code nicht löschen: ${qr.filename}`, e);
+        }
+      }
+      
+      // Aus der Datenbank löschen
       await pool.query('DELETE FROM qr_codes WHERE profession_id = ?', [professionId]);
+      
+      // Neuen QR-Code einfügen
       await pool.query(
         'INSERT INTO qr_codes (profession_id, filename) VALUES (?, ?)',
         [professionId, file.filename]
       );
+      
+      if (DEBUG) {
+        console.log(`QR-Code hochgeladen für Beruf ${professionId}: ${file.filename}`);
+      }
+      
+      return res.status(201).json({
+        url: `/uploads/qr_codes/${file.filename}`
+      });
     } else {
       // Galeriebild hochladen
       const [result] = await pool.query(
@@ -415,28 +596,35 @@ app.post('/api/professions/:professionId/images/:type?', upload.single('file'), 
       );
       
       const imageId = result.insertId;
+      
+      if (DEBUG) {
+        console.log(`Bild hochgeladen für Beruf ${professionId}: ${file.filename}`);
+      }
+      
       res.status(201).json({
         id: imageId,
-        url: `/uploads/${type === 'qr' ? 'qr_codes' : 'gallery'}/${file.filename}`,
+        url: `/uploads/gallery/${file.filename}`,
         alt_text: altText
       });
-      return;
     }
-    
-    res.status(201).json({
-      url: `/uploads/${type === 'qr' ? 'qr_codes' : 'gallery'}/${file.filename}`
-    });
   } catch (err) {
-    console.error('Fehler beim Hochladen des Bildes:', err);
-    res.status(500).json({ error: 'Datenbankfehler' });
+    // Bei einem Fehler die hochgeladene Datei entfernen
+    if (req.file) {
+      try {
+        await fs.unlink(req.file.path);
+      } catch (e) {
+        console.warn(`Konnte Datei nicht löschen: ${req.file.path}`, e);
+      }
+    }
+    handleError(res, err, 'Fehler beim Hochladen des Bildes');
   }
 });
 
 // Bild löschen
 app.delete('/api/gallery-images/:id', async (req, res) => {
-  const { id } = req.params;
-  
   try {
+    const { id } = req.params;
+    
     // Bilddatei finden
     const [images] = await pool.query('SELECT filename FROM gallery_images WHERE id = ?', [id]);
     
@@ -456,14 +644,38 @@ app.delete('/api/gallery-images/:id', async (req, res) => {
       console.warn(`Konnte Bild nicht löschen: ${filename}`, e);
     }
     
+    if (DEBUG) {
+      console.log(`Bild gelöscht: ${id} (${filename})`);
+    }
+    
     res.json({ message: 'Bild erfolgreich gelöscht' });
   } catch (err) {
-    console.error('Fehler beim Löschen des Bildes:', err);
-    res.status(500).json({ error: 'Datenbankfehler' });
+    handleError(res, err, 'Fehler beim Löschen des Bildes');
   }
 });
 
 // Server starten
 app.listen(PORT, () => {
-  console.log(`Server läuft auf Port ${PORT}`);
+  console.log(`
+=========================================
+  VW Ausbildungsberufe API Server
+=========================================
+  Server läuft auf Port ${PORT}
+  http://localhost:${PORT}/api
+  
+  Debug-Modus: ${DEBUG ? 'Aktiviert' : 'Deaktiviert'}
+  Upload-Verzeichnis: ${uploadDir}
+=========================================
+  `);
+});
+
+// Bei unerwarteter Beendigung aufräumen
+process.on('SIGINT', () => {
+  console.log('Server wird beendet...');
+  process.exit(0);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Unbehandelte Ausnahme:', err);
+  process.exit(1);
 });
