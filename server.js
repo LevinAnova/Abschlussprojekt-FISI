@@ -57,61 +57,51 @@ const pool = mysql.createPool({
   }
 })();
 
-// Absoluter Pfad zu /var/www/uploads
-const uploadDir = '/var/www/uploads';
+// In server.js
+const uploadDir = path.join(__dirname, 'public', 'uploads');
 
-// Stelle sicher, dass die Upload-Verzeichnisse existieren
-(async () => {
-    try {
-      await fs.mkdir(path.join(uploadDir, 'gallery'), { recursive: true });
-      await fs.mkdir(path.join(uploadDir, 'qr_codes'), { recursive: true });
-      console.log('✅ Upload-Verzeichnisse erfolgreich erstellt');
-    } catch (err) {
-      console.error('❌ Fehler beim Erstellen der Upload-Verzeichnisse:', err);
-    }
-  })();
-  
-  const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      const professionId = req.params.professionId;
-      const type = req.params.type || 'gallery';
-      
-      // Basis-Verzeichnis für die entsprechende Bildart
-      const baseDir = path.join(uploadDir, type === 'qr' ? 'qr_codes' : 'gallery');
-      
-      // Beruf-spezifisches Verzeichnis
-      const professionDir = path.join(baseDir, professionId);
-      
-      // Verzeichnis erstellen, falls es nicht existiert
-      fs.mkdir(professionDir, { recursive: true }, (err) => {
-        if (err) {
-          console.error(`Fehler beim Erstellen des Verzeichnisses für ${professionId}:`, err);
-          // Im Fehlerfall das Basis-Verzeichnis verwenden
-          cb(null, baseDir);
-        } else {
-          // Beruf-spezifisches Verzeichnis verwenden
-          cb(null, professionDir);
-        }
-      });
-    },
-    filename: function (req, file, cb) {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      const ext = path.extname(file.originalname);
-      cb(null, `image-${uniqueSuffix}${ext}`);
-    }
-  });
+// Einfache Storage-Konfiguration
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, `image-${uniqueSuffix}${ext}`);
+  }
+});
 
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limit 5MB
-  fileFilter: function (req, file, cb) {
-    const allowedTypes = [
-      'image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'
-    ];
-    if (!allowedTypes.includes(file.mimetype)) {
-      return cb(new Error('Nur Bilddateien erlaubt!'), false);
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+});
+
+// Vereinfachte Route für Bildupload
+app.post('/api/professions/:professionId/images', upload.single('file'), async (req, res) => {
+  try {
+    const { professionId } = req.params;
+    const file = req.file;
+    
+    if (!file) {
+      return res.status(400).json({ error: 'Keine Datei hochgeladen' });
     }
-    cb(null, true);
+    
+    // Dateiname in Datenbank speichern
+    const [result] = await pool.query(
+      'INSERT INTO gallery_images (profession_id, filename, alt_text) VALUES (?, ?, ?)',
+      [professionId, file.filename, req.body.alt_text || '']
+    );
+    
+    res.status(201).json({
+      id: result.insertId,
+      url: `/uploads/${file.filename}`,
+      alt_text: req.body.alt_text || ''
+    });
+  } catch (err) {
+    console.error('Fehler beim Hochladen:', err);
+    res.status(500).json({ error: 'Hochladen fehlgeschlagen: ' + err.message });
   }
 });
 
