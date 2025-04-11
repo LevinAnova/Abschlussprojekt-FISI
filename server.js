@@ -1,9 +1,9 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
-const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 const cors = require('cors');
+const formidable = require('formidable');
 
 // Express App initialisieren
 const app = express();
@@ -57,53 +57,21 @@ const pool = mysql.createPool({
   }
 })();
 
-// In server.js
-const uploadDir = path.join(__dirname, 'public', 'uploads');
+// Upload-Verzeichnisse definieren
+const uploadDir = '/var/www/uploads';
+const galleryDir = path.join(uploadDir, 'gallery');
+const qrCodesDir = path.join(uploadDir, 'qr_codes');
 
-// Einfache Storage-Konfiguration
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `image-${uniqueSuffix}${ext}`);
-  }
-});
-
-const upload = multer({ 
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
-});
-
-// Vereinfachte Route für Bildupload
-app.post('/api/professions/:professionId/images', upload.single('file'), async (req, res) => {
+// Stelle sicher, dass die Upload-Verzeichnisse existieren
+(async () => {
   try {
-    const { professionId } = req.params;
-    const file = req.file;
-    
-    if (!file) {
-      return res.status(400).json({ error: 'Keine Datei hochgeladen' });
-    }
-    
-    // Dateiname in Datenbank speichern
-    const [result] = await pool.query(
-      'INSERT INTO gallery_images (profession_id, filename, alt_text) VALUES (?, ?, ?)',
-      [professionId, file.filename, req.body.alt_text || '']
-    );
-    
-    res.status(201).json({
-      id: result.insertId,
-      url: `/uploads/${file.filename}`,
-      alt_text: req.body.alt_text || ''
-    });
+    await fs.mkdir(galleryDir, { recursive: true });
+    await fs.mkdir(qrCodesDir, { recursive: true });
+    console.log('✅ Upload-Verzeichnisse erfolgreich erstellt');
   } catch (err) {
-    console.error('Fehler beim Hochladen:', err);
-    res.status(500).json({ error: 'Hochladen fehlgeschlagen: ' + err.message });
+    console.error('❌ Fehler beim Erstellen der Upload-Verzeichnisse:', err);
   }
-});
+})();
 
 // Logging-Middleware
 app.use((req, res, next) => {
@@ -287,10 +255,10 @@ app.get('/api/professions', async (req, res) => {
           locations: locations.map(l => l.text),
           gallery_images: images.map(img => ({
             id: img.id,
-            url: `/uploads/gallery/${id}/${img.filename}`,
+            url: `/uploads/gallery/${profession.id}/${img.filename}`,
             alt_text: img.alt_text || profession.title
           })),
-          qr_code: qrCodes.length > 0 ? `/uploads/qr_codes/${id}/${qrCodes[0].filename}` : null
+          qr_code: qrCodes.length > 0 ? `/uploads/qr_codes/${profession.id}/${qrCodes[0].filename}` : null
         };
       } catch (err) {
         console.error(`Fehler beim Laden der Details für Beruf ${profession.id}:`, err);
@@ -376,7 +344,7 @@ app.get('/api/professions/:id', async (req, res) => {
         url: `/uploads/gallery/${profession.id}/${img.filename}`,
         alt_text: img.alt_text || profession.title
       })),
-      qr_code: qrCodes.length > 0 ? `/uploads/qr_codes/${qrCodes[0].filename}` : null
+      qr_code: qrCodes.length > 0 ? `/uploads/qr_codes/${profession.id}/${qrCodes[0].filename}` : null
     };
     
     res.json(result);
@@ -540,89 +508,108 @@ app.delete('/api/professions/:id', async (req, res) => {
   }
 });
 
-// ===== Bild-Upload und -Verwaltung =====
+// ===== Bild-Upload und -Verwaltung mit formidable =====
 
 // Bild hochladen
-app.post('/api/professions/:professionId/images/:type?', upload.single('file'), async (req, res) => {
+app.post('/api/professions/:professionId/images/:type?', async (req, res) => {
   try {
     const { professionId, type } = req.params;
-    const file = req.file;
-    const altText = req.body.alt_text || '';
-    
-    if (!file) {
-      return res.status(400).json({ error: 'Keine Datei hochgeladen' });
-    }
+    const isQrCode = type === 'qr';
     
     // Prüfen, ob der Beruf existiert
     const [professionExists] = await pool.query('SELECT id FROM professions WHERE id = ?', [professionId]);
     if (professionExists.length === 0) {
-      // Datei löschen, wenn der Beruf nicht existiert
-      try {
-        await fs.unlink(file.path);
-      } catch (e) {
-        console.warn(`Konnte Datei nicht löschen: ${file.path}`, e);
-      }
       return res.status(404).json({ error: `Beruf mit ID ${professionId} existiert nicht` });
     }
     
-    if (type === 'qr') {
-      // QR-Code hochladen (ersetze vorhandenen)
-      
-      // Alten QR-Code finden und löschen
-      const [oldQrCodes] = await pool.query('SELECT filename FROM qr_codes WHERE profession_id = ?', [professionId]);
-      for (const qr of oldQrCodes) {
-        try {
-          await fs.unlink(path.join(uploadDir, 'qr_codes', qr.filename));
-        } catch (e) {
-          console.warn(`Konnte alten QR-Code nicht löschen: ${qr.filename}`, e);
-        }
-      }
-      
-      // Aus der Datenbank löschen
-      await pool.query('DELETE FROM qr_codes WHERE profession_id = ?', [professionId]);
-      
-      // Neuen QR-Code einfügen
-      await pool.query(
-        'INSERT INTO qr_codes (profession_id, filename) VALUES (?, ?)',
-        [professionId, file.filename]
-      );
-      
-      if (DEBUG) {
-        console.log(`QR-Code hochgeladen für Beruf ${professionId}: ${file.filename}`);
-      }
-      
-      return res.status(201).json({
-        url: `/uploads/qr_codes/${file.filename}`
-      });
-    } else {
-      // Galeriebild hochladen
-      const [result] = await pool.query(
-        'INSERT INTO gallery_images (profession_id, filename, alt_text, sort_order) VALUES (?, ?, ?, (SELECT COALESCE(MAX(sort_order) + 1, 0) FROM gallery_images g WHERE g.profession_id = ?))',
-        [professionId, file.filename, altText, professionId]
-      );
-      
-      const imageId = result.insertId;
-      
-      if (DEBUG) {
-        console.log(`Bild hochgeladen für Beruf ${professionId}: ${file.filename}`);
-      }
-      
-      res.status(201).json({
-        id: imageId,
-        url: `/uploads/gallery/${file.filename}`,
-        alt_text: altText
-      });
+    // Zielverzeichnis erstellen
+    const targetDir = isQrCode ? path.join(qrCodesDir, professionId) : path.join(galleryDir, professionId);
+    try {
+      await fs.mkdir(targetDir, { recursive: true });
+    } catch (mkdirErr) {
+      console.error(`Fehler beim Erstellen des Verzeichnisses ${targetDir}:`, mkdirErr);
+      // Fallback auf Hauptverzeichnis
+      targetDir = isQrCode ? qrCodesDir : galleryDir;
     }
-  } catch (err) {
-    // Bei einem Fehler die hochgeladene Datei entfernen
-    if (req.file) {
+    
+    // Formidable für Datei-Upload konfigurieren
+    const form = new formidable.IncomingForm({
+      uploadDir: targetDir,
+      keepExtensions: true,
+      maxFileSize: 5 * 1024 * 1024 // 5MB
+    });
+    
+    // Verarbeite den Upload
+    form.parse(req, async (err, fields, files) => {
+      if (err) {
+        console.error('Formidable-Fehler:', err);
+        return handleError(res, err, 'Fehler beim Hochladen der Datei', 500);
+      }
+      
+      if (!files.file) {
+        return res.status(400).json({ error: 'Keine Datei hochgeladen' });
+      }
+      
       try {
-        await fs.unlink(req.file.path);
-      } catch (e) {
-        console.warn(`Konnte Datei nicht löschen: ${req.file.path}`, e);
+        const file = files.file;
+        const filename = path.basename(file.path);
+        const altText = fields.alt_text || '';
+        
+        if (isQrCode) {
+          // QR-Code hochladen (ersetze vorhandenen)
+          
+          // Alten QR-Code finden und löschen
+          const [oldQrCodes] = await pool.query('SELECT filename FROM qr_codes WHERE profession_id = ?', [professionId]);
+          for (const qr of oldQrCodes) {
+            try {
+              await fs.unlink(path.join(qrCodesDir, qr.filename));
+            } catch (e) {
+              console.warn(`Konnte alten QR-Code nicht löschen: ${qr.filename}`, e);
+            }
+          }
+          
+          // Aus der Datenbank löschen
+          await pool.query('DELETE FROM qr_codes WHERE profession_id = ?', [professionId]);
+          
+          // Neuen QR-Code einfügen
+          await pool.query(
+            'INSERT INTO qr_codes (profession_id, filename) VALUES (?, ?)',
+            [professionId, filename]
+          );
+          
+          if (DEBUG) {
+            console.log(`QR-Code hochgeladen für Beruf ${professionId}: ${filename}`);
+          }
+          
+          return res.status(201).json({
+            url: `/uploads/qr_codes/${professionId}/${filename}`
+          });
+        } else {
+          // Galeriebild hochladen
+          const [result] = await pool.query(
+            'INSERT INTO gallery_images (profession_id, filename, alt_text, sort_order) VALUES (?, ?, ?, (SELECT COALESCE(MAX(sort_order) + 1, 0) FROM gallery_images g WHERE g.profession_id = ?))',
+            [professionId, filename, altText, professionId]
+          );
+          
+          const imageId = result.insertId;
+          
+          if (DEBUG) {
+            console.log(`Bild hochgeladen für Beruf ${professionId}: ${filename}`);
+          }
+          
+          res.status(201).json({
+            id: imageId,
+            url: `/uploads/gallery/${professionId}/${filename}`,
+            alt_text: altText
+          });
+        }
+      } catch (dbErr) {
+        console.error('Datenbank-Fehler:', dbErr);
+        handleError(res, dbErr, 'Fehler beim Speichern der Datei in der Datenbank', 500);
       }
-    }
-    handleError(res, err, 'Fehler beim Hochladen des Bildes');
+    });
+  } catch (err) {
+    handleError(res, err, 'Fehler beim Hochladen des Bildes', 500);
   }
 });
 
@@ -632,20 +619,20 @@ app.delete('/api/gallery-images/:id', async (req, res) => {
     const { id } = req.params;
     
     // Bilddatei finden
-    const [images] = await pool.query('SELECT filename FROM gallery_images WHERE id = ?', [id]);
+    const [images] = await pool.query('SELECT profession_id, filename FROM gallery_images WHERE id = ?', [id]);
     
     if (images.length === 0) {
       return res.status(404).json({ error: 'Bild nicht gefunden' });
     }
     
-    const filename = images[0].filename;
+    const { profession_id, filename } = images[0];
     
     // Aus der Datenbank löschen
     await pool.query('DELETE FROM gallery_images WHERE id = ?', [id]);
     
     // Von der Festplatte löschen
     try {
-      await fs.unlink(path.join(uploadDir, 'gallery', filename));
+      await fs.unlink(path.join(galleryDir, profession_id, filename));
     } catch (e) {
       console.warn(`Konnte Bild nicht löschen: ${filename}`, e);
     }

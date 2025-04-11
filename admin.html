@@ -884,7 +884,7 @@
                 }
             });
             
-async function uploadGalleryImage(file) {
+            async function uploadGalleryImage(file) {
   const professionId = document.getElementById('professionId').value;
   if (!professionId) {
     showAlert(professionAlert, 'Bitte speichern Sie zuerst den Beruf, bevor Sie Bilder hochladen.', 'danger');
@@ -898,8 +898,8 @@ async function uploadGalleryImage(file) {
     const formData = new FormData();
     formData.append('file', file);
     
-    // Direkter Zugriff auf Express-Server ohne Nginx-Proxy
-    const response = await fetch(`http://localhost:3000/api/professions/${professionId}/images`, {
+    // Direkter Fetch-Aufruf zum API-Endpunkt
+    const response = await fetch(`/api/professions/${professionId}/images`, {
       method: 'POST',
       body: formData
     });
