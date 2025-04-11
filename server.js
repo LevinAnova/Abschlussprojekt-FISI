@@ -70,8 +70,8 @@ const uploadDir = '/var/www/uploads';
       console.error('❌ Fehler beim Erstellen der Upload-Verzeichnisse:', err);
     }
   })();
-
-const storage = multer.diskStorage({
+  
+  const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       const professionId = req.params.professionId;
       const type = req.params.type || 'gallery';

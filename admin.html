@@ -799,37 +799,36 @@
             }
             
             async function loadGalleryImages(professionId) {
-    if (!professionId) {
-        console.warn('loadGalleryImages: Keine Berufs-ID angegeben');
-        renderGalleryImages([]);
-        return;
+  if (!professionId) {
+    console.warn('loadGalleryImages: Keine Berufs-ID angegeben');
+    renderGalleryImages([]);
+    return;
+  }
+  
+  try {
+    console.log('Lade Galerie-Bilder für Beruf:', professionId);
+    const response = await fetch(`/api/professions/${professionId}`);
+    
+    if (!response.ok) {
+      throw new Error(`Server-Fehler: ${response.status} ${response.statusText}`);
     }
     
-    try {
-        console.log('Lade Galerie-Bilder für Beruf:', professionId);
-        const response = await fetch(`/api/professions/${professionId}`);
-        
-        if (!response.ok) {
-            throw new Error(`Server-Fehler: ${response.status} ${response.statusText}`);
-        }
-        
-        const profession = await response.json();
-        console.log('Geladene Berufsdetails:', profession);
-        
-        if (profession && Array.isArray(profession.gallery_images)) {
-            console.log('Gefundene Galerie-Bilder:', profession.gallery_images.length);
-            renderGalleryImages(profession.gallery_images);
-        } else {
-            console.warn('Keine Galerie-Bilder gefunden für:', professionId);
-            renderGalleryImages([]);
-        }
-    } catch (error) {
-        console.error('Fehler beim Laden der Bilder:', error);
-        renderGalleryImages([]);
-        showAlert(professionAlert, 'Fehler beim Laden der Bilder: ' + error.message, 'danger');
+    const profession = await response.json();
+    console.log('Geladene Berufsdetails:', profession);
+    
+    if (profession && Array.isArray(profession.gallery_images)) {
+      console.log('Gefundene Galerie-Bilder:', profession.gallery_images.length);
+      renderGalleryImages(profession.gallery_images);
+    } else {
+      console.warn('Keine Galerie-Bilder gefunden für:', professionId);
+      renderGalleryImages([]);
     }
-}
-            
+  } catch (error) {
+    console.error('Fehler beim Laden der Bilder:', error);
+    renderGalleryImages([]);
+    showAlert(professionAlert, 'Fehler beim Laden der Bilder: ' + error.message, 'danger');
+  }
+}           
             function resetQrCode() {
                 qrPreview.style.display = 'none';
                 qrPreviewImage.src = '';
@@ -886,42 +885,42 @@
             });
             
             async function uploadGalleryImage(file) {
-    const professionId = document.getElementById('professionId').value;
-    if (!professionId) {
-        showAlert(professionAlert, 'Bitte speichern Sie zuerst den Beruf, bevor Sie Bilder hochladen.', 'danger');
-        return;
+  const professionId = document.getElementById('professionId').value;
+  if (!professionId) {
+    showAlert(professionAlert, 'Bitte speichern Sie zuerst den Beruf, bevor Sie Bilder hochladen.', 'danger');
+    return;
+  }
+  
+  uploadProgress.style.display = 'block';
+  
+  try {
+    // Formular für Datei-Upload erstellen
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // Direkter Fetch-Aufruf zum API-Endpunkt
+    const response = await fetch(`/api/professions/${professionId}/images`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Server-Fehler: ${response.status} ${response.statusText}`);
     }
     
-    uploadProgress.style.display = 'block';
+    const result = await response.json();
+    console.log('Bild-Upload-Ergebnis:', result);
     
-    try {
-        // Formular für Datei-Upload erstellen
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        // Direkter Fetch-Aufruf zum API-Endpunkt
-        const response = await fetch(`/api/professions/${professionId}/images`, {
-            method: 'POST',
-            body: formData
-        });
-        
-        if (!response.ok) {
-            throw new Error(`Server-Fehler: ${response.status} ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        console.log('Bild-Upload-Ergebnis:', result);
-        
-        // Nach erfolgreichem Upload die Bilder neu laden
-        await loadGalleryImages(professionId);
-        showAlert(professionAlert, 'Bild erfolgreich hochgeladen.', 'success');
-    } catch (error) {
-        console.error('Fehler beim Hochladen des Bildes:', error);
-        showAlert(professionAlert, 'Fehler beim Hochladen des Bildes: ' + error.message, 'danger');
-    } finally {
-        uploadProgress.style.display = 'none';
-        imageUpload.value = ''; // Reset input
-    }
+    // Nach erfolgreichem Upload die Bilder neu laden
+    await loadGalleryImages(professionId);
+    showAlert(professionAlert, 'Bild erfolgreich hochgeladen.', 'success');
+  } catch (error) {
+    console.error('Fehler beim Hochladen des Bildes:', error);
+    showAlert(professionAlert, 'Fehler beim Hochladen des Bildes: ' + error.message, 'danger');
+  } finally {
+    uploadProgress.style.display = 'none';
+    imageUpload.value = ''; // Reset input
+  }
 }
             
             // Event-Listener für QR-Code-Upload
