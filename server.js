@@ -57,8 +57,8 @@ const pool = mysql.createPool({
   }
 })();
 
-// Upload-Konfiguration
-const uploadDir = path.join(__dirname, 'public', 'uploads');
+// Absoluter Pfad zu /var/www/uploads
+const uploadDir = '/var/www/uploads';
 
 // Stelle sicher, dass die Upload-Verzeichnisse existieren
 (async () => {
