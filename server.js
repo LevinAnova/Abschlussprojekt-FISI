@@ -522,15 +522,15 @@ app.post('/api/professions/:professionId/images/:type?', async (req, res) => {
       return res.status(404).json({ error: `Beruf mit ID ${professionId} existiert nicht` });
     }
     
-    // Zielverzeichnis erstellen
-    const targetDir = isQrCode ? path.join(qrCodesDir, professionId) : path.join(galleryDir, professionId);
-    try {
-      await fs.mkdir(targetDir, { recursive: true });
-    } catch (mkdirErr) {
-      console.error(`Fehler beim Erstellen des Verzeichnisses ${targetDir}:`, mkdirErr);
-      // Fallback auf Hauptverzeichnis
-      targetDir = isQrCode ? qrCodesDir : galleryDir;
-    }
+// Zielverzeichnis erstellen
+let targetDir = isQrCode ? path.join(qrCodesDir, professionId) : path.join(galleryDir, professionId);
+try {
+  await fs.mkdir(targetDir, { recursive: true });
+} catch (mkdirErr) {
+  console.error(`Fehler beim Erstellen des Verzeichnisses ${targetDir}:`, mkdirErr);
+  // Fallback auf Hauptverzeichnis
+  targetDir = isQrCode ? qrCodesDir : galleryDir;
+}
     
     // Formidable für Datei-Upload konfigurieren
     const form = new formidable.IncomingForm({
