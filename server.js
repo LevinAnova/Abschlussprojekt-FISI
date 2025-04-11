@@ -62,28 +62,44 @@ const uploadDir = path.join(__dirname, 'public', 'uploads');
 
 // Stelle sicher, dass die Upload-Verzeichnisse existieren
 (async () => {
-  try {
-    await fs.mkdir(path.join(uploadDir, 'gallery'), { recursive: true });
-    await fs.mkdir(path.join(uploadDir, 'qr_codes'), { recursive: true });
-    console.log('✅ Upload-Verzeichnisse erfolgreich erstellt');
-  } catch (err) {
-    console.error('❌ Fehler beim Erstellen der Upload-Verzeichnisse:', err);
-  }
-})();
+    try {
+      await fs.mkdir(path.join(uploadDir, 'gallery'), { recursive: true });
+      await fs.mkdir(path.join(uploadDir, 'qr_codes'), { recursive: true });
+      console.log('✅ Upload-Verzeichnisse erfolgreich erstellt');
+    } catch (err) {
+      console.error('❌ Fehler beim Erstellen der Upload-Verzeichnisse:', err);
+    }
+  })();
 
-// Multer-Konfiguration für Datei-Uploads
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const type = req.params.type || 'gallery';
-    const dest = path.join(uploadDir, type === 'qr' ? 'qr_codes' : 'gallery');
-    cb(null, dest);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `${req.params.professionId}-${uniqueSuffix}${ext}`);
-  }
-});
+    destination: function (req, file, cb) {
+      const professionId = req.params.professionId;
+      const type = req.params.type || 'gallery';
+      
+      // Basis-Verzeichnis für die entsprechende Bildart
+      const baseDir = path.join(uploadDir, type === 'qr' ? 'qr_codes' : 'gallery');
+      
+      // Beruf-spezifisches Verzeichnis
+      const professionDir = path.join(baseDir, professionId);
+      
+      // Verzeichnis erstellen, falls es nicht existiert
+      fs.mkdir(professionDir, { recursive: true }, (err) => {
+        if (err) {
+          console.error(`Fehler beim Erstellen des Verzeichnisses für ${professionId}:`, err);
+          // Im Fehlerfall das Basis-Verzeichnis verwenden
+          cb(null, baseDir);
+        } else {
+          // Beruf-spezifisches Verzeichnis verwenden
+          cb(null, professionDir);
+        }
+      });
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const ext = path.extname(file.originalname);
+      cb(null, `image-${uniqueSuffix}${ext}`);
+    }
+  });
 
 const upload = multer({ 
   storage: storage,
@@ -281,10 +297,10 @@ app.get('/api/professions', async (req, res) => {
           locations: locations.map(l => l.text),
           gallery_images: images.map(img => ({
             id: img.id,
-            url: `/uploads/gallery/${img.filename}`,
+            url: `/uploads/gallery/${id}/${img.filename}`,
             alt_text: img.alt_text || profession.title
           })),
-          qr_code: qrCodes.length > 0 ? `/uploads/qr_codes/${qrCodes[0].filename}` : null
+          qr_code: qrCodes.length > 0 ? `/uploads/qr_codes/${id}/${qrCodes[0].filename}` : null
         };
       } catch (err) {
         console.error(`Fehler beim Laden der Details für Beruf ${profession.id}:`, err);
@@ -367,7 +383,7 @@ app.get('/api/professions/:id', async (req, res) => {
       locations: locations.map(l => l.text),
       gallery_images: images.map(img => ({
         id: img.id,
-        url: `/uploads/gallery/${img.filename}`,
+        url: `/uploads/gallery/${profession.id}/${img.filename}`,
         alt_text: img.alt_text || profession.title
       })),
       qr_code: qrCodes.length > 0 ? `/uploads/qr_codes/${qrCodes[0].filename}` : null

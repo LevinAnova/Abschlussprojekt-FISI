@@ -465,10 +465,17 @@
       
       // QR-Code ID aktualisieren
       const qrBerufId = document.getElementById('qrBerufId');
-      if (qrBerufId) {
-        qrBerufId.textContent = berufId;
-      }
-      
+      if (beruf.qr_code) {
+    const qrCodeImg = document.querySelector('.qr-code img');
+    if (qrCodeImg) {
+        qrCodeImg.src = beruf.qr_code;
+        qrCodeImg.onerror = function() {
+            console.warn('QR-Code konnte nicht geladen werden:', beruf.qr_code);
+            this.src = '/api/placeholder/250/250';
+            this.onerror = null;
+        };
+    }
+}
       // Bilder für die Galerie laden
       loadGalleryImages(berufId);
       
@@ -710,62 +717,105 @@
       return testPaths[berufId] || '#';
     }
 
-    // Bilder für die Galerie laden
     function loadGalleryImages(berufId) {
-      const galleryWrapper = document.querySelector('.gallery-wrapper');
-      galleryWrapper.innerHTML = '';
-      
-      const beruf = findBerufById(berufId);
-      
-      // CMS-Bilder verwenden, wenn vorhanden
-      let galleryImages = [];
-      
-      if (beruf.gallery_images && beruf.gallery_images.length > 0) {
-        galleryImages = beruf.gallery_images;
-      } else {
-        // Fallback auf lokale Standardbilder
-        galleryImages = [
-          { 
+    const galleryWrapper = document.querySelector('.gallery-wrapper');
+    galleryWrapper.innerHTML = '';
+    
+    const beruf = findBerufById(berufId);
+    
+    // Überprüfen, ob wir gültige Berufsdaten haben
+    if (!beruf) {
+        console.error(`Beruf mit ID ${berufId} nicht gefunden`);
+        loadDefaultGalleryImages(galleryWrapper);
+        return;
+    }
+    
+    console.log('Lade Galerie-Bilder für:', berufId, beruf);
+    
+    // CMS-Bilder verwenden, wenn vorhanden
+    if (beruf.gallery_images && beruf.gallery_images.length > 0) {
+        console.log('Gefundene Galerie-Bilder:', beruf.gallery_images.length);
+        
+        // Sortierte Bilder zur besseren Übersicht
+        const sortedImages = [...beruf.gallery_images].sort((a, b) => {
+            // Nach ID sortieren, falls verfügbar
+            if (a.id && b.id) return a.id - b.id;
+            return 0;
+        });
+        
+        // Erstelle die Galerie-Slides
+        sortedImages.forEach((image) => {
+            createGallerySlide(galleryWrapper, image);
+        });
+    } else {
+        console.warn('Keine Galerie-Bilder für Beruf gefunden:', berufId);
+        loadDefaultGalleryImages(galleryWrapper);
+    }
+    
+    // Navigationspunkte aktualisieren
+    const totalSlides = galleryWrapper.children.length;
+    updateGalleryDots(totalSlides);
+}
+
+// Hilfsfunktion zum Erstellen eines Gallery-Slides
+function createGallerySlide(galleryWrapper, image) {
+    const slide = document.createElement('div');
+    slide.className = 'gallery-slide';
+    
+    const img = document.createElement('img');
+    
+    // Vollständige URL setzen mit Fehlerbehandlung
+    if (image.url) {
+        // URL bereinigen und sicherstellen, dass sie korrekt ist
+        img.src = image.url.startsWith('http') ? image.url : 
+                 image.url.startsWith('/') ? image.url : '/' + image.url;
+    } else if (image.src) {
+        img.src = image.src;
+    } else {
+        console.warn('Bild ohne URL oder src:', image);
+        img.src = 'img/placeholder.jpg';
+    }
+    
+    img.alt = image.alt_text || image.alt || 'Ausbildung bei Volkswagen';
+    img.className = 'gallery-image';
+    
+    // Fehlerbehandlung für Bilder
+    img.onerror = function() {
+        console.warn(`Bild konnte nicht geladen werden: ${img.src}`);
+        this.src = 'img/placeholder.jpg';
+        this.onerror = null; // Verhindern von Endlosschleifen
+    };
+    
+    slide.appendChild(img);
+    galleryWrapper.appendChild(slide);
+}
+
+// Standardbilder laden, wenn keine vom CMS verfügbar sind
+function loadDefaultGalleryImages(galleryWrapper) {
+    console.log('Lade Standardbilder für Galerie');
+    const defaultImages = [
+        { 
             src: "img/gallery/default1.png",
             alt: "Ausbildung bei Volkswagen" 
-          },
-          { 
+        },
+        { 
             src: "img/gallery/default2.png",
             alt: "Praktische Übungen" 
-          },
-          { 
+        },
+        { 
             src: "img/gallery/default3.png",
             alt: "Team-Arbeit" 
-          },
-          { 
+        },
+        { 
             src: "img/gallery/default4.jpg", 
             alt: "Moderner Arbeitsplatz" 
-          }
-        ];
-      }
-      
-      // Erstelle die Galerie-Slides
-      galleryImages.forEach((image) => {
-        const slide = document.createElement('div');
-        slide.className = 'gallery-slide';
-        
-        const img = document.createElement('img');
-        img.src = image.src;
-        img.alt = image.alt;
-        img.className = 'gallery-image';
-        
-        // Fehlerbehandlung für Bilder
-        img.onerror = function() {
-          this.src = 'img/placeholder.jpg';
-          console.warn(`Bild ${image.src} konnte nicht geladen werden.`);
-        };
-        
-        slide.appendChild(img);
-        galleryWrapper.appendChild(slide);
-      });
-      
-      updateGalleryDots(galleryImages.length);
-    }
+        }
+    ];
+    
+    defaultImages.forEach(image => {
+        createGallerySlide(galleryWrapper, image);
+    });
+}
 
     // Navigationspunkte für die Galerie aktualisieren
     function updateGalleryDots(imageCount) {

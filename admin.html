@@ -207,6 +207,8 @@
 
         .header-title {
             text-align: center;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         @keyframes spin {
@@ -736,41 +738,53 @@
                 });
             }
             
-            // Funktionen für Bilder und QR-Code
-            function renderGalleryImages(images) {
-                const galleryContainer = galleryImagesContainer; // Verwende die umbenannte Variable
-                const noImagesMessage = document.getElementById('noImagesMessage');
-                
-                if (images.length === 0) {
-                    galleryContainer.innerHTML = '';
-                    galleryContainer.appendChild(noImagesMessage);
-                    noImagesMessage.style.display = 'block';
-                    return;
-                }
-                
-                noImagesMessage.style.display = 'none';
-                galleryContainer.innerHTML = '';
-                
-                images.forEach(image => {
-                    const galleryItem = document.createElement('div');
-                    galleryItem.className = 'gallery-item';
-                    galleryItem.innerHTML = `
-                        <img src="${image.url}" alt="${image.alt_text || 'Galeriebild'}">
-                        <button class="delete-btn" data-id="${image.id}">&times;</button>
-                    `;
-                    galleryContainer.appendChild(galleryItem);
-                });
-                
-                // Event-Listener für Lösch-Buttons
-                document.querySelectorAll('.gallery-item .delete-btn').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const imageId = this.dataset.id;
-                        if (confirm('Möchten Sie dieses Bild wirklich löschen?')) {
-                            deleteImage(imageId);
-                        }
-                    });
-                });
+    // Funktionen für Bilder und QR-Code
+    function renderGalleryImages(images) {
+    const galleryContainer = galleryImagesContainer; // Verwende die umbenannte Variable
+    const noImagesMessage = document.getElementById('noImagesMessage');
+    
+    if (!images || images.length === 0) {
+        galleryContainer.innerHTML = '';
+        galleryContainer.appendChild(noImagesMessage);
+        noImagesMessage.style.display = 'block';
+        return;
+    }
+    
+    noImagesMessage.style.display = 'none';
+    galleryContainer.innerHTML = '';
+    
+    images.forEach(image => {
+        // Fehlerbehandlung für mögliche ungültige Bildobjekte
+        if (!image || !image.url) {
+            console.warn('Ungültiges Bildobjekt:', image);
+            return;
+        }
+        
+        const galleryItem = document.createElement('div');
+        galleryItem.className = 'gallery-item';
+        
+        // Vollständige URL erstellen - stellen wir sicher, dass die URL korrekt ist
+        const imageUrl = image.url.startsWith('http') ? image.url : 
+                         image.url.startsWith('/') ? image.url : '/' + image.url;
+        
+        galleryItem.innerHTML = `
+            <img src="${imageUrl}" alt="${image.alt_text || 'Galeriebild'}" 
+                 onerror="this.src='/img/placeholder.jpg'; this.onerror=null;">
+            <button class="delete-btn" data-id="${image.id}">&times;</button>
+        `;
+        galleryContainer.appendChild(galleryItem);
+    });
+    
+    // Event-Listener für Lösch-Buttons
+    document.querySelectorAll('.gallery-item .delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const imageId = this.dataset.id;
+            if (confirm('Möchten Sie dieses Bild wirklich löschen?')) {
+                deleteImage(imageId);
             }
+        });
+    });
+}
             
             async function deleteImage(imageId) {
                 try {
@@ -785,14 +799,36 @@
             }
             
             async function loadGalleryImages(professionId) {
-                try {
-                    const profession = await cmsApi.getProfession(professionId);
-                    renderGalleryImages(profession.gallery_images || []);
-                } catch (error) {
-                    console.error('Fehler beim Laden der Bilder:', error);
-                    renderGalleryImages([]);
-                }
-            }
+    if (!professionId) {
+        console.warn('loadGalleryImages: Keine Berufs-ID angegeben');
+        renderGalleryImages([]);
+        return;
+    }
+    
+    try {
+        console.log('Lade Galerie-Bilder für Beruf:', professionId);
+        const response = await fetch(`/api/professions/${professionId}`);
+        
+        if (!response.ok) {
+            throw new Error(`Server-Fehler: ${response.status} ${response.statusText}`);
+        }
+        
+        const profession = await response.json();
+        console.log('Geladene Berufsdetails:', profession);
+        
+        if (profession && Array.isArray(profession.gallery_images)) {
+            console.log('Gefundene Galerie-Bilder:', profession.gallery_images.length);
+            renderGalleryImages(profession.gallery_images);
+        } else {
+            console.warn('Keine Galerie-Bilder gefunden für:', professionId);
+            renderGalleryImages([]);
+        }
+    } catch (error) {
+        console.error('Fehler beim Laden der Bilder:', error);
+        renderGalleryImages([]);
+        showAlert(professionAlert, 'Fehler beim Laden der Bilder: ' + error.message, 'danger');
+    }
+}
             
             function resetQrCode() {
                 qrPreview.style.display = 'none';
@@ -850,26 +886,43 @@
             });
             
             async function uploadGalleryImage(file) {
-                const professionId = document.getElementById('professionId').value;
-                if (!professionId) {
-                    showAlert(professionAlert, 'Bitte speichern Sie zuerst den Beruf, bevor Sie Bilder hochladen.', 'danger');
-                    return;
-                }
-                
-                uploadProgress.style.display = 'block';
-                
-                try {
-                    await cmsApi.uploadImage(professionId, file);
-                    await loadGalleryImages(professionId);
-                    showAlert(professionAlert, 'Bild erfolgreich hochgeladen.', 'success');
-                } catch (error) {
-                    console.error('Fehler beim Hochladen des Bildes:', error);
-                    showAlert(professionAlert, 'Fehler beim Hochladen des Bildes: ' + error.message, 'danger');
-                } finally {
-                    uploadProgress.style.display = 'none';
-                    imageUpload.value = ''; // Reset input
-                }
-            }
+    const professionId = document.getElementById('professionId').value;
+    if (!professionId) {
+        showAlert(professionAlert, 'Bitte speichern Sie zuerst den Beruf, bevor Sie Bilder hochladen.', 'danger');
+        return;
+    }
+    
+    uploadProgress.style.display = 'block';
+    
+    try {
+        // Formular für Datei-Upload erstellen
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // Direkter Fetch-Aufruf zum API-Endpunkt
+        const response = await fetch(`/api/professions/${professionId}/images`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Server-Fehler: ${response.status} ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('Bild-Upload-Ergebnis:', result);
+        
+        // Nach erfolgreichem Upload die Bilder neu laden
+        await loadGalleryImages(professionId);
+        showAlert(professionAlert, 'Bild erfolgreich hochgeladen.', 'success');
+    } catch (error) {
+        console.error('Fehler beim Hochladen des Bildes:', error);
+        showAlert(professionAlert, 'Fehler beim Hochladen des Bildes: ' + error.message, 'danger');
+    } finally {
+        uploadProgress.style.display = 'none';
+        imageUpload.value = ''; // Reset input
+    }
+}
             
             // Event-Listener für QR-Code-Upload
             qrUploadArea.addEventListener('click', function() {
