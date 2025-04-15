@@ -4,8 +4,8 @@ const path = require('path');
 const cors = require('cors');
 const formidable = require('formidable');
 const os = require('os');
-const fs = require('fs');                 
-const fsPromises = require('fs').promises; 
+const fs = require('fs');                 // Für synchrone Funktionen wie existsSync
+const fsPromises = fs.promises;           // Für asynchrone Operationen mit Promises
 
 // Express App initialisieren
 const app = express();
@@ -67,10 +67,29 @@ const qrCodesDir = path.join(uploadDir, 'qr_codes');
 // Stelle sicher, dass die Upload-Verzeichnisse existieren
 (async () => {
   try {
-    await fsPromises.mkdir(uploadDir, { recursive: true });  // fsPromises statt fs
-    await fsPromises.mkdir(galleryDir, { recursive: true });
-    await fsPromises.mkdir(qrCodesDir, { recursive: true });
+    // Prüfe und erstelle die Verzeichnisse - mit Fehlerbehandlung
+    if (!fs.existsSync(uploadDir)) {
+      await fsPromises.mkdir(uploadDir, { recursive: true });
+    }
+    
+    if (!fs.existsSync(galleryDir)) {
+      await fsPromises.mkdir(galleryDir, { recursive: true });
+    }
+    
+    if (!fs.existsSync(qrCodesDir)) {
+      await fsPromises.mkdir(qrCodesDir, { recursive: true });
+    }
+    
     console.log('✅ Upload-Verzeichnisse erfolgreich erstellt');
+    
+    // Setze Berechtigungen, falls möglich
+    try {
+      await fsPromises.chmod(uploadDir, 0o755);
+      await fsPromises.chmod(galleryDir, 0o755);
+      await fsPromises.chmod(qrCodesDir, 0o755);
+    } catch (permErr) {
+      console.warn('ℹ️ Konnte Berechtigungen für Verzeichnisse nicht setzen:', permErr.message);
+    }
   } catch (err) {
     console.error('❌ Fehler beim Erstellen der Upload-Verzeichnisse:', err);
   }
@@ -261,7 +280,7 @@ app.get('/api/professions', async (req, res) => {
             url: `/uploads/gallery/${profession.id}/${img.filename}`,
             alt_text: img.alt_text || profession.title
           })),
-          qr_code: qrCodes.length > 0 ? `/uploads/qr_codes/${id}/${qrCodes[0].filename}` : null
+          qr_code: qrCodes.length > 0 ? `/uploads/qr_codes/${profession.id}/${qrCodes[0].filename}` : null
         };
       } catch (err) {
         console.error(`Fehler beim Laden der Details für Beruf ${profession.id}:`, err);
@@ -308,7 +327,12 @@ app.delete('/api/professions/:id/qr-code', async (req, res) => {
     
     // Von der Festplatte löschen
     try {
-      await fsPromises.unlink(path.join(qrCodesDir, id, filename));
+      const qrCodePath = path.join(qrCodesDir, id, filename);
+      if (fs.existsSync(qrCodePath)) {
+        await fsPromises.unlink(qrCodePath);
+      } else {
+        console.warn(`QR-Code-Datei existiert nicht: ${qrCodePath}`);
+      }
     } catch (e) {
       console.warn(`Konnte QR-Code nicht löschen: ${filename}`, e);
     }
@@ -513,7 +537,12 @@ app.delete('/api/professions/:id', async (req, res) => {
     // Dateien von der Festplatte löschen
     for (const img of images) {
       try {
-        await fsPromises.unlink(path.join(uploadDir, 'gallery', img.filename));
+        const imagePath = path.join(galleryDir, id, img.filename);
+        if (fs.existsSync(imagePath)) {
+          await fsPromises.unlink(imagePath);
+        } else {
+          console.warn(`Bilddatei existiert nicht: ${imagePath}`);
+        }
       } catch (e) {
         console.warn(`Konnte Bild nicht löschen: ${img.filename}`, e);
       }
@@ -521,7 +550,12 @@ app.delete('/api/professions/:id', async (req, res) => {
     
     for (const qr of qrCodes) {
       try {
-        await fsPromises.unlink(path.join(uploadDir, 'qr_codes', qr.filename));
+        const qrPath = path.join(qrCodesDir, id, qr.filename);
+        if (fs.existsSync(qrPath)) {
+          await fsPromises.unlink(qrPath);
+        } else {
+          console.warn(`QR-Code-Datei existiert nicht: ${qrPath}`);
+        }
       } catch (e) {
         console.warn(`Konnte QR-Code nicht löschen: ${qr.filename}`, e);
       }
@@ -559,73 +593,185 @@ app.post('/api/professions/:professionId/images/:type?', async (req, res) => {
       return res.status(404).json({ error: `Beruf mit ID ${professionId} existiert nicht` });
     }
     
-    // Verzeichnisse erstellen - KONSEQUENT mit fsPromises
+    // Verzeichnisse erstellen - mit Fehlerbehandlung
     try {
-      await fsPromises.mkdir(uploadDir, { recursive: true });
-      await fsPromises.mkdir(galleryDir, { recursive: true });
-      await fsPromises.mkdir(qrCodesDir, { recursive: true });
+      // Basis-Verzeichnisse prüfen und erstellen
+      if (!fs.existsSync(uploadDir)) {
+        await fsPromises.mkdir(uploadDir, { recursive: true });
+      }
       
+      if (!fs.existsSync(galleryDir)) {
+        await fsPromises.mkdir(galleryDir, { recursive: true });
+      }
+      
+      if (!fs.existsSync(qrCodesDir)) {
+        await fsPromises.mkdir(qrCodesDir, { recursive: true });
+      }
+      
+      // Zielverzeichnis für den spezifischen Beruf erstellen
       const targetDir = isQrCode 
         ? path.join(qrCodesDir, professionId) 
         : path.join(galleryDir, professionId);
       
-      await fsPromises.mkdir(targetDir, { recursive: true });
+      if (!fs.existsSync(targetDir)) {
+        await fsPromises.mkdir(targetDir, { recursive: true });
+      }
       
-      // Temporäres Verzeichnis
+      // Temporäres Verzeichnis für Uploads
       const tempDir = path.join(os.tmpdir(), 'vw-uploads');
-      await fsPromises.mkdir(tempDir, { recursive: true });
+      if (!fs.existsSync(tempDir)) {
+        await fsPromises.mkdir(tempDir, { recursive: true });
+      }
       
-      // Formidable konfigurieren
+      // Formidable konfigurieren - angepasst für verschiedene Versionen
       const form = new formidable.IncomingForm({
         uploadDir: tempDir,
         keepExtensions: true,
-        maxFileSize: 5 * 1024 * 1024
+        maxFileSize: 5 * 1024 * 1024, // 5MB
+        multiples: false // Nur eine Datei erlauben
       });
       
-      // Form parsen
+      // Form parsen mit verbesserter Fehlerbehandlung
       form.parse(req, async (err, fields, files) => {
         if (err) {
           console.error('Formidable Fehler:', err);
           return res.status(500).json({ error: 'Fehler beim Datei-Upload: ' + err.message });
         }
         
-        if (!files || !files.file) {
+        // Debug-Ausgabe der vollständigen Dateienstruktur
+        console.log('Formidable Dateien:', JSON.stringify(files, null, 2));
+        
+        if (!files || Object.keys(files).length === 0) {
           return res.status(400).json({ error: 'Keine Datei gefunden' });
         }
-        console.log('Formidable Dateistruktur:', JSON.stringify(files, null, 2));
+        
         try {
-          const file = files.file;
-          const originalFilename = file.name || 'unnamed-file';
+          // Extrahiere die Datei - Unterstützt verschiedene formidable-Versionen
+          let file;
+          
+          // Formidable v1.x
+          if (files.file && typeof files.file === 'object' && !Array.isArray(files.file)) {
+            file = files.file;
+          } 
+          // Formidable v2.x
+          else if (files.file && Array.isArray(files.file) && files.file.length > 0) {
+            file = files.file[0];
+          } 
+          // Fallback: Nimm die erste Datei, die wir finden können
+          else {
+            const firstKey = Object.keys(files)[0];
+            if (firstKey && files[firstKey]) {
+              const firstFile = files[firstKey];
+              file = Array.isArray(firstFile) ? firstFile[0] : firstFile;
+            } else {
+              console.error('Keine gültige Datei gefunden:', files);
+              return res.status(400).json({ error: 'Keine gültige Datei gefunden' });
+            }
+          }
+          
+          // Prüfe nochmals, ob wir eine gültige Datei haben
+          if (!file || typeof file !== 'object') {
+            console.error('Keine gültige Datei gefunden:', files);
+            return res.status(400).json({ error: 'Keine gültige Datei gefunden' });
+          }
+          
+          // Ausgabe der genauen Dateistruktur für Debugging
+          console.log('Verwendete Datei:', {
+            path: file.filepath || file.path || 'kein Pfad',
+            name: file.originalFilename || file.name || 'kein Name',
+            type: file.mimetype || file.type || 'kein Typ',
+            size: file.size || 'keine Größe'
+          });
+          
+          // Bestimme Dateiname und Pfad - robust gegen unterschiedliche formidable-Versionen
+          const filePath = file.filepath || file.path;
+          if (!filePath) {
+            return res.status(400).json({ error: 'Dateipfad konnte nicht ermittelt werden' });
+          }
+          
+          const originalFilename = file.originalFilename || file.name || `unnamed-file-${Date.now()}`;
           const safeFilename = `${Date.now()}-${path.basename(originalFilename).replace(/[^a-zA-Z0-9.-]/g, '_')}`;
           const targetFilePath = path.join(targetDir, safeFilename);
           
+          console.log(`Verschiebe Datei von ${filePath} nach ${targetFilePath}`);
+          
           // Datei verschieben
-          const data = await fsPromises.readFile(file.path);
-          await fsPromises.writeFile(targetFilePath, data);
-          await fsPromises.unlink(file.path);
+          try {
+            // Prüfe, ob Quelldatei existiert
+            if (!fs.existsSync(filePath)) {
+              return res.status(400).json({ error: `Quelldatei nicht gefunden: ${filePath}` });
+            }
+            
+            // Datei kopieren und dann löschen (da direktes Verschieben problematisch sein kann)
+            const data = await fsPromises.readFile(filePath);
+            await fsPromises.writeFile(targetFilePath, data);
+            
+            try {
+              await fsPromises.unlink(filePath); // Temporäre Datei löschen
+            } catch (unlinkErr) {
+              console.warn(`Konnte temporäre Datei nicht löschen: ${filePath}`, unlinkErr);
+            }
+          } catch (fileErr) {
+            console.error('Fehler beim Verschieben der Datei:', fileErr);
+            return res.status(500).json({ error: 'Fehler beim Verschieben der Datei: ' + fileErr.message });
+          }
           
           // In die Datenbank eintragen
           if (isQrCode) {
-            // QR-Code-Logik hier...
-            return res.status(201).json({
-              url: `/uploads/qr_codes/${professionId}/${safeFilename}`
-            });
-          } else {
-            // Galeriebild speichern
-            const connection = await pool.getConnection();
+            // QR-Code speichern
             try {
-              const [result] = await connection.query(
-                'INSERT INTO gallery_images (profession_id, filename, alt_text, sort_order) VALUES (?, ?, ?, (SELECT COALESCE(MAX(sort_order) + 1, 0) FROM gallery_images g WHERE g.profession_id = ?))',
-                [professionId, safeFilename, fields.alt_text || '', professionId]
+              // Prüfen, ob bereits ein QR-Code existiert
+              const [existingQR] = await pool.query('SELECT id, filename FROM qr_codes WHERE profession_id = ?', [professionId]);
+              
+              // Falls ja, alten QR-Code löschen
+              if (existingQR.length > 0) {
+                try {
+                  const oldQRPath = path.join(qrCodesDir, professionId, existingQR[0].filename);
+                  if (fs.existsSync(oldQRPath)) {
+                    await fsPromises.unlink(oldQRPath);
+                  }
+                  
+                  // Aus der Datenbank löschen
+                  await pool.query('DELETE FROM qr_codes WHERE id = ?', [existingQR[0].id]);
+                } catch (delErr) {
+                  console.warn(`Fehler beim Löschen des alten QR-Codes:`, delErr);
+                }
+              }
+              
+              // Neuen QR-Code eintragen
+              await pool.query(
+                'INSERT INTO qr_codes (profession_id, filename) VALUES (?, ?)',
+                [professionId, safeFilename]
               );
               
               return res.status(201).json({
-                id: result.insertId,
-                url: `/uploads/gallery/${professionId}/${safeFilename}`,
-                alt_text: fields.alt_text || ''
+                url: `/uploads/qr_codes/${professionId}/${safeFilename}`
               });
-            } finally {
-              connection.release();
+            } catch (qrErr) {
+              console.error('Fehler beim Speichern des QR-Codes in der Datenbank:', qrErr);
+              return res.status(500).json({ error: 'Fehler beim Speichern des QR-Codes: ' + qrErr.message });
+            }
+          } else {
+            // Galeriebild speichern
+            try {
+              const connection = await pool.getConnection();
+              try {
+                const [result] = await connection.query(
+                  'INSERT INTO gallery_images (profession_id, filename, alt_text, sort_order) VALUES (?, ?, ?, (SELECT COALESCE(MAX(sort_order) + 1, 0) FROM gallery_images g WHERE g.profession_id = ?))',
+                  [professionId, safeFilename, fields.alt_text || '', professionId]
+                );
+                
+                return res.status(201).json({
+                  id: result.insertId,
+                  url: `/uploads/gallery/${professionId}/${safeFilename}`,
+                  alt_text: fields.alt_text || ''
+                });
+              } finally {
+                connection.release();
+              }
+            } catch (dbErr) {
+              console.error('Fehler beim Speichern des Bildes in der Datenbank:', dbErr);
+              return res.status(500).json({ error: 'Fehler beim Speichern des Bildes: ' + dbErr.message });
             }
           }
         } catch (error) {
@@ -635,7 +781,7 @@ app.post('/api/professions/:professionId/images/:type?', async (req, res) => {
       });
     } catch (dirError) {
       console.error('Fehler beim Erstellen der Verzeichnisse:', dirError);
-      return res.status(500).json({ error: 'Konnte Upload-Verzeichnisse nicht erstellen' });
+      return res.status(500).json({ error: 'Konnte Upload-Verzeichnisse nicht erstellen: ' + dirError.message });
     }
   } catch (err) {
     console.error('Unbehandelte Ausnahme beim Bild-Upload:', err);
@@ -662,7 +808,12 @@ app.delete('/api/gallery-images/:id', async (req, res) => {
     
     // Von der Festplatte löschen
     try {
-      await fsPromises.unlink(path.join(galleryDir, profession_id, filename));
+      const imagePath = path.join(galleryDir, profession_id, filename);
+      if (fs.existsSync(imagePath)) {
+        await fsPromises.unlink(imagePath);
+      } else {
+        console.warn(`Bilddatei existiert nicht: ${imagePath}`);
+      }
     } catch (e) {
       console.warn(`Konnte Bild nicht löschen: ${filename}`, e);
     }
