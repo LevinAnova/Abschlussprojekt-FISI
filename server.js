@@ -7,11 +7,11 @@ const formidable = require('formidable');
 
 // Express App initialisieren
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 0;
 
 // Middleware
 app.use(cors({
-  origin: '*', // In Produktion sollte dies eingeschränkt werden
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -36,7 +36,7 @@ function handleError(res, error, message = 'Ein Fehler ist aufgetreten', statusC
 const pool = mysql.createPool({
   host: '127.0.0.1',
   user: 'vwapp',
-  password: 'fisi', // Ändere dies entsprechend deinem Setup
+  password: 'fisi',
   database: 'vw_ausbildung',
   waitForConnections: true,
   connectionLimit: 10,
@@ -258,7 +258,7 @@ app.get('/api/professions', async (req, res) => {
             url: `/uploads/gallery/${profession.id}/${img.filename}`,
             alt_text: img.alt_text || profession.title
           })),
-          qr_code: qrCodes.length > 0 ? `/uploads/qr_codes/${profession.id}/${qrCodes[0].filename}` : null
+          qr_code: qrCodes.length > 0 ? `/uploads/qr_codes/${id}/${qrCodes[0].filename}` : null
         };
       } catch (err) {
         console.error(`Fehler beim Laden der Details für Beruf ${profession.id}:`, err);
@@ -282,6 +282,41 @@ app.get('/api/professions', async (req, res) => {
     res.json(result);
   } catch (err) {
     handleError(res, err, 'Fehler beim Abrufen der Berufe');
+  }
+});
+
+
+// QR-Code löschen
+app.delete('/api/professions/:id/qr-code', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // QR-Code-Datei finden
+    const [qrCodes] = await pool.query('SELECT filename FROM qr_codes WHERE profession_id = ?', [id]);
+    
+    if (qrCodes.length === 0) {
+      return res.status(404).json({ error: 'QR-Code nicht gefunden' });
+    }
+    
+    const filename = qrCodes[0].filename;
+    
+    // Aus der Datenbank löschen
+    await pool.query('DELETE FROM qr_codes WHERE profession_id = ?', [id]);
+    
+    // Von der Festplatte löschen
+    try {
+      await fs.unlink(path.join(qrCodesDir, id, filename));
+    } catch (e) {
+      console.warn(`Konnte QR-Code nicht löschen: ${filename}`, e);
+    }
+    
+    if (DEBUG) {
+      console.log(`QR-Code gelöscht für Beruf: ${id}`);
+    }
+    
+    res.json({ message: 'QR-Code erfolgreich gelöscht' });
+  } catch (err) {
+    handleError(res, err, 'Fehler beim Löschen des QR-Codes');
   }
 });
 
@@ -540,16 +575,18 @@ try {
     });
     
     // Verarbeite den Upload
-    form.parse(req, async (err, fields, files) => {
-      if (err) {
-        console.error('Formidable-Fehler:', err);
-        return handleError(res, err, 'Fehler beim Hochladen der Datei', 500);
-      }
-      
-      if (!files.file) {
-        return res.status(400).json({ error: 'Keine Datei hochgeladen' });
-      }
-      
+ // Verbesserte Fehlerbehandlung für formidable
+form.parse(req, async (err, fields, files) => {
+  if (err) {
+    console.error('Formidable-Fehler:', err);
+    return handleError(res, err, 'Fehler beim Hochladen der Datei', 500);
+  }
+  
+  console.log('Erhaltene Dateien:', files);
+  
+  if (!files || !files.file) {
+    return res.status(400).json({ error: 'Keine Datei hochgeladen oder Datei nicht gefunden' });
+  }
       try {
         const file = files.file;
         const filename = path.basename(file.path);

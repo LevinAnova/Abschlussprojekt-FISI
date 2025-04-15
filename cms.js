@@ -103,6 +103,16 @@ const cmsApi = {
       if (!response.ok) throw new Error('Fehler beim Hochladen des Bildes');
       return await response.json();
     },
+
+    // QR-Code löschen
+  async deleteQrCode(professionId) {
+  const response = await fetch(`${this.baseUrl}/professions/${professionId}/qr-code`, {
+    method: 'DELETE'
+  });
+  
+  if (!response.ok) throw new Error('Fehler beim Löschen des QR-Codes');
+  return await response.json();
+  },
     
   // Nach dem Hochladen eines Bildes
   async uploadImage(professionId, file, altText, isQrCode = false) {

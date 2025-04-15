@@ -884,7 +884,7 @@
                 }
             });
             
-            async function uploadGalleryImage(file) {
+async function uploadGalleryImage(file) {
   const professionId = document.getElementById('professionId').value;
   if (!professionId) {
     showAlert(professionAlert, 'Bitte speichern Sie zuerst den Beruf, bevor Sie Bilder hochladen.', 'danger');
@@ -894,6 +894,8 @@
   uploadProgress.style.display = 'block';
   
   try {
+    console.log('Starte Bild-Upload für Beruf:', professionId);
+    
     // Formular für Datei-Upload erstellen
     const formData = new FormData();
     formData.append('file', file);
@@ -905,6 +907,8 @@
     });
     
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Server-Antwort:', response.status, errorText);
       throw new Error(`Server-Fehler: ${response.status} ${response.statusText}`);
     }
     
@@ -978,14 +982,19 @@
                 }
             }
             
-            // QR-Code entfernen
-            removeQrBtn.addEventListener('click', function() {
-                if (confirm('Möchten Sie den QR-Code wirklich entfernen?')) {
-                    // Hier müsste eine API-Funktion zum Entfernen des QR-Codes aufgerufen werden
-                    resetQrCode();
-                    showAlert(professionAlert, 'QR-Code erfolgreich entfernt.', 'success');
-                }
-            });
+            removeQrBtn.addEventListener('click', async function() {
+  if (confirm('Möchten Sie den QR-Code wirklich entfernen?')) {
+    try {
+      const professionId = document.getElementById('professionId').value;
+      await cmsApi.deleteQrCode(professionId);
+      resetQrCode();
+      showAlert(professionAlert, 'QR-Code erfolgreich entfernt.', 'success');
+    } catch (error) {
+      console.error('Fehler beim Löschen des QR-Codes:', error);
+      showAlert(professionAlert, 'Fehler beim Löschen des QR-Codes: ' + error.message, 'danger');
+    }
+  }
+});
 
             // CRUD-Funktionen für Kategorien
             async function loadCategories() {
