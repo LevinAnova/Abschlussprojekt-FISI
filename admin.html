@@ -884,7 +884,7 @@
                 }
             });
             
-async function uploadGalleryImage(file) {
+            async function uploadGalleryImage(file) {
   const professionId = document.getElementById('professionId').value;
   if (!professionId) {
     showAlert(professionAlert, 'Bitte speichern Sie zuerst den Beruf, bevor Sie Bilder hochladen.', 'danger');
@@ -895,6 +895,7 @@ async function uploadGalleryImage(file) {
   
   try {
     console.log('Starte Bild-Upload für Beruf:', professionId);
+    console.log('Datei:', file.name, file.size, 'Bytes');
     
     // Formular für Datei-Upload erstellen
     const formData = new FormData();
@@ -907,13 +908,21 @@ async function uploadGalleryImage(file) {
     });
     
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Server-Antwort:', response.status, errorText);
-      throw new Error(`Server-Fehler: ${response.status} ${response.statusText}`);
+      // Versuche, die Fehlermeldung aus der Antwort zu extrahieren
+      let errorMessage;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorData.message || `Server-Fehler: ${response.status}`;
+      } catch (e) {
+        errorMessage = `Server-Fehler: ${response.status} ${response.statusText}`;
+      }
+      
+      console.error('Fehler beim Bild-Upload:', errorMessage);
+      throw new Error(errorMessage);
     }
     
     const result = await response.json();
-    console.log('Bild-Upload-Ergebnis:', result);
+    console.log('Bild-Upload erfolgreich:', result);
     
     // Nach erfolgreichem Upload die Bilder neu laden
     await loadGalleryImages(professionId);
