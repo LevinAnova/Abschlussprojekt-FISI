@@ -67,8 +67,9 @@ const qrCodesDir = path.join(uploadDir, 'qr_codes');
 // Stelle sicher, dass die Upload-Verzeichnisse existieren
 (async () => {
   try {
-    await fs.mkdir(galleryDir, { recursive: true });
-    await fs.mkdir(qrCodesDir, { recursive: true });
+    await fsPromises.mkdir(uploadDir, { recursive: true });  // fsPromises statt fs
+    await fsPromises.mkdir(galleryDir, { recursive: true });
+    await fsPromises.mkdir(qrCodesDir, { recursive: true });
     console.log('✅ Upload-Verzeichnisse erfolgreich erstellt');
   } catch (err) {
     console.error('❌ Fehler beim Erstellen der Upload-Verzeichnisse:', err);
@@ -307,7 +308,7 @@ app.delete('/api/professions/:id/qr-code', async (req, res) => {
     
     // Von der Festplatte löschen
     try {
-      await fs.unlink(path.join(qrCodesDir, id, filename));
+      await fsPromises.unlink(path.join(qrCodesDir, id, filename));
     } catch (e) {
       console.warn(`Konnte QR-Code nicht löschen: ${filename}`, e);
     }
@@ -512,7 +513,7 @@ app.delete('/api/professions/:id', async (req, res) => {
     // Dateien von der Festplatte löschen
     for (const img of images) {
       try {
-        await fs.unlink(path.join(uploadDir, 'gallery', img.filename));
+        await fsPromises.unlink(path.join(uploadDir, 'gallery', img.filename));
       } catch (e) {
         console.warn(`Konnte Bild nicht löschen: ${img.filename}`, e);
       }
@@ -520,7 +521,7 @@ app.delete('/api/professions/:id', async (req, res) => {
     
     for (const qr of qrCodes) {
       try {
-        await fs.unlink(path.join(uploadDir, 'qr_codes', qr.filename));
+        await fsPromises.unlink(path.join(uploadDir, 'qr_codes', qr.filename));
       } catch (e) {
         console.warn(`Konnte QR-Code nicht löschen: ${qr.filename}`, e);
       }
@@ -660,7 +661,7 @@ app.delete('/api/gallery-images/:id', async (req, res) => {
     
     // Von der Festplatte löschen
     try {
-      await fs.unlink(path.join(galleryDir, profession_id, filename));
+      await fsPromises.unlink(path.join(galleryDir, profession_id, filename));
     } catch (e) {
       console.warn(`Konnte Bild nicht löschen: ${filename}`, e);
     }
