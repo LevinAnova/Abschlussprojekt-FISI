@@ -743,13 +743,9 @@
     const galleryContainer = galleryImagesContainer; // Verwende die umbenannte Variable
     const noImagesMessage = document.getElementById('noImagesMessage');
     
-    if (!images || images.length === 0) {
-        galleryContainer.innerHTML = '';
-        galleryContainer.appendChild(noImagesMessage);
-        noImagesMessage.style.display = 'block';
-        return;
+    if (element && element.style) {
+        element.style.display = 'block';
     }
-    
     noImagesMessage.style.display = 'none';
     galleryContainer.innerHTML = '';
     
