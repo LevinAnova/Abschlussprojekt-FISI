@@ -592,10 +592,11 @@ app.post('/api/professions/:professionId/images/:type?', async (req, res) => {
         if (!files || !files.file) {
           return res.status(400).json({ error: 'Keine Datei gefunden' });
         }
-        
+        console.log('Formidable Dateistruktur:', JSON.stringify(files, null, 2));
         try {
           const file = files.file;
-          const safeFilename = `${Date.now()}-${path.basename(file.name).replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+          const originalFilename = file.name || 'unnamed-file';
+          const safeFilename = `${Date.now()}-${path.basename(originalFilename).replace(/[^a-zA-Z0-9.-]/g, '_')}`;
           const targetFilePath = path.join(targetDir, safeFilename);
           
           // Datei verschieben
