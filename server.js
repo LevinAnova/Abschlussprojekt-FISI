@@ -7,7 +7,7 @@ const formidable = require('formidable');
 
 // Express App initialisieren
 const app = express();
-const PORT = process.env.PORT || 0;
+const PORT = process.env.PORT || 4848;
 
 // Middleware
 app.use(cors({

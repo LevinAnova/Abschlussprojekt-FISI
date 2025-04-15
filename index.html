@@ -204,8 +204,8 @@
   
   try {
     // Daten vom Backend abrufen
-    const categoriesResponse = await fetch('http://localhost:3001/api/categories');
-    const professionsResponse = await fetch('http://localhost:3001/api/professions');
+    const categoriesResponse = await fetch('http://localhost:4848/api/categories');
+    const professionsResponse = await fetch('http://localhost:4848/api/professions');
     
     if (!categoriesResponse.ok || !professionsResponse.ok) {
       throw new Error('Fehler beim Laden der Daten');
