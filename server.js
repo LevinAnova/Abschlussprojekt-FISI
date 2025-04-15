@@ -60,7 +60,7 @@ const pool = mysql.createPool({
 })();
 
 // Upload-Verzeichnisse definieren
-const uploadDir = '/var/www/uploads';
+const uploadDir = '/var/www/html/vw-ausbildung/uploads';
 const galleryDir = path.join(uploadDir, 'gallery');
 const qrCodesDir = path.join(uploadDir, 'qr_codes');
 
