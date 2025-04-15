@@ -89,19 +89,32 @@ const cmsApi = {
       return await response.json();
     },
     
-    // Bild hochladen
     async uploadImage(professionId, file, altText, isQrCode = false) {
       const formData = new FormData();
       formData.append('file', file);
       if (altText) formData.append('alt_text', altText);
       
-      const response = await fetch(`${this.baseUrl}/professions/${professionId}/images/${isQrCode ? 'qr' : ''}`, {
+      const endpoint = isQrCode ? 
+        `${this.baseUrl}/professions/${professionId}/images/qr` : 
+        `${this.baseUrl}/professions/${professionId}/images`;
+      
+      const response = await fetch(endpoint, {
         method: 'POST',
         body: formData
       });
       
       if (!response.ok) throw new Error('Fehler beim Hochladen des Bildes');
-      return await response.json();
+      const result = await response.json();
+      
+      // Service Worker benachrichtigen, um das neue Bild zu cachen
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'CACHE_NEW_IMAGE',
+          url: result.url  // URL aus dem Serverergebnis
+        });
+      }
+      
+      return result;  // Rückgabe der Bilddaten
     },
 
     // QR-Code löschen

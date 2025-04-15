@@ -938,74 +938,58 @@ function renderGalleryImages(images) {
   }
 }
             
-            // Event-Listener für QR-Code-Upload
-            qrUploadArea.addEventListener('click', function() {
-                qrUpload.click();
-            });
-            
-            qrUpload.addEventListener('change', function() {
-                if (this.files.length > 0) {
-                    uploadQrCode(this.files[0]);
-                }
-            });
-            
-            // Drag & Drop für QR-Code
-            qrUploadArea.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                this.style.borderColor = '#4cc0f1';
-                this.style.backgroundColor = '#e6f7ff';
-            });
-            
-            qrUploadArea.addEventListener('dragleave', function() {
-                this.style.borderColor = '#ddd';
-                this.style.backgroundColor = '#f9f9f9';
-            });
-            
-            qrUploadArea.addEventListener('drop', function(e) {
-                e.preventDefault();
-                this.style.borderColor = '#ddd';
-                this.style.backgroundColor = '#f9f9f9';
-                
-                if (e.dataTransfer.files.length > 0) {
-                    uploadQrCode(e.dataTransfer.files[0]);
-                }
-            });
-            
-            async function uploadQrCode(file) {
-                const professionId = document.getElementById('professionId').value;
-                if (!professionId) {
-                    showAlert(professionAlert, 'Bitte speichern Sie zuerst den Beruf, bevor Sie einen QR-Code hochladen.', 'danger');
-                    return;
-                }
-                
-                qrUploadProgress.style.display = 'block';
-                
-                try {
-                    await cmsApi.uploadImage(professionId, file, null, true); // true für QR-Code
-                    await loadQrCode(professionId);
-                    showAlert(professionAlert, 'QR-Code erfolgreich hochgeladen.', 'success');
-                } catch (error) {
-                    console.error('Fehler beim Hochladen des QR-Codes:', error);
-                    showAlert(professionAlert, 'Fehler beim Hochladen des QR-Codes: ' + error.message, 'danger');
-                } finally {
-                    qrUploadProgress.style.display = 'none';
-                    qrUpload.value = ''; // Reset input
-                }
-            }
-            
-            removeQrBtn.addEventListener('click', async function() {
-  if (confirm('Möchten Sie den QR-Code wirklich entfernen?')) {
-    try {
-      const professionId = document.getElementById('professionId').value;
-      await cmsApi.deleteQrCode(professionId);
-      resetQrCode();
-      showAlert(professionAlert, 'QR-Code erfolgreich entfernt.', 'success');
-    } catch (error) {
-      console.error('Fehler beim Löschen des QR-Codes:', error);
-      showAlert(professionAlert, 'Fehler beim Löschen des QR-Codes: ' + error.message, 'danger');
-    }
+async function uploadQrCode(file) {
+  const professionId = document.getElementById('professionId').value;
+  if (!professionId) {
+    showAlert(professionAlert, 'Bitte speichern Sie zuerst den Beruf, bevor Sie einen QR-Code hochladen.', 'danger');
+    return;
   }
-});
+  
+  qrUploadProgress.style.display = 'block';
+  
+  try {
+    console.log('Starte QR-Code-Upload für Beruf:', professionId);
+    console.log('Datei:', file.name, file.size, 'Bytes');
+    
+    // Formular für Datei-Upload erstellen
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // Direkter Fetch-Aufruf zum API-Endpunkt für QR-Codes
+    const response = await fetch(`/api/professions/${professionId}/images/qr`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      // Versuche, die Fehlermeldung aus der Antwort zu extrahieren
+      let errorMessage;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorData.message || `Server-Fehler: ${response.status}`;
+      } catch (e) {
+        errorMessage = `Server-Fehler: ${response.status} ${response.statusText}`;
+      }
+      
+      console.error('Fehler beim QR-Code-Upload:', errorMessage);
+      throw new Error(errorMessage);
+    }
+    
+    const result = await response.json();
+    console.log('QR-Code-Upload erfolgreich:', result);
+    
+    // QR-Code anzeigen
+    await loadQrCode(professionId);
+    showAlert(professionAlert, 'QR-Code erfolgreich hochgeladen.', 'success');
+  } catch (error) {
+    console.error('Fehler beim Hochladen des QR-Codes:', error);
+    showAlert(professionAlert, 'Fehler beim Hochladen des QR-Codes: ' + error.message, 'danger');
+  } finally {
+    qrUploadProgress.style.display = 'none';
+    qrUpload.value = ''; // Reset input
+  }
+}
+
 
             // CRUD-Funktionen für Kategorien
             async function loadCategories() {
