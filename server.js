@@ -1,11 +1,11 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
 const path = require('path');
-const fs = require('fs').promises;
 const cors = require('cors');
 const formidable = require('formidable');
 const os = require('os');
-
+const fs = require('fs');                 
+const fsPromises = require('fs').promises; 
 
 // Express App initialisieren
 const app = express();
@@ -562,14 +562,15 @@ app.post('/api/professions/:professionId/images/:type?', async (req, res) => {
     }
     
     // Stelle sicher, dass die Basis-Verzeichnisse existieren
-    if (!fs.existsSync(uploadDir)){
-      await fs.mkdir(uploadDir, { recursive: true });
+    if (!fs.existsSync(uploadDir)) {
+      await fsPromises.mkdir(uploadDir, { recursive: true });
     }
+    
     if (!fs.existsSync(galleryDir)){
-      await fs.mkdir(galleryDir, { recursive: true });
+      await fsPromises.mkdir(galleryDir, { recursive: true });
     }
     if (!fs.existsSync(qrCodesDir)){
-      await fs.mkdir(qrCodesDir, { recursive: true });
+      await fsPromises.mkdir(qrCodesDir, { recursive: true });
     }
     
     // Zielverzeichnis erstellen
