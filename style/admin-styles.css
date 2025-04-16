@@ -1,5 +1,5 @@
-  /* Modal-Styling für Scrollbarkeit */
-  .modal-overlay {
+/* Modal-Styling für verbesserte Scrollbarkeit */
+.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -8,7 +8,7 @@
     background-color: rgba(0, 0, 0, 0.7);
     display: none;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Geändert von center für besseres Scrollverhalten */
     z-index: 1000;
     overflow-y: auto;
     padding: 20px;
@@ -28,7 +28,7 @@
     max-height: calc(100vh - 40px); /* 40px als Padding */
     display: flex;
     flex-direction: column;
-    margin: auto;
+    margin: 20px auto; /* Verbessert für mobile Ansichten */
 }
 
 .modal-header {
@@ -38,12 +38,18 @@
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
+    background-color: white; /* Stellt sicher, dass der Header immer sichtbar ist */
+    border-radius: 8px 8px 0 0;
+    position: sticky; /* Für bessere Benutzererfahrung */
+    top: 0;
+    z-index: 10;
 }
 
 .modal-body {
     padding: 20px;
     overflow-y: auto; /* Scrollbar für Inhalt */
     max-height: calc(100vh - 180px); /* Platz für Header und Footer */
+    flex-grow: 1; /* Wichtig für das Scrollverhalten */
 }
 
 .modal-footer {
@@ -53,25 +59,37 @@
     justify-content: flex-end;
     gap: 10px;
     flex-shrink: 0;
+    background-color: white; /* Stellt sicher, dass der Footer immer sichtbar ist */
+    border-radius: 0 0 8px 8px;
+    position: sticky; /* Für bessere Benutzererfahrung */
+    bottom: 0;
+    z-index: 10;
 }
 
 /* Verbesserte Mobile-Ansicht */
 @media (max-height: 768px) {
     .modal {
         height: calc(100vh - 40px);
+        margin: 20px auto;
     }
     
     .modal-body {
-        max-height: none;
+        max-height: none; /* Volle Höhe nutzen */
         flex-grow: 1;
     }
 }
 
-/* Styling für Formulartabs */
+/* Styling für Formulartabs - verbessert */
 .form-tabs {
     display: flex;
+    flex-wrap: wrap; /* Ermöglicht Umbrechen auf kleinen Bildschirmen */
     margin-bottom: 20px;
     border-bottom: 1px solid #ddd;
+    position: sticky; /* Tabs bleiben sichtbar beim Scrollen */
+    top: 0;
+    background-color: white;
+    z-index: 5;
+    padding-top: 5px;
 }
 
 .form-tab {
@@ -81,7 +99,9 @@
     border: 1px solid #ddd;
     border-bottom: none;
     margin-right: 5px;
+    margin-bottom: 4px; /* Verbessert für mobile Ansichten */
     border-radius: 4px 4px 0 0;
+    white-space: nowrap;
 }
 
 .form-tab.active {
@@ -94,13 +114,34 @@
 
 .form-section {
     display: none;
+    margin-bottom: 20px; /* Abstand zwischen Sektionen */
+    padding-top: 10px; /* Abstand zum Tab oben */
 }
 
 .form-section.active {
     display: block;
 }
 
-/* Styling für Bild-Upload und Gallerie */
+/* Verbesserte Card-Darstellung für Formular-Sektionen */
+.section-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.section-card h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #001e50;
+    font-size: 1.2rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+}
+
+/* Styling für Bild-Upload und Gallerie - verbessert */
 .upload-area {
     border: 2px dashed #ddd;
     padding: 30px;
@@ -166,6 +207,7 @@
     border: 1px solid #ddd;
     padding: 10px;
     border-radius: 4px;
+    background-color: white;
 }
 
 .qr-preview img {
@@ -207,11 +249,33 @@
     100% { transform: rotate(360deg); }
 }
 
-/* Quiz-Fragen Styling */
+/* Quiz-Fragen Styling - verbessert */
 .quiz-question {
     border: 1px solid #ddd;
     border-radius: 8px;
     margin-bottom: 20px;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    padding: 12px 15px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.card-title {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #001e50;
 }
 
 .answer-option {
@@ -228,10 +292,57 @@
 
 .delete-question {
     cursor: pointer;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .question-number {
     font-weight: bold;
+}
+
+/* Verbesserte Formular-Felder und Labels */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #4cc0f1;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 30, 80, 0.1);
+}
+
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
 }
 
 .info-text {
@@ -250,4 +361,164 @@
 
 .quiz-question {
     animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    cursor: pointer;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #001e50;
+    border-color: #001e50;
+}
+
+.btn-primary:hover {
+    background-color: #00132f;
+    border-color: #00132f;
+}
+
+.btn-secondary {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #5a6268;
+}
+
+.btn-danger {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+}
+
+/* List Manager */
+.list-manager {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.list-item-content {
+    flex-grow: 1;
+}
+
+.add-item-form {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Alerts */
+.alert {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+
+.alert-icon {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+/* Tabellen */
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    background-color: transparent;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+}
+
+.table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+
+/* Custom Scrollbar für bessere UX */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
