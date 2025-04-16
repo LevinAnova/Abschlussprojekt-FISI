@@ -854,7 +854,7 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-pp.get('/api/professions/:id/quiz', async (req, res) => {
+app.get('/api/professions/:id/quiz', async (req, res) => {
   try {
     const { id } = req.params;
     
