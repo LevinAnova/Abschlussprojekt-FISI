@@ -6,6 +6,10 @@ const formidable = require('formidable');
 const os = require('os');
 const fs = require('fs');                 // Für synchrone Funktionen wie existsSync
 const fsPromises = fs.promises;           // Für asynchrone Operationen mit Promises
+const bcrypt = require('bcrypt');
+const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
+
 
 // Express App initialisieren
 const app = express();
@@ -109,6 +113,49 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Interner Serverfehler', details: DEBUG ? err.message : undefined });
 });
 
+
+// Middleware für Sitzungsverwaltung
+const sessionStore = new MySQLStore({
+  host: '127.0.0.1',
+  user: 'vwapp',
+  password: 'fisi',
+  database: 'vw_ausbildung'
+});
+
+app.use(session({
+  key: 'vw_ausbildung_sid',
+  secret: 'vw_ausbildung_secret',
+  store: sessionStore,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 1 Tag
+      httpOnly: true,
+      secure: false // Bei Produktion auf true setzen
+  }
+}));
+
+// Authentifizierungsmiddleware
+function isAuthenticated(req, res, next) {
+  if (req.session.user) {
+      return next();
+  }
+  res.status(401).json({ error: 'Nicht autorisiert. Bitte melden Sie sich an.' });
+}
+
+// Statische Dateien für login.html vor der Auth-Middleware servieren
+app.get('/login.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// Middleware zum Schutz der admin.html
+app.use('/admin.html', (req, res, next) => {
+  if (!req.session.user) {
+      return res.redirect('/login.html');
+  }
+  next();
+});
+
 // ===== API-Routen =====
 
 // Root-Endpoint für API-Tests
@@ -118,6 +165,129 @@ app.get('/api', (req, res) => {
     version: '1.0.0',
     endpoints: ['/api/categories', '/api/professions']
   });
+});
+
+// Login Routen
+app.post('/api/auth/login', async (req, res) => {
+  try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+          return res.status(400).json({ error: 'Benutzername und Passwort erforderlich' });
+      }
+      
+      const [users] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+      
+      if (users.length === 0) {
+          return res.status(401).json({ error: 'Ungültiger Benutzername oder Passwort' });
+      }
+      
+      const user = users[0];
+      const passwordValid = await bcrypt.compare(password, user.password);
+      
+      if (!passwordValid) {
+          return res.status(401).json({ error: 'Ungültiger Benutzername oder Passwort' });
+      }
+      
+      // Benutzer in der Sitzung speichern (ohne Passwort)
+      req.session.user = {
+          id: user.id,
+          username: user.username,
+          role: user.role
+      };
+      
+      res.json({ success: true, message: 'Anmeldung erfolgreich' });
+  } catch (err) {
+      handleError(res, err, 'Fehler bei der Anmeldung');
+  }
+});
+
+app.get('/api/auth/status', (req, res) => {
+  if (req.session.user) {
+      res.json({
+          authenticated: true,
+          user: req.session.user
+      });
+  } else {
+      res.json({
+          authenticated: false
+      });
+  }
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  req.session.destroy((err) => {
+      if (err) {
+          return res.status(500).json({ error: 'Fehler beim Abmelden' });
+      }
+      res.json({ message: 'Abmeldung erfolgreich' });
+  });
+});
+
+// Routen für Benutzerverwaltung
+app.get('/api/users', isAuthenticated, async (req, res) => {
+  try {
+      const [users] = await pool.query('SELECT id, username, role, created_at FROM users');
+      res.json(users);
+  } catch (err) {
+      handleError(res, err, 'Fehler beim Abrufen der Benutzer');
+  }
+});
+
+app.post('/api/users', isAuthenticated, async (req, res) => {
+  try {
+      const { username, password, role } = req.body;
+      
+      if (!username || !password) {
+          return res.status(400).json({ error: 'Benutzername und Passwort erforderlich' });
+      }
+      
+      // Prüfen, ob der Benutzername bereits existiert
+      const [existingUsers] = await pool.query('SELECT id FROM users WHERE username = ?', [username]);
+      if (existingUsers.length > 0) {
+          return res.status(409).json({ error: 'Benutzername existiert bereits' });
+      }
+      
+      // Passwort hashen
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      
+      // Benutzer speichern
+      const [result] = await pool.query(
+          'INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
+          [username, hashedPassword, role || 'admin']
+      );
+      
+      res.status(201).json({ 
+          id: result.insertId,
+          username,
+          role: role || 'admin'
+      });
+  } catch (err) {
+      handleError(res, err, 'Fehler beim Erstellen des Benutzers');
+  }
+});
+
+app.delete('/api/users/:id', isAuthenticated, async (req, res) => {
+  try {
+      const { id } = req.params;
+      
+      // Verhindere das Löschen des eigenen Kontos
+      if (req.session.user.id == id) {
+          return res.status(400).json({ error: 'Sie können Ihr eigenes Konto nicht löschen' });
+      }
+      
+      // Benutzer löschen
+      const [result] = await pool.query('DELETE FROM users WHERE id = ?', [id]);
+      
+      if (result.affectedRows === 0) {
+          return res.status(404).json({ error: 'Benutzer nicht gefunden' });
+      }
+      
+      res.json({ message: 'Benutzer erfolgreich gelöscht' });
+  } catch (err) {
+      handleError(res, err, 'Fehler beim Löschen des Benutzers');
+  }
 });
 
 // ===== Kategorien API =====

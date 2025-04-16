@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VW Ausbildung - Login</title>
+    <link rel="stylesheet" href="style/admin-styles.css">
+    <style>
+        /* Zusätzliche Styles für die Login-Seite */
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-logo img {
+            height: 80px;
+        }
+        .login-card {
+            padding: 30px;
+        }
+        .login-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #001e50;
+            font-family: 'VW Head', sans-serif;
+        }
+        .login-btn {
+            width: 100%;
+            margin-top: 20px;
+        }
+        .powered-by {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container login-container">
+        <div class="login-logo">
+            <img src="img/vwlogo.png" alt="Volkswagen Logo">
+        </div>
+        <div class="card login-card">
+            <h2 class="login-title">Anmeldung zum Admin-Bereich</h2>
+            <div id="loginAlert" class="alert" style="display: none;"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username" class="form-label">Benutzername</label>
+                    <input type="text" id="username" class="form-control" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="form-label">Passwort</label>
+                    <input type="password" id="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary login-btn">Anmelden</button>
+            </form>
+        </div>
+        <div class="powered-by">
+            Volkswagen Ausbildungs-CMS © 2025
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const loginAlert = document.getElementById('loginAlert');
+
+            // Login-Formular Submit Handler
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                try {
+                    // Deaktiviere den Submit-Button während der Anfrage
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Anmeldung...';
+                    
+                    // Sende Login-Anfrage an den Server
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+                    
+                    // Antwort vom Server verarbeiten
+                    if (response.ok) {
+                        // Erfolgreiche Anmeldung, zu admin.html weiterleiten
+                        showAlert('Anmeldung erfolgreich! Sie werden weitergeleitet...', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'admin.html';
+                        }, 1000);
+                    } else {
+                        // Fehlermeldung anzeigen
+                        const errorData = await response.json();
+                        showAlert(errorData.error || 'Anmeldung fehlgeschlagen.', 'danger');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Anmelden';
+                    }
+                } catch (error) {
+                    showAlert('Verbindungsfehler. Bitte versuchen Sie es später erneut.', 'danger');
+                    console.error('Login error:', error);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Anmelden';
+                }
+            });
+            
+            // Hilfsfunktion zum Anzeigen von Alerts
+            function showAlert(message, type) {
+                loginAlert.innerHTML = `<div class="alert-icon">${type === 'success' ? '✓' : '⚠'}</div>${message}`;
+                loginAlert.className = `alert alert-${type}`;
+                loginAlert.style.display = 'flex';
+                
+                // Alert nach 5 Sekunden ausblenden, wenn es ein Erfolg war
+                if (type === 'success') {
+                    setTimeout(() => {
+                        loginAlert.style.display = 'none';
+                    }, 5000);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

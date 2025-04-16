@@ -5,6 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VW Ausbildung - Admin</title>
+    <script>
+        // Sofortige Authentifizierungsprüfung
+        (async function() {
+            try {
+                const response = await fetch('/api/auth/status');
+                const data = await response.json();
+                
+                if (!data.authenticated) {
+                    // Nicht angemeldet, zur Login-Seite umleiten
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Authentifizierungsfehler:', error);
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="style/admin-styles.css">
     <script src="js/cms.js" defer></script>
 
@@ -23,6 +40,7 @@
         <ul class="tabs" id="adminTabs">
             <li class="tab-item active" data-tab="categories">Kategorien</li>
             <li class="tab-item" data-tab="professions">Ausbildungsberufe</li>
+            <li class="tab-item" data-tab="users">Benutzerverwaltung</li>
         </ul>
 
         <!-- Kategorien-Verwaltung -->
@@ -75,6 +93,35 @@
                             <!-- Berufe werden hier eingefügt -->
                             <tr>
                                 <td colspan="4">Berufe werden geladen...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!--Benutzerverwaltung-->
+        <section id="usersSection" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Benutzer verwalten</h2>
+                    <button id="addUserBtn" class="btn btn-primary btn-sm">Neuer Benutzer</button>
+                </div>
+                <div class="card-body">
+                    <div id="userAlert" class="alert" style="display: none;"></div>
+                    <table class="table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>Benutzername</th>
+                                <th>Rolle</th>
+                                <th>Erstellt am</th>
+                                <th>Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersList">
+                            <!-- Benutzer werden hier eingefügt -->
+                            <tr>
+                                <td colspan="4">Benutzer werden geladen...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -275,6 +322,40 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal-overlay" id="userModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="userModalTitle">Benutzer hinzufügen</h3>
+                    <button class="modal-close" id="closeUserModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="userForm">
+                        <div class="form-group">
+                            <label for="userUsername" class="form-label">Benutzername</label>
+                            <input type="text" id="userUsername" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userPassword" class="form-label">Passwort</label>
+                            <input type="password" id="userPassword" class="form-control" required>
+                            <small class="password-hint">Passwort muss mindestens 8 Zeichen lang sein.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="userRole" class="form-label">Rolle</label>
+                            <select id="userRole" class="form-control">
+                                <option value="admin">Administrator</option>
+                                <option value="editor">Redakteur</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelUserBtn">Abbrechen</button>
+                    <button class="btn btn-primary" id="saveUserBtn">Speichern</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <template id="questionTemplate">
@@ -1119,153 +1200,153 @@
             }
 
             async function saveQuizQuestions(professionId) {
-    if (!professionId || !document.getElementById('hasKnowledgeTest').checked) {
-        console.log('Kein Wissenstest zu speichern oder Test nicht aktiviert');
-        return;
-    }
-
-    // Quiz-Daten sammeln
-    const quizQuestions = [];
-    const questionElements = document.querySelectorAll('.quiz-question');
-    
-    console.log('Frage-Elemente gefunden:', questionElements.length);
-    
-    questionElements.forEach((questionEl, index) => {
-        const questionText = questionEl.querySelector('.question-text').value;
-        const questionExplanation = questionEl.querySelector('.question-explanation').value;
-        const options = [];
-        const answerOptions = questionEl.querySelectorAll('.answer-option');
-        
-        let hasCorrectAnswer = false;
-        
-        answerOptions.forEach(option => {
-            const isCorrect = option.querySelector('.correct-answer').checked;
-            if (isCorrect) hasCorrectAnswer = true;
-            
-            options.push({
-                text: option.querySelector('.answer-text').value,
-                isCorrect: isCorrect
-            });
-        });
-        
-        quizQuestions.push({
-            text: questionText,
-            explanation: questionExplanation,
-            options: options,
-            // Wir prüfen hier, ob die Frage gültig ist
-            isValid: questionText && hasCorrectAnswer && !options.some(o => !o.text)
-        });
-    });
-
-    // Validieren der Daten
-    const invalidQuestions = quizQuestions.filter(q => !q.isValid);
-
-    if (invalidQuestions.length > 0) {
-        console.error('Ungültige Fragen:', invalidQuestions);
-        throw new Error('Bitte füllen Sie alle Felder aus und wählen Sie jeweils eine richtige Antwort für jede Frage aus.');
-    }
-
-    try {
-        console.log('Sende Quiz-Daten an API:', quizQuestions);
-        
-        const response = await fetch(`/api/professions/${professionId}/quiz`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ questions: quizQuestions })
-        });
-        
-        if (!response.ok) {
-            let errorMsg = 'Fehler beim Speichern des Wissenstests';
-            try {
-                const errorData = await response.json();
-                errorMsg = errorData.error || errorMsg;
-            } catch (e) {
-                console.error('Fehler beim Parsen der Fehlermeldung', e);
-            }
-            throw new Error(errorMsg);
-        }
-        
-        const result = await response.json();
-        console.log('Quiz erfolgreich gespeichert:', result);
-        return result;
-    } catch (error) {
-        console.error('Fehler beim Speichern der Wissenstest-Fragen:', error);
-        throw error;
-    }
-}
-
-// Aktuelle saveProfession-Funktion ersetzen:
-async function saveProfession() {
-    const professionId = document.getElementById('professionId').value.trim();
-    const professionTitle = document.getElementById('professionTitle').value.trim();
-    const professionDescription = document.getElementById('professionDescription').value.trim();
-    const professionDuration = document.getElementById('professionDuration').value.trim();
-    const categoryId = document.getElementById('professionCategory').value;
-    const hasKnowledgeTest = document.getElementById('hasKnowledgeTest').checked;
-
-    if (!professionId || !professionTitle || !professionDescription || !professionDuration || !categoryId) {
-        showAlert(professionAlert, 'Alle Pflichtfelder müssen ausgefüllt sein.', 'danger');
-        return;
-    }
-
-    try {
-        const profession = {
-            id: professionId,
-            title: professionTitle,
-            description: professionDescription,
-            duration: professionDuration,
-            category: categoryId,
-            has_knowledge_test: hasKnowledgeTest,
-            requirements: requirements,
-            career_options: careerOptions,
-            locations: locations
-        };
-
-        console.log('Speichere Beruf:', profession);
-        await cmsApi.saveProfession(profession);
-        console.log('Beruf gespeichert');
-
-        // Nach erfolgreicher Berufsspeicherung den Wissenstest speichern
-        if (hasKnowledgeTest) {
-            try {
-                console.log('Speichere Wissenstest für:', professionId);
-                await saveQuizQuestions(professionId);
-                console.log('Wissenstest gespeichert');
-            } catch (quizError) {
-                console.error('Fehler beim Speichern des Wissenstests:', quizError);
-                showAlert(professionAlert, 'Beruf gespeichert, aber Wissenstest konnte nicht gespeichert werden: ' + quizError.message, 'warning');
-                
-                // Wir schließen das Modal trotzdem, da der Beruf selbst gespeichert wurde
-                if (currentMode === 'add') {
-                    currentMode = 'edit';
-                    document.getElementById('professionId').disabled = true;
+                if (!professionId || !document.getElementById('hasKnowledgeTest').checked) {
+                    console.log('Kein Wissenstest zu speichern oder Test nicht aktiviert');
+                    return;
                 }
-                loadProfessions();
-                return;
+
+                // Quiz-Daten sammeln
+                const quizQuestions = [];
+                const questionElements = document.querySelectorAll('.quiz-question');
+
+                console.log('Frage-Elemente gefunden:', questionElements.length);
+
+                questionElements.forEach((questionEl, index) => {
+                    const questionText = questionEl.querySelector('.question-text').value;
+                    const questionExplanation = questionEl.querySelector('.question-explanation').value;
+                    const options = [];
+                    const answerOptions = questionEl.querySelectorAll('.answer-option');
+
+                    let hasCorrectAnswer = false;
+
+                    answerOptions.forEach(option => {
+                        const isCorrect = option.querySelector('.correct-answer').checked;
+                        if (isCorrect) hasCorrectAnswer = true;
+
+                        options.push({
+                            text: option.querySelector('.answer-text').value,
+                            isCorrect: isCorrect
+                        });
+                    });
+
+                    quizQuestions.push({
+                        text: questionText,
+                        explanation: questionExplanation,
+                        options: options,
+                        // Wir prüfen hier, ob die Frage gültig ist
+                        isValid: questionText && hasCorrectAnswer && !options.some(o => !o.text)
+                    });
+                });
+
+                // Validieren der Daten
+                const invalidQuestions = quizQuestions.filter(q => !q.isValid);
+
+                if (invalidQuestions.length > 0) {
+                    console.error('Ungültige Fragen:', invalidQuestions);
+                    throw new Error('Bitte füllen Sie alle Felder aus und wählen Sie jeweils eine richtige Antwort für jede Frage aus.');
+                }
+
+                try {
+                    console.log('Sende Quiz-Daten an API:', quizQuestions);
+
+                    const response = await fetch(`/api/professions/${professionId}/quiz`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ questions: quizQuestions })
+                    });
+
+                    if (!response.ok) {
+                        let errorMsg = 'Fehler beim Speichern des Wissenstests';
+                        try {
+                            const errorData = await response.json();
+                            errorMsg = errorData.error || errorMsg;
+                        } catch (e) {
+                            console.error('Fehler beim Parsen der Fehlermeldung', e);
+                        }
+                        throw new Error(errorMsg);
+                    }
+
+                    const result = await response.json();
+                    console.log('Quiz erfolgreich gespeichert:', result);
+                    return result;
+                } catch (error) {
+                    console.error('Fehler beim Speichern der Wissenstest-Fragen:', error);
+                    throw error;
+                }
             }
-        }
 
-        if (currentMode === 'add') {
-            // Wechsel zum Galerie-Tab nach dem ersten Speichern eines neuen Berufs
-            document.querySelector('.form-tab.active').classList.remove('active');
-            document.querySelector('.form-tab[data-section="gallery"]').classList.add('active');
-            document.querySelector('.form-section.active').classList.remove('active');
-            document.getElementById('gallerySection').classList.add('active');
+            // Aktuelle saveProfession-Funktion ersetzen:
+            async function saveProfession() {
+                const professionId = document.getElementById('professionId').value.trim();
+                const professionTitle = document.getElementById('professionTitle').value.trim();
+                const professionDescription = document.getElementById('professionDescription').value.trim();
+                const professionDuration = document.getElementById('professionDuration').value.trim();
+                const categoryId = document.getElementById('professionCategory').value;
+                const hasKnowledgeTest = document.getElementById('hasKnowledgeTest').checked;
 
-            // Setze currentMode auf 'edit', damit der Benutzer nun Bilder hochladen kann
-            currentMode = 'edit';
-            document.getElementById('professionId').disabled = true;
-            showAlert(professionAlert, 'Beruf erfolgreich erstellt. Sie können jetzt Bilder hochladen.', 'success');
-        } else {
-            closeModal(professionModal);
-            loadProfessions();
-            showAlert(professionAlert, 'Beruf erfolgreich aktualisiert.', 'success');
-        }
-    } catch (error) {
-        console.error('Fehler beim Speichern des Berufs:', error);
-        showAlert(professionAlert, 'Fehler beim Speichern des Berufs: ' + error.message, 'danger');
-    }
-}
+                if (!professionId || !professionTitle || !professionDescription || !professionDuration || !categoryId) {
+                    showAlert(professionAlert, 'Alle Pflichtfelder müssen ausgefüllt sein.', 'danger');
+                    return;
+                }
+
+                try {
+                    const profession = {
+                        id: professionId,
+                        title: professionTitle,
+                        description: professionDescription,
+                        duration: professionDuration,
+                        category: categoryId,
+                        has_knowledge_test: hasKnowledgeTest,
+                        requirements: requirements,
+                        career_options: careerOptions,
+                        locations: locations
+                    };
+
+                    console.log('Speichere Beruf:', profession);
+                    await cmsApi.saveProfession(profession);
+                    console.log('Beruf gespeichert');
+
+                    // Nach erfolgreicher Berufsspeicherung den Wissenstest speichern
+                    if (hasKnowledgeTest) {
+                        try {
+                            console.log('Speichere Wissenstest für:', professionId);
+                            await saveQuizQuestions(professionId);
+                            console.log('Wissenstest gespeichert');
+                        } catch (quizError) {
+                            console.error('Fehler beim Speichern des Wissenstests:', quizError);
+                            showAlert(professionAlert, 'Beruf gespeichert, aber Wissenstest konnte nicht gespeichert werden: ' + quizError.message, 'warning');
+
+                            // Wir schließen das Modal trotzdem, da der Beruf selbst gespeichert wurde
+                            if (currentMode === 'add') {
+                                currentMode = 'edit';
+                                document.getElementById('professionId').disabled = true;
+                            }
+                            loadProfessions();
+                            return;
+                        }
+                    }
+
+                    if (currentMode === 'add') {
+                        // Wechsel zum Galerie-Tab nach dem ersten Speichern eines neuen Berufs
+                        document.querySelector('.form-tab.active').classList.remove('active');
+                        document.querySelector('.form-tab[data-section="gallery"]').classList.add('active');
+                        document.querySelector('.form-section.active').classList.remove('active');
+                        document.getElementById('gallerySection').classList.add('active');
+
+                        // Setze currentMode auf 'edit', damit der Benutzer nun Bilder hochladen kann
+                        currentMode = 'edit';
+                        document.getElementById('professionId').disabled = true;
+                        showAlert(professionAlert, 'Beruf erfolgreich erstellt. Sie können jetzt Bilder hochladen.', 'success');
+                    } else {
+                        closeModal(professionModal);
+                        loadProfessions();
+                        showAlert(professionAlert, 'Beruf erfolgreich aktualisiert.', 'success');
+                    }
+                } catch (error) {
+                    console.error('Fehler beim Speichern des Berufs:', error);
+                    showAlert(professionAlert, 'Fehler beim Speichern des Berufs: ' + error.message, 'danger');
+                }
+            }
 
             async function deleteProfession(professionId) {
                 try {
@@ -1317,24 +1398,24 @@ async function saveProfession() {
 
             // Tab ein-/ausblenden basierend auf Checkbox-Status
             function toggleQuizTab(show) {
-    console.log('Toggle Quiz-Tab:', show);
-    quizTab.style.display = show ? 'block' : 'none';
+                console.log('Toggle Quiz-Tab:', show);
+                quizTab.style.display = show ? 'block' : 'none';
 
-    // Wenn der Tab ausgeblendet wird, auch die Sektion ausblenden
-    if (!show && quizSection.classList.contains('active')) {
-        // Zurück zum ersten Tab wechseln
-        document.querySelector('.form-tab[data-section="general"]').click();
-    }
+                // Wenn der Tab ausgeblendet wird, auch die Sektion ausblenden
+                if (!show && quizSection.classList.contains('active')) {
+                    // Zurück zum ersten Tab wechseln
+                    document.querySelector('.form-tab[data-section="general"]').click();
+                }
 
-    // Wenn wieder eingeblendet und noch keine Fragen da sind, eine leere erstellen
-    if (show && quizQuestionsData.length === 0) {
-        console.log('Erstelle eine leere Frage beim Einblenden des Tabs');
-        addQuestion();
-    }
+                // Wenn wieder eingeblendet und noch keine Fragen da sind, eine leere erstellen
+                if (show && quizQuestionsData.length === 0) {
+                    console.log('Erstelle eine leere Frage beim Einblenden des Tabs');
+                    addQuestion();
+                }
 
-    // "Weitere Frage hinzufügen"-Button nur anzeigen, wenn weniger als MAX_QUESTIONS
-    updateAddQuestionButton();
-}
+                // "Weitere Frage hinzufügen"-Button nur anzeigen, wenn weniger als MAX_QUESTIONS
+                updateAddQuestionButton();
+            }
 
             // Frage hinzufügen
             function addQuestion() {
@@ -1383,189 +1464,452 @@ async function saveProfession() {
 
             // Alle Wissenstest-Fragen rendern
             function renderQuizQuestions() {
-    quizQuestions.innerHTML = '';
-    console.log('Rendering Quiz-Fragen:', quizQuestionsData.length);
+                quizQuestions.innerHTML = '';
+                console.log('Rendering Quiz-Fragen:', quizQuestionsData.length);
 
-    quizQuestionsData.forEach((question, index) => {
-        // Template klonen
-        const questionEl = document.importNode(questionTemplate.content, true).querySelector('.quiz-question');
+                quizQuestionsData.forEach((question, index) => {
+                    // Template klonen
+                    const questionEl = document.importNode(questionTemplate.content, true).querySelector('.quiz-question');
 
-        // Fragennummer setzen
-        questionEl.querySelector('.question-number').textContent = index + 1;
-        
-        // Fragetext und Erklärung setzen
-        const questionTextInput = questionEl.querySelector('.question-text');
-        const questionExplanationInput = questionEl.querySelector('.question-explanation');
-        
-        questionTextInput.value = question.text || '';
-        questionExplanationInput.value = question.explanation || '';
+                    // Fragennummer setzen
+                    questionEl.querySelector('.question-number').textContent = index + 1;
 
-        // Radio-Button-Gruppe eindeutig machen
-        const radioGroup = `correct-${question.id}`;
-        const radioInputs = questionEl.querySelectorAll('.correct-answer');
-        const answerInputs = questionEl.querySelectorAll('.answer-text');
-        
-        // Sicherstellen, dass options ein Array ist
-        question.options = Array.isArray(question.options) ? question.options : [
-            { text: '', isCorrect: false },
-            { text: '', isCorrect: false },
-            { text: '', isCorrect: false },
-            { text: '', isCorrect: false }
-        ];
-        
-        // Sicherstellen, dass genügend Optionen vorhanden sind
-        while (question.options.length < 4) {
-            question.options.push({ text: '', isCorrect: false });
-        }
-        
-        // Radio-Buttons und Antworten setzen
-        radioInputs.forEach((radio, i) => {
-            radio.name = radioGroup;
-            radio.checked = question.options[i] && question.options[i].isCorrect;
-            
-            const input = answerInputs[i];
-            if (input && question.options[i]) {
-                input.value = question.options[i].text || '';
+                    // Fragetext und Erklärung setzen
+                    const questionTextInput = questionEl.querySelector('.question-text');
+                    const questionExplanationInput = questionEl.querySelector('.question-explanation');
+
+                    questionTextInput.value = question.text || '';
+                    questionExplanationInput.value = question.explanation || '';
+
+                    // Radio-Button-Gruppe eindeutig machen
+                    const radioGroup = `correct-${question.id}`;
+                    const radioInputs = questionEl.querySelectorAll('.correct-answer');
+                    const answerInputs = questionEl.querySelectorAll('.answer-text');
+
+                    // Sicherstellen, dass options ein Array ist
+                    question.options = Array.isArray(question.options) ? question.options : [
+                        { text: '', isCorrect: false },
+                        { text: '', isCorrect: false },
+                        { text: '', isCorrect: false },
+                        { text: '', isCorrect: false }
+                    ];
+
+                    // Sicherstellen, dass genügend Optionen vorhanden sind
+                    while (question.options.length < 4) {
+                        question.options.push({ text: '', isCorrect: false });
+                    }
+
+                    // Radio-Buttons und Antworten setzen
+                    radioInputs.forEach((radio, i) => {
+                        radio.name = radioGroup;
+                        radio.checked = question.options[i] && question.options[i].isCorrect;
+
+                        const input = answerInputs[i];
+                        if (input && question.options[i]) {
+                            input.value = question.options[i].text || '';
+                        }
+                    });
+
+                    // Event-Listener für Änderungen
+                    questionTextInput.addEventListener('input', function (e) {
+                        question.text = e.target.value;
+                    });
+
+                    questionExplanationInput.addEventListener('input', function (e) {
+                        question.explanation = e.target.value;
+                    });
+
+                    answerInputs.forEach((input, i) => {
+                        input.addEventListener('input', function (e) {
+                            if (!question.options[i]) question.options[i] = { text: '', isCorrect: false };
+                            question.options[i].text = e.target.value;
+                        });
+                    });
+
+                    radioInputs.forEach((radio, i) => {
+                        radio.addEventListener('change', function () {
+                            // Alle auf false setzen
+                            question.options.forEach(option => option.isCorrect = false);
+                            // Nur die ausgewählte auf true setzen
+                            if (!question.options[i]) question.options[i] = { text: '', isCorrect: true };
+                            else question.options[i].isCorrect = true;
+                        });
+                    });
+
+                    // Lösch-Button Event-Listener
+                    questionEl.querySelector('.delete-question').addEventListener('click', function () {
+                        if (confirm('Möchten Sie diese Frage wirklich löschen?')) {
+                            deleteQuestion(question.id);
+                        }
+                    });
+
+                    // Element zum Container hinzufügen
+                    quizQuestions.appendChild(questionEl);
+                });
             }
-        });
 
-        // Event-Listener für Änderungen
-        questionTextInput.addEventListener('input', function (e) {
-            question.text = e.target.value;
-        });
+            // Aktuelle addQuestion-Funktion ersetzen:
+            function addQuestion() {
+                if (quizQuestionsData.length >= MAX_QUESTIONS) {
+                    showAlert(professionAlert, `Maximal ${MAX_QUESTIONS} Fragen erlaubt.`, 'warning');
+                    return;
+                }
 
-        questionExplanationInput.addEventListener('input', function (e) {
-            question.explanation = e.target.value;
-        });
+                // Neue Frage erstellen
+                const newQuestion = {
+                    id: Date.now(), // Temporäre ID für die UI
+                    text: '',
+                    explanation: '',
+                    options: [
+                        { text: '', isCorrect: false },
+                        { text: '', isCorrect: false },
+                        { text: '', isCorrect: false },
+                        { text: '', isCorrect: false }
+                    ]
+                };
 
-        answerInputs.forEach((input, i) => {
-            input.addEventListener('input', function (e) {
-                if (!question.options[i]) question.options[i] = { text: '', isCorrect: false };
-                question.options[i].text = e.target.value;
-            });
-        });
-
-        radioInputs.forEach((radio, i) => {
-            radio.addEventListener('change', function () {
-                // Alle auf false setzen
-                question.options.forEach(option => option.isCorrect = false);
-                // Nur die ausgewählte auf true setzen
-                if (!question.options[i]) question.options[i] = { text: '', isCorrect: true };
-                else question.options[i].isCorrect = true;
-            });
-        });
-
-        // Lösch-Button Event-Listener
-        questionEl.querySelector('.delete-question').addEventListener('click', function () {
-            if (confirm('Möchten Sie diese Frage wirklich löschen?')) {
-                deleteQuestion(question.id);
+                quizQuestionsData.push(newQuestion);
+                console.log('Frage hinzugefügt, neue Anzahl:', quizQuestionsData.length);
+                renderQuizQuestions();
+                updateAddQuestionButton();
             }
-        });
-
-        // Element zum Container hinzufügen
-        quizQuestions.appendChild(questionEl);
-    });
-}
-
-// Aktuelle addQuestion-Funktion ersetzen:
-function addQuestion() {
-    if (quizQuestionsData.length >= MAX_QUESTIONS) {
-        showAlert(professionAlert, `Maximal ${MAX_QUESTIONS} Fragen erlaubt.`, 'warning');
-        return;
-    }
-
-    // Neue Frage erstellen
-    const newQuestion = {
-        id: Date.now(), // Temporäre ID für die UI
-        text: '',
-        explanation: '',
-        options: [
-            { text: '', isCorrect: false },
-            { text: '', isCorrect: false },
-            { text: '', isCorrect: false },
-            { text: '', isCorrect: false }
-        ]
-    };
-
-    quizQuestionsData.push(newQuestion);
-    console.log('Frage hinzugefügt, neue Anzahl:', quizQuestionsData.length);
-    renderQuizQuestions();
-    updateAddQuestionButton();
-}
 
             // Wissenstest-Daten laden
             async function loadQuizQuestions(professionId) {
-    if (!professionId) {
-        console.log('Keine Berufs-ID zum Laden des Wissenstests');
-        quizQuestionsData = [];
-        renderQuizQuestions();
-        return;
-    }
+                if (!professionId) {
+                    console.log('Keine Berufs-ID zum Laden des Wissenstests');
+                    quizQuestionsData = [];
+                    renderQuizQuestions();
+                    return;
+                }
 
-    try {
-        console.log('Lade Wissenstest für Beruf:', professionId);
-        const response = await fetch(`/api/professions/${professionId}/quiz`);
-        
-        if (!response.ok) {
-            if (response.status === 404) {
-                console.log('Kein Wissenstest gefunden für:', professionId);
-                quizQuestionsData = [];
-            } else {
-                console.error('Server-Fehler beim Laden des Wissenstests:', response.status);
-                quizQuestionsData = [];
+                try {
+                    console.log('Lade Wissenstest für Beruf:', professionId);
+                    const response = await fetch(`/api/professions/${professionId}/quiz`);
+
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            console.log('Kein Wissenstest gefunden für:', professionId);
+                            quizQuestionsData = [];
+                        } else {
+                            console.error('Server-Fehler beim Laden des Wissenstests:', response.status);
+                            quizQuestionsData = [];
+                        }
+                    } else {
+                        const result = await response.json();
+                        console.log('Geladene Wissenstest-Daten:', result);
+
+                        // Format der API-Antwort verarbeiten
+                        if (Array.isArray(result)) {
+                            quizQuestionsData = result.map(question => ({
+                                id: question.id || Date.now() + Math.floor(Math.random() * 1000),
+                                text: question.text || '',
+                                explanation: question.explanation || '',
+                                options: question.options.map(option => ({
+                                    text: option.text || '',
+                                    isCorrect: option.isCorrect || false
+                                }))
+                            }));
+                        } else {
+                            console.warn('Unerwartetes Format der Wissenstest-Daten:', result);
+                            quizQuestionsData = [];
+                        }
+                    }
+
+                    // Wenn keine Fragen gefunden wurden, aber Wissenstest aktiviert ist, eine leere erstellen
+                    if (quizQuestionsData.length === 0 && document.getElementById('hasKnowledgeTest').checked) {
+                        console.log('Keine Fragen gefunden, erstelle eine leere Frage');
+                        addQuestion();
+                    } else {
+                        renderQuizQuestions();
+                    }
+
+                    updateAddQuestionButton();
+                } catch (error) {
+                    console.error('Fehler beim Laden der Wissenstest-Fragen:', error);
+                    showAlert(professionAlert, 'Fehler beim Laden der Wissenstest-Fragen: ' + error.message, 'danger');
+
+                    // Bei Fehler trotzdem eine leere Frage erstellen, wenn der Test aktiviert ist
+                    if (document.getElementById('hasKnowledgeTest').checked) {
+                        quizQuestionsData = [];
+                        addQuestion();
+                    }
+                }
             }
-        } else {
-            const result = await response.json();
-            console.log('Geladene Wissenstest-Daten:', result);
-            
-            // Format der API-Antwort verarbeiten
-            if (Array.isArray(result)) {
-                quizQuestionsData = result.map(question => ({
-                    id: question.id || Date.now() + Math.floor(Math.random() * 1000),
-                    text: question.text || '',
-                    explanation: question.explanation || '',
-                    options: question.options.map(option => ({
-                        text: option.text || '',
-                        isCorrect: option.isCorrect || false
-                    }))
-                }));
-            } else {
-                console.warn('Unerwartetes Format der Wissenstest-Daten:', result);
-                quizQuestionsData = [];
+
+            // Quiz-Button initialisieren
+            addQuestionBtn.addEventListener('click', addQuestion);
+
+            // Wissenstest-Checkbox-Listener
+            hasKnowledgeTest.addEventListener('change', function () {
+                toggleQuizTab(this.checked);
+            });
+
+            // Wissenstest-Tab initial ausblenden
+            toggleQuizTab(false);
+        });
+
+
+        // Variablen für Benutzerverwaltung
+        let users = [];
+        let currentUserId = null;
+
+        // DOM-Elemente für Benutzerverwaltung
+        const usersSection = document.getElementById('usersSection');
+        const usersList = document.getElementById('usersList');
+        const addUserBtn = document.getElementById('addUserBtn');
+        const userAlert = document.getElementById('userAlert');
+        const userModal = document.getElementById('userModal');
+        const userForm = document.getElementById('userForm');
+        const saveUserBtn = document.getElementById('saveUserBtn');
+        const cancelUserBtn = document.getElementById('cancelUserBtn');
+        const closeUserModal = document.getElementById('closeUserModal');
+
+        // Authentifizierungsstatus prüfen
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/status');
+                const data = await response.json();
+
+                if (!data.authenticated) {
+                    // Nicht angemeldet, zur Login-Seite umleiten
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Optional: Angemeldeten Benutzer anzeigen
+                const headerTitle = document.querySelector('.header-title');
+                if (headerTitle) {
+                    const userDisplay = document.createElement('div');
+                    userDisplay.className = 'user-display';
+                    userDisplay.innerHTML = `
+                <span>Angemeldet als: <b>${data.user.username}</b></span>
+                <button id="logoutBtn" class="btn btn-sm btn-secondary">Abmelden</button>
+            `;
+                    headerTitle.insertAdjacentElement('afterend', userDisplay);
+
+                    // Logout-Button Event-Listener
+                    document.getElementById('logoutBtn').addEventListener('click', logout);
+                }
+            } catch (error) {
+                console.error('Fehler bei der Authentifizierungsprüfung:', error);
+                window.location.href = 'login.html';
             }
         }
 
-        // Wenn keine Fragen gefunden wurden, aber Wissenstest aktiviert ist, eine leere erstellen
-        if (quizQuestionsData.length === 0 && document.getElementById('hasKnowledgeTest').checked) {
-            console.log('Keine Fragen gefunden, erstelle eine leere Frage');
-            addQuestion();
-        } else {
-            renderQuizQuestions();
+        // Logout-Funktion
+        async function logout() {
+            try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Fehler beim Abmelden:', error);
+            }
         }
 
-        updateAddQuestionButton();
-    } catch (error) {
-        console.error('Fehler beim Laden der Wissenstest-Fragen:', error);
-        showAlert(professionAlert, 'Fehler beim Laden der Wissenstest-Fragen: ' + error.message, 'danger');
-        
-        // Bei Fehler trotzdem eine leere Frage erstellen, wenn der Test aktiviert ist
-        if (document.getElementById('hasKnowledgeTest').checked) {
-            quizQuestionsData = [];
-            addQuestion();
+        // Benutzer laden
+        async function loadUsers() {
+            try {
+                usersList.innerHTML = '<tr><td colspan="4">Benutzer werden geladen...</td></tr>';
+
+                const response = await fetch('/api/users');
+                if (!response.ok) {
+                    throw new Error('Fehler beim Laden der Benutzer');
+                }
+
+                users = await response.json();
+                renderUsers();
+                showUserAlert('Benutzer erfolgreich geladen.', 'success');
+            } catch (error) {
+                console.error('Fehler beim Laden der Benutzer:', error);
+                usersList.innerHTML = '<tr><td colspan="4">Fehler beim Laden der Benutzer.</td></tr>';
+                showUserAlert('Fehler beim Laden der Benutzer: ' + error.message, 'danger');
+            }
         }
-    }
+
+        // Benutzer-Liste rendern
+        function renderUsers() {
+            if (users.length === 0) {
+                usersList.innerHTML = '<tr><td colspan="4">Keine Benutzer gefunden.</td></tr>';
+                return;
+            }
+
+            usersList.innerHTML = '';
+            users.forEach(user => {
+                const row = document.createElement('tr');
+
+                // Datum formatieren
+                const createdDate = new Date(user.created_at).toLocaleDateString('de-DE', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                row.innerHTML = `
+            <td>${user.username}</td>
+            <td><span class="badge ${user.role === 'admin' ? 'badge-admin' : 'badge-editor'}">${user.role}</span></td>
+            <td>${createdDate}</td>
+            <td>
+                <button class="btn btn-danger btn-sm delete-user" data-id="${user.id}">Löschen</button>
+            </td>
+        `;
+                usersList.appendChild(row);
+            });
+
+            // Event-Listener für Lösch-Buttons
+            document.querySelectorAll('.delete-user').forEach(button => {
+                button.addEventListener('click', function () {
+                    const userId = this.dataset.id;
+                    const user = users.find(u => u.id == userId);
+
+                    if (confirm(`Möchten Sie den Benutzer "${user.username}" wirklich löschen?`)) {
+                        deleteUser(userId);
+                    }
+                });
+            });
+        }
+
+        // Benutzer-Modal öffnen
+        addUserBtn.addEventListener('click', function () {
+            currentUserId = null;
+            document.getElementById('userModalTitle').textContent = 'Benutzer hinzufügen';
+            document.getElementById('userUsername').value = '';
+            document.getElementById('userPassword').value = '';
+            document.getElementById('userRole').value = 'admin';
+
+            openModal(userModal);
+        });
+
+        // Benutzer-Modal schließen
+        closeUserModal.addEventListener('click', function () {
+            closeModal(userModal);
+        });
+
+        cancelUserBtn.addEventListener('click', function () {
+            closeModal(userModal);
+        });
+
+        // Benutzer speichern
+        saveUserBtn.addEventListener('click', async function () {
+            const username = document.getElementById('userUsername').value.trim();
+            const password = document.getElementById('userPassword').value.trim();
+            const role = document.getElementById('userRole').value;
+
+            if (!username) {
+                showUserAlert('Benutzername ist erforderlich.', 'danger');
+                return;
+            }
+
+            if (!password || password.length < 8) {
+                showUserAlert('Passwort muss mindestens 8 Zeichen lang sein.', 'danger');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password, role })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Fehler beim Speichern des Benutzers');
+                }
+
+                closeModal(userModal);
+                loadUsers();
+                showUserAlert('Benutzer erfolgreich erstellt.', 'success');
+            } catch (error) {
+                console.error('Fehler beim Speichern des Benutzers:', error);
+                showUserAlert('Fehler beim Speichern des Benutzers: ' + error.message, 'danger');
+            }
+        });
+
+        // Benutzer löschen
+        async function deleteUser(userId) {
+            try {
+                const response = await fetch(`/api/users/${userId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Fehler beim Löschen des Benutzers');
+                }
+
+                loadUsers();
+                showUserAlert('Benutzer erfolgreich gelöscht.', 'success');
+            } catch (error) {
+                console.error('Fehler beim Löschen des Benutzers:', error);
+                showUserAlert('Fehler beim Löschen des Benutzers: ' + error.message, 'danger');
+            }
+        }
+
+        // Hilfsfunktion zum Anzeigen von Alerts in der Benutzerverwaltung
+        function showUserAlert(message, type) {
+            userAlert.innerHTML = `<div class="alert-icon">${type === 'success' ? '✓' : '⚠'}</div>${message}`;
+            userAlert.className = `alert alert-${type}`;
+            userAlert.style.display = 'flex';
+
+            // Alert nach 5 Sekunden ausblenden
+            setTimeout(() => {
+                userAlert.style.display = 'none';
+            }, 5000);
+        }
+
+        // CSS für Benutzerrollen-Badges
+        const styleTag = document.createElement('style');
+        styleTag.innerHTML = `
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
 }
+.badge-admin {
+    background-color: #001e50;
+    color: white;
+}
+.badge-editor {
+    background-color: #4cc0f1;
+    color: white;
+}
+.user-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 20px;
+    font-size: 0.9rem;
+}
+.password-hint {
+    color: #666;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+`;
+        document.head.appendChild(styleTag);
 
-// Quiz-Button initialisieren
-addQuestionBtn.addEventListener('click', addQuestion);
+        // Authentifizierungsstatus beim Laden der Seite prüfen
+        document.addEventListener('DOMContentLoaded', function () {
+            const existingOnLoad = window.onload;
 
-// Wissenstest-Checkbox-Listener
-hasKnowledgeTest.addEventListener('change', function() {
-    toggleQuizTab(this.checked);
-});
+            window.onload = function () {
+                if (existingOnLoad) existingOnLoad();
 
-// Wissenstest-Tab initial ausblenden
-toggleQuizTab(false);
+                // Authentifizierung prüfen
+                checkAuth();
+
+                // Tab-Event-Listener für den Benutzer-Tab
+                document.querySelector('.tab-item[data-tab="users"]').addEventListener('click', function () {
+                    loadUsers();
+                });
+            };
         });
     </script>
 </body>
