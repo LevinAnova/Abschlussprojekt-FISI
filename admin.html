@@ -1118,6 +1118,65 @@
                 }
             }
 
+            async function saveQuizQuestions(professionId) {
+    if (!professionId || !document.getElementById('hasKnowledgeTest').checked) {
+        return;
+    }
+
+    // Quiz-Daten sammeln
+    const quizQuestions = [];
+    const questionElements = document.querySelectorAll('.quiz-question');
+    
+    questionElements.forEach(questionEl => {
+        const questionText = questionEl.querySelector('.question-text').value;
+        const questionExplanation = questionEl.querySelector('.question-explanation').value;
+        const options = [];
+        const answerOptions = questionEl.querySelectorAll('.answer-option');
+        
+        answerOptions.forEach(option => {
+            options.push({
+                text: option.querySelector('.answer-text').value,
+                isCorrect: option.querySelector('.correct-answer').checked
+            });
+        });
+        
+        quizQuestions.push({
+            text: questionText,
+            explanation: questionExplanation,
+            options: options
+        });
+    });
+
+    // Validieren der Daten
+    const invalidQuestions = quizQuestions.filter(q =>
+        !q.text ||
+        q.options.some(o => !o.text) ||
+        !q.options.some(o => o.isCorrect)
+    );
+
+    if (invalidQuestions.length > 0) {
+        throw new Error('Bitte füllen Sie alle Felder aus und wählen Sie jeweils eine richtige Antwort für jede Frage aus.');
+    }
+
+    try {
+        const response = await fetch(`${cmsApi.baseUrl}/professions/${professionId}/quiz`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ questions: quizQuestions })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Fehler beim Speichern des Wissenstests');
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Fehler beim Speichern der Wissenstest-Fragen:', error);
+        throw error;
+    }
+}
+
             async function saveProfession() {
                 const professionId = document.getElementById('professionId').value.trim();
                 const professionTitle = document.getElementById('professionTitle').value.trim();
@@ -1167,29 +1226,6 @@
                     showAlert(professionAlert, 'Fehler beim Speichern des Berufs: ' + error.message, 'danger');
                 }
 
-                async function saveQuizQuestions(professionId) {
-                    if (!professionId || !hasKnowledgeTest.checked) {
-                        return;
-                    }
-
-                    // Validieren der Daten
-                    const invalidQuestions = quizQuestionsData.filter(q =>
-                        !q.text ||
-                        q.options.some(o => !o.text) ||
-                        !q.options.some(o => o.isCorrect)
-                    );
-
-                    if (invalidQuestions.length > 0) {
-                        throw new Error(`Bitte füllen Sie alle Felder aus und wählen Sie jeweils eine richtige Antwort für jede Frage aus.`);
-                    }
-
-                    try {
-                        await cmsApi.saveQuizQuestions(professionId, quizQuestionsData);
-                    } catch (error) {
-                        console.error('Fehler beim Speichern der Wissenstest-Fragen:', error);
-                        throw error;
-                    }
-                }
                 const originalEditProfession = editProfession;
                 editProfession = async function (professionId) {
                     await originalEditProfession(professionId);
