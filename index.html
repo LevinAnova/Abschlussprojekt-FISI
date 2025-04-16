@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,17 +8,20 @@
   <link rel="stylesheet" href="style/styles.css">
   <link rel="manifest" href="manifest.json">
 </head>
+
 <body>
   <div class="animated-background"></div>
   <button class="back-to-landing" onclick="window.location.href='landing.html'">
     <span>Zurück zur Startseite</span>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-      <path d="M10.4 12l5.3-5.3c0.4-0.4 0.4-1 0-1.4s-1-0.4-1.4 0l-6 6c-0.4 0.4-0.4 1 0 1.4l6 6c0.2 0.2 0.5 0.3 0.7 0.3s0.5-0.1 0.7-0.3c0.4-0.4 0.4-1 0-1.4L10.4 12z"/>
+      <path
+        d="M10.4 12l5.3-5.3c0.4-0.4 0.4-1 0-1.4s-1-0.4-1.4 0l-6 6c-0.4 0.4-0.4 1 0 1.4l6 6c0.2 0.2 0.5 0.3 0.7 0.3s0.5-0.1 0.7-0.3c0.4-0.4 0.4-1 0-1.4L10.4 12z" />
     </svg>
   </button>
   <div class="language-selector">
     <label for="language-select">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
         <line x1="2" y1="12" x2="22" y2="12"></line>
         <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
@@ -41,22 +45,22 @@
   </div>
   <div class="container">
     <header>
-      <img src="img/vwlogo.png"  class="logo">
+      <img src="img/vwlogo.png" class="logo">
       <h1 class="title">Ausbildungsberufe</h1>
       <div style="width: 60px;"></div>
     </header>
-    
+
     <div class="filter-container" id="filterContainer">
       <button class="filter-btn active" data-category="all">Alle</button>
     </div>
-    
+
     <div class="card-container" id="cardContainer">
       <div id="loadingIndicator" class="loading-indicator">
         <div class="spinner"></div>
         <p>Daten werden geladen...</p>
       </div>
     </div>
-    
+
     <footer>
       <p>© Volkswagen AG 2025 | Ausbildungsberufe</p>
     </footer>
@@ -77,16 +81,17 @@
     <!-- Header und Navigation bleiben bestehen -->
     <div class="detail-header">
       <button id="backButton" class="back-button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
       </button>
       <h2 id="detailTitle" class="detail-title">Ausbildungsberuf</h2>
       <div style="width: 40px;"></div>
     </div>
-    
+
     <span id="detailCategory" class="detail-category">Kategorie</span>
-    
+
     <!-- Neues flexibles Container-Layout -->
     <div class="detail-container">
       <!-- Oberer Bereich: QR-Code und Galerie nebeneinander -->
@@ -101,7 +106,7 @@
             <div class="qr-beruf-id" id="qrBerufId"></div>
           </div>
         </div>
-        
+
         <!-- Bildergalerie Container -->
         <div class="image-gallery-container">
           <h3 class="gallery-title">Einblicke in den Beruf</h3>
@@ -113,7 +118,7 @@
           <div class="gallery-navigation">
             <button class="gallery-button prev-button">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor" />
               </svg>
             </button>
             <div class="gallery-dots">
@@ -121,17 +126,18 @@
             </div>
             <button class="gallery-button next-button">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor" />
               </svg>
             </button>
           </div>
         </div>
       </div>
-      
+
       <!-- Mittlerer Bereich: Wissenstest-Button -->
       <div class="knowledge-test-container" id="knowledgeTestContainer">
         <a id="testKnowledgeLink" href="#" class="knowledge-test-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
             <polyline points="22 4 12 14.01 9 11.01"></polyline>
           </svg>
@@ -139,29 +145,29 @@
         </a>
         <p class="knowledge-test-info">Finde heraus, ob dieser Beruf zu dir passt!</p>
       </div>
-      
+
       <!-- Unterer Bereich: Berufsinfos -->
       <div class="detail-main">
         <div class="detail-section">
           <h3>Beschreibung</h3>
           <div id="detailDescription"></div>
         </div>
-        
+
         <div class="detail-section">
           <h3>Ausbildungsdauer</h3>
           <div id="detailDuration"></div>
         </div>
-        
+
         <div class="detail-section">
           <h3>Anforderungen</h3>
           <div id="detailRequirements"></div>
         </div>
-        
+
         <div class="detail-section">
           <h3>Karrieremöglichkeiten</h3>
           <div id="detailCareer"></div>
         </div>
-        
+
         <div class="detail-section">
           <h3>Standorte</h3>
           <div id="detailLocations"></div>
@@ -174,7 +180,8 @@
   <div class="fullscreen-overlay">
     <img src="" alt="" class="fullscreen-image">
     <div class="close-fullscreen">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
@@ -191,7 +198,7 @@
       useMockData: false, // CMS-Daten verwenden
       offlineEnabled: true // Offline-Funktionalität aktivieren
     };
-    
+
     // Cache für die geladenen Daten
     let contentCache = {
       categories: [],
@@ -199,116 +206,116 @@
     };
 
     async function fetchCmsData() {
-  const loadingIndicator = document.getElementById('loadingIndicator');
-  loadingIndicator.style.display = 'flex';
-  
-  try {
-    // Daten vom Backend abrufen
-    const categoriesResponse = await fetch('http://localhost:4848/api/categories');
-    const professionsResponse = await fetch('http://localhost:4848/api/professions');
-    
-    if (!categoriesResponse.ok || !professionsResponse.ok) {
-      throw new Error('Fehler beim Laden der Daten');
-    }
-    
-    const categories = await categoriesResponse.json();
-    const professions = await professionsResponse.json();
-    
-    // Daten transformieren
-    const transformedData = {
-      categories: [
-        { id: "all", name: "Alle" }, // Standard-Kategorie hinzufügen
-        ...categories.map(category => ({
-          id: category.id,
-          name: category.name
-        }))
-      ],
-      berufe: professions.map(profession => ({
-        id: profession.id,
-        title: profession.title,
-        description: profession.description,
-        duration: profession.duration,
-        category: profession.category_id,
-        requirements: profession.requirements,
-        career_options: profession.career_options,
-        locations: profession.locations,
-        hasKnowledgeTest: profession.has_knowledge_test,
-        gallery_images: profession.gallery_images,
-        qr_code: profession.qr_code
-      }))
-    };
-    
-    // Daten für Offline-Nutzung speichern
-    if (cmsConfig.offlineEnabled) {
-      localStorage.setItem('cms_data', JSON.stringify(transformedData));
-      localStorage.setItem('cms_last_update', new Date().toISOString());
-    }
-    
-    return transformedData;
-  } catch (error) {
-    console.error('Fehler beim Laden der Daten:', error);
-    
-    // Bei Netzwerkfehlern die gespeicherten Daten aus dem LocalStorage laden
-    if (cmsConfig.offlineEnabled && localStorage.getItem('cms_data')) {
-      console.log('Offline-Modus: Lade gespeicherte Daten');
-      return JSON.parse(localStorage.getItem('cms_data'));
-    }
-    
-    // Fehleranzeige
-    const cardContainer = document.getElementById('cardContainer');
-    cardContainer.innerHTML = `
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      loadingIndicator.style.display = 'flex';
+
+      try {
+        // Daten vom Backend abrufen
+        const categoriesResponse = await fetch('http://localhost:4848/api/categories');
+        const professionsResponse = await fetch('http://localhost:4848/api/professions');
+
+        if (!categoriesResponse.ok || !professionsResponse.ok) {
+          throw new Error('Fehler beim Laden der Daten');
+        }
+
+        const categories = await categoriesResponse.json();
+        const professions = await professionsResponse.json();
+
+        // Daten transformieren
+        const transformedData = {
+          categories: [
+            { id: "all", name: "Alle" }, // Standard-Kategorie hinzufügen
+            ...categories.map(category => ({
+              id: category.id,
+              name: category.name
+            }))
+          ],
+          berufe: professions.map(profession => ({
+            id: profession.id,
+            title: profession.title,
+            description: profession.description,
+            duration: profession.duration,
+            category: profession.category_id,
+            requirements: profession.requirements,
+            career_options: profession.career_options,
+            locations: profession.locations,
+            hasKnowledgeTest: profession.has_knowledge_test,
+            gallery_images: profession.gallery_images,
+            qr_code: profession.qr_code
+          }))
+        };
+
+        // Daten für Offline-Nutzung speichern
+        if (cmsConfig.offlineEnabled) {
+          localStorage.setItem('cms_data', JSON.stringify(transformedData));
+          localStorage.setItem('cms_last_update', new Date().toISOString());
+        }
+
+        return transformedData;
+      } catch (error) {
+        console.error('Fehler beim Laden der Daten:', error);
+
+        // Bei Netzwerkfehlern die gespeicherten Daten aus dem LocalStorage laden
+        if (cmsConfig.offlineEnabled && localStorage.getItem('cms_data')) {
+          console.log('Offline-Modus: Lade gespeicherte Daten');
+          return JSON.parse(localStorage.getItem('cms_data'));
+        }
+
+        // Fehleranzeige
+        const cardContainer = document.getElementById('cardContainer');
+        cardContainer.innerHTML = `
       <div class="error-message">
         <p>Fehler beim Laden der Daten. Bitte versuchen Sie es später erneut.</p>
         <button id="retryButton">Erneut versuchen</button>
       </div>
     `;
-    document.getElementById('retryButton').addEventListener('click', initializeApp);
-    return null;
-  } finally {
-    loadingIndicator.style.display = 'none';
-  }
-}
-    
+        document.getElementById('retryButton').addEventListener('click', initializeApp);
+        return null;
+      } finally {
+        loadingIndicator.style.display = 'none';
+      }
+    }
+
     // Kategorien aus dem Direktus-Format transformieren
     function transformCategories(categoriesData) {
       const categories = [
         { id: "all", name: "Alle" } // Standard-Kategorie "Alle" beibehalten
       ];
-      
+
       categoriesData.forEach(category => {
         categories.push({
           id: category.slug,
           name: category.name
         });
       });
-      
+
       return categories;
     }
-    
+
     // Berufe aus dem Direktus-Format transformieren
     function transformProfessions(professionsData) {
       return professionsData.map(profession => {
         // Anforderungen aus JSON extrahieren
-        const requirements = Array.isArray(profession.requirements) 
-          ? profession.requirements.map(item => item.text || item) 
+        const requirements = Array.isArray(profession.requirements)
+          ? profession.requirements.map(item => item.text || item)
           : [];
-        
+
         // Karriereoptionen aus JSON extrahieren
-        const careerOptions = Array.isArray(profession.career_options) 
-          ? profession.career_options.map(item => item.text || item) 
+        const careerOptions = Array.isArray(profession.career_options)
+          ? profession.career_options.map(item => item.text || item)
           : [];
-        
+
         // Standorte aus JSON extrahieren
-        const locations = Array.isArray(profession.locations) 
-          ? profession.locations.map(item => item.text || item) 
+        const locations = Array.isArray(profession.locations)
+          ? profession.locations.map(item => item.text || item)
           : [];
-        
+
         // Bilder für die Galerie
         const galleryImages = profession.gallery_images?.map(img => ({
           src: `${cmsConfig.imageBasePath}/${img.id}`,
           alt: img.title || profession.title
         })) || [];
-        
+
         return {
           id: profession.slug,
           title: profession.title,
@@ -324,19 +331,19 @@
         };
       });
     }
-    
+
     // Filter initialisieren
     function initializeFilters(categories) {
       const filterContainer = document.getElementById('filterContainer');
       filterContainer.innerHTML = '';
-      
+
       categories.forEach(category => {
         const button = document.createElement('button');
         button.className = 'filter-btn' + (category.id === 'all' ? ' active' : '');
         button.setAttribute('data-category', category.id);
         button.textContent = category.name;
-        
-        button.addEventListener('click', function() {
+
+        button.addEventListener('click', function () {
           // Benutzerinteraktion - Timer zurücksetzen
           resetInactivityTimer();
 
@@ -344,7 +351,7 @@
           setTimeout(() => {
             this.classList.remove('touch-active');
           }, 200);
-          
+
           document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.classList.remove('active');
           });
@@ -353,7 +360,7 @@
 
           filterCards(this.dataset.category);
         });
-        
+
         filterContainer.appendChild(button);
       });
     }
@@ -362,20 +369,20 @@
     function createCards(berufe) {
       const container = document.getElementById('cardContainer');
       container.innerHTML = '';
-      
+
       berufe.forEach((beruf, index) => {
         const card = document.createElement('div');
         card.className = 'card';
         card.dataset.id = beruf.id;
         card.dataset.category = beruf.category;
         card.style.animationDelay = `${0.1 + (index * 0.05)}s`;
-        
-        card.addEventListener('click', function() {
+
+        card.addEventListener('click', function () {
           // Benutzerinteraktion - Timer zurücksetzen
           resetInactivityTimer();
           openDetailPage(beruf.id);
         });
-        
+
         card.innerHTML = `
           <div class="card-header">
             <h2 class="card-title">${beruf.title}</h2>
@@ -386,7 +393,7 @@
             <div class="card-duration">Ausbildungsdauer: ${beruf.duration}</div>
           </div>
         `;
-        
+
         container.appendChild(card);
       });
     }
@@ -405,12 +412,12 @@
     // Karten nach Kategorie filtern
     function filterCards(categoryId) {
       const cards = document.querySelectorAll('.card');
-      
+
       cards.forEach((card, index) => {
         const display = categoryId === 'all' || card.dataset.category === categoryId;
 
         card.style.animation = 'none';
-        
+
         if (display) {
           card.style.display = 'flex';
 
@@ -427,20 +434,20 @@
     function openDetailPage(berufId) {
       const detailPage = document.getElementById('detailPage');
       const beruf = findBerufById(berufId);
-      
+
       if (!beruf) {
         console.error(`Beruf with ID ${berufId} not found`);
         return;
       }
-      
+
       // Set title and category
       const detailTitle = document.getElementById('detailTitle');
       const detailCategory = document.getElementById('detailCategory');
       detailTitle.textContent = beruf.title;
       detailTitle.dataset.berufId = berufId;
-      
+
       detailCategory.textContent = getCategoryName(beruf.category);
-      
+
       // Set detail sections
       document.getElementById('detailDescription').innerHTML = `<p>${beruf.description}</p>`;
       document.getElementById('detailDuration').innerHTML = `<p>${beruf.duration}</p>`;
@@ -462,35 +469,35 @@
       } else {
         document.getElementById('detailLocations').innerHTML = '<p>Keine Angaben</p>';
       }
-      
+
       // QR-Code ID aktualisieren
       const qrBerufId = document.getElementById('qrBerufId');
       if (beruf.qr_code) {
-    const qrCodeImg = document.querySelector('.qr-code img');
-    if (qrCodeImg) {
-        qrCodeImg.src = beruf.qr_code;
-        qrCodeImg.onerror = function() {
+        const qrCodeImg = document.querySelector('.qr-code img');
+        if (qrCodeImg) {
+          qrCodeImg.src = beruf.qr_code;
+          qrCodeImg.onerror = function () {
             console.warn('QR-Code konnte nicht geladen werden:', beruf.qr_code);
             this.src = '/api/placeholder/250/250';
             this.onerror = null;
-        };
-    }
-}
+          };
+        }
+      }
       // Bilder für die Galerie laden
       loadGalleryImages(berufId);
-      
+
       // Wissenstest-Link konfigurieren
       const hasKnowledgeTest = checkIfKnowledgeTestExists(berufId);
       const knowledgeTestLink = document.getElementById('testKnowledgeLink');
       const knowledgeTestContainer = document.getElementById('knowledgeTestContainer');
-      
+
       if (hasKnowledgeTest) {
         const testUrl = getKnowledgeTestUrl(berufId);
         knowledgeTestLink.href = testUrl;
         knowledgeTestLink.classList.remove('disabled');
         knowledgeTestLink.title = `Teste dein Wissen über ${beruf.title}`;
         knowledgeTestContainer.style.display = 'flex';
-        
+
         knowledgeTestLink.addEventListener('click', resetInactivityTimer);
       } else {
         knowledgeTestContainer.style.display = 'none';
@@ -504,13 +511,13 @@
 
       // Detailseite anzeigen und Animation starten
       detailPage.style.display = 'flex';
-      document.body.style.overflow = 'hidden'; 
+      document.body.style.overflow = 'hidden';
 
       detailPage.style.animation = 'none';
       setTimeout(() => {
         detailPage.style.animation = 'slideIn 0.5s ease forwards';
       }, 10);
-      
+
       // Galerie initialisieren
       setTimeout(() => {
         if (document.querySelector('.gallery-wrapper')) {
@@ -536,7 +543,7 @@
     // App initialisieren
     async function initializeApp() {
       const data = await fetchCmsData();
-      
+
       if (data) {
         contentCache = data;
 
@@ -547,13 +554,13 @@
 
     // Touch-Events einrichten
     function setupTouchEvents() {
-      document.addEventListener('click', function(event) {
+      document.addEventListener('click', function (event) {
         if (event.target.closest('#backButton')) {
           closeDetailPage();
         }
       });
 
-      document.addEventListener('keydown', function(e) {
+      document.addEventListener('keydown', function (e) {
         // Benutzerinteraktion - Timer zurücksetzen
         resetInactivityTimer();
         if (e.key === 'Escape') {
@@ -564,7 +571,7 @@
 
     // Bildschirmorientierung behandeln
     function setupOrientationHandling() {
-      window.addEventListener('orientationchange', function() {
+      window.addEventListener('orientationchange', function () {
         // Benutzerinteraktion - Timer zurücksetzen
         resetInactivityTimer();
         setTimeout(() => {
@@ -573,7 +580,7 @@
         }, 100);
       });
 
-      window.addEventListener('resize', function() {
+      window.addEventListener('resize', function () {
         // Benutzerinteraktion - Timer zurücksetzen
         resetInactivityTimer();
         const isLandscape = window.innerWidth > window.innerHeight;
@@ -589,7 +596,7 @@
     // Automatische Aktualisierung einrichten
     function setupAutoRefresh() {
       if (cmsConfig.refreshInterval > 0) {
-        setInterval(async function() {
+        setInterval(async function () {
           const data = await fetchCmsData();
           if (data) {
             contentCache = data;
@@ -604,7 +611,7 @@
         }, cmsConfig.refreshInterval);
       }
     }
-    
+
     // Inaktivitäts-Timer-Funktionen
     let inactivityTimeout;
     let warningTimeout;
@@ -617,14 +624,14 @@
     function updateCountdown() {
       const countdownElement = document.getElementById('countdown');
       countdownElement.textContent = remainingSeconds;
-      
+
       if (remainingSeconds <= 10) {
         countdownElement.style.color = '#ff0000';
         countdownElement.style.fontSize = '2.2rem';
       }
-      
+
       remainingSeconds--;
-      
+
       if (remainingSeconds < 0) {
         clearInterval(countdownInterval);
       }
@@ -633,10 +640,10 @@
     // Warnmeldung anzeigen
     function showInactivityWarning() {
       document.getElementById('inactivityWarning').style.display = 'flex';
-      
+
       remainingSeconds = Math.floor(warningTime / 1000);
       updateCountdown();
-      
+
       countdownInterval = setInterval(updateCountdown, 1000);
     }
 
@@ -651,13 +658,13 @@
       clearTimeout(inactivityTimeout);
       clearTimeout(warningTimeout);
       clearInterval(countdownInterval);
-      
+
       hideInactivityWarning();
-      
+
       warningTimeout = setTimeout(() => {
         showInactivityWarning();
       }, inactivityTime - warningTime);
-      
+
       inactivityTimeout = setTimeout(() => {
         window.location.href = 'landing.html';
       }, inactivityTime);
@@ -666,26 +673,26 @@
     // Inaktivitätserkennung einrichten
     function setupInactivityDetection() {
       const events = [
-        'mousedown', 'mousemove', 'keypress', 
+        'mousedown', 'mousemove', 'keypress',
         'scroll', 'touchstart', 'click', 'keydown'
       ];
-      
+
       events.forEach(eventName => {
         document.addEventListener(eventName, resetInactivityTimer, true);
       });
-      
+
       resetInactivityTimer();
     }
-    
+
     // Prüfen, ob ein Wissenstest existiert
     function checkIfKnowledgeTestExists(berufId) {
       const beruf = findBerufById(berufId);
-      
+
       // Wenn im CMS definiert ist, dass ein Test verfügbar ist
       if (beruf && beruf.hasKnowledgeTest) {
         return true;
       }
-      
+
       // Fallback zur Liste von bekannten Tests
       const availableTests = [
         'chemielaborant',
@@ -693,140 +700,632 @@
         'fachinformatiker-systemintegration',
         'elektroniker-automatisierung'
       ];
-      
+
       return availableTests.includes(berufId);
     }
-    
+
     // URL für den Wissenstest abrufen
     function getKnowledgeTestUrl(berufId) {
       const beruf = findBerufById(berufId);
-      
+
       // Wenn im CMS eine spezifische URL definiert ist
       if (beruf && beruf.knowledgeTestUrl) {
         return beruf.knowledgeTestUrl;
       }
-      
+
       // Fallback auf lokale Tests
       const testPaths = {
         'chemielaborant': 'tests/chemielaborant.html',
         'fachkraft-metalltechnik': 'tests/metalltechnik.html',
-        'fachinformatiker-systemintegration' : 'tests/blank.html',
-        'elektroniker-automatisierung' : 'tests/eat.html'
+        'fachinformatiker-systemintegration': 'tests/blank.html',
+        'elektroniker-automatisierung': 'tests/eat.html'
       };
-      
+
       return testPaths[berufId] || '#';
     }
 
+    // Prüfen, ob ein Wissenstest API-basiert existiert
+    async function checkIfAPIKnowledgeTestExists(berufId) {
+      try {
+        const response = await fetch(`/api/quiz/${berufId}`);
+        return response.ok;
+      } catch (error) {
+        console.error('Fehler beim Prüfen des API-Wissenstests:', error);
+        return false;
+      }
+    }
+
+    // Funktion zum Laden und Anzeigen des Wissenstests
+    async function loadAndShowQuiz(berufId) {
+      try {
+        // API-Aufruf zum Laden des Tests
+        const response = await fetch(`/api/quiz/${berufId}`);
+
+        if (!response.ok) {
+          console.error('Fehler beim Laden des Wissenstests:', response.statusText);
+          return false;
+        }
+
+        const quizData = await response.json();
+
+        // Overlay für den Quiz erstellen
+        const overlayHtml = `
+      <div id="quiz-overlay" class="modal-overlay active">
+        <div class="modal quiz-modal">
+          <div class="modal-header">
+            <h3 class="modal-title">${quizData.title}</h3>
+            <button class="modal-close" id="closeQuizBtn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="quiz-container">
+              <div class="quiz-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text">Frage 1 von ${quizData.questions.length}</div>
+              </div>
+              
+              <div class="quiz-content">
+                <!-- Hier werden die Fragen dynamisch eingefügt -->
+              </div>
+              
+              <div class="quiz-feedback" style="display: none">
+                <div class="feedback-content"></div>
+              </div>
+              
+              <div class="quiz-navigation">
+                <button class="btn btn-primary" id="nextQuestionBtn">Antworten</button>
+              </div>
+            </div>
+            
+            <div class="quiz-results" style="display: none">
+              <h3>Dein Ergebnis</h3>
+              <div class="result-score">0/${quizData.questions.length} Punkte</div>
+              <div class="result-percentage">0%</div>
+              <div class="result-message"></div>
+              
+              <div class="result-details">
+                <!-- Details werden hier angezeigt -->
+              </div>
+              
+              <button class="btn btn-primary mt-4" id="restartQuizBtn">Test neu starten</button>
+              <button class="btn btn-secondary mt-4" id="closeResultsBtn">Schließen</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+        // Overlay zum DOM hinzufügen
+        document.body.insertAdjacentHTML('beforeend', overlayHtml);
+
+        // Styling für den Quiz hinzufügen
+        const styleElement = document.createElement('style');
+        styleElement.id = 'quiz-styles';
+        styleElement.textContent = `
+      .quiz-modal {
+        max-width: 800px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      
+      .quiz-progress {
+        margin-bottom: 20px;
+      }
+      
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 8px;
+      }
+      
+      .progress-fill {
+        height: 100%;
+        background-color: #001e50;
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+      
+      .progress-text {
+        font-size: 14px;
+        color: #666;
+        text-align: center;
+      }
+      
+      .quiz-question {
+        margin-bottom: 30px;
+      }
+      
+      .question-text {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      
+      .answer-options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .answer-option {
+        padding: 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      
+      .answer-option:hover {
+        border-color: #4cc0f1;
+        background-color: #f0f9ff;
+      }
+      
+      .answer-option.selected {
+        border-color: #001e50;
+        background-color: #e6f7ff;
+      }
+      
+      .answer-option.correct {
+        border-color: #28a745;
+        background-color: #eafaef;
+      }
+      
+      .answer-option.incorrect {
+        border-color: #dc3545;
+        background-color: #feecef;
+      }
+      
+      .quiz-feedback {
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      
+      .quiz-feedback.correct {
+        background-color: #eafaef;
+        border-left: 4px solid #28a745;
+      }
+      
+      .quiz-feedback.incorrect {
+        background-color: #feecef;
+        border-left: 4px solid #dc3545;
+      }
+      
+      .quiz-navigation {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+      
+      .quiz-results {
+        text-align: center;
+      }
+      
+      .result-score, .result-percentage {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 10px 0;
+        color: #001e50;
+      }
+      
+      .result-message {
+        font-size: 1.2rem;
+        margin: 20px 0;
+      }
+      
+      .result-details {
+        text-align: left;
+        margin-top: 30px;
+      }
+      
+      .result-item {
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+      }
+      
+      .result-item.correct {
+        background-color: #eafaef;
+        border-left: 4px solid #28a745;
+      }
+      
+      .result-item.incorrect {
+        background-color: #feecef;
+        border-left: 4px solid #dc3545;
+      }
+    `;
+        document.head.appendChild(styleElement);
+
+        // Quiz-Daten
+        let currentQuestionIndex = 0;
+        let selectedAnswers = [];
+        let score = 0;
+
+        // Funktion zum Anzeigen einer Frage
+        function showQuestion(index) {
+          const question = quizData.questions[index];
+          const quizContent = document.querySelector('.quiz-content');
+
+          // Fortschritt aktualisieren
+          document.querySelector('.progress-fill').style.width = `${((index + 1) / quizData.questions.length) * 100}%`;
+          document.querySelector('.progress-text').textContent = `Frage ${index + 1} von ${quizData.questions.length}`;
+
+          // Frage anzeigen
+          quizContent.innerHTML = `
+        <div class="quiz-question" data-question-id="${question.id}">
+          <div class="question-text">${question.text}</div>
+          <div class="answer-options">
+            ${question.options.map(option => `
+              <div class="answer-option" data-answer-id="${option.id}">
+                ${option.text}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+          // Event-Listener für Antwortoptionen
+          const answerOptions = quizContent.querySelectorAll('.answer-option');
+          answerOptions.forEach(option => {
+            option.addEventListener('click', () => {
+              // Vorherige Auswahl entfernen
+              answerOptions.forEach(opt => opt.classList.remove('selected'));
+
+              // Neue Auswahl setzen
+              option.classList.add('selected');
+
+              // Button-Text ändern
+              const nextBtn = document.getElementById('nextQuestionBtn');
+              nextBtn.textContent = index < quizData.questions.length - 1 ? 'Weiter' : 'Ergebnis anzeigen';
+              nextBtn.disabled = false;
+            });
+          });
+
+          // Button-Text und Status
+          const nextBtn = document.getElementById('nextQuestionBtn');
+          nextBtn.textContent = 'Antworten';
+          nextBtn.disabled = true;
+
+          // Feedback ausblenden
+          document.querySelector('.quiz-feedback').style.display = 'none';
+        }
+
+        // Funktion zum Überprüfen der Antwort
+        function checkAnswer() {
+          const questionElement = document.querySelector('.quiz-question');
+          const questionId = questionElement.dataset.questionId;
+          const selectedOption = questionElement.querySelector('.answer-option.selected');
+
+          if (!selectedOption) return false;
+
+          const selectedAnswerId = selectedOption.dataset.answerId;
+          const question = quizData.questions[currentQuestionIndex];
+          const isCorrect = selectedAnswerId == question.correctAnswerId;
+
+          // Antwort speichern
+          selectedAnswers.push({
+            questionIndex: currentQuestionIndex,
+            questionId: questionId,
+            selectedAnswerId: selectedAnswerId,
+            isCorrect: isCorrect
+          });
+
+          if (isCorrect) {
+            score++;
+          }
+
+          // Antworten markieren
+          const options = questionElement.querySelectorAll('.answer-option');
+          options.forEach(option => {
+            option.classList.remove('selected');
+            const answerId = option.dataset.answerId;
+
+            if (answerId == question.correctAnswerId) {
+              option.classList.add('correct');
+            } else if (answerId == selectedAnswerId && !isCorrect) {
+              option.classList.add('incorrect');
+            }
+
+            // Antwortoptionen deaktivieren
+            option.style.pointerEvents = 'none';
+          });
+
+          // Feedback anzeigen
+          const feedback = document.querySelector('.quiz-feedback');
+          feedback.style.display = 'block';
+          feedback.className = `quiz-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+          feedback.querySelector('.feedback-content').innerHTML = `
+        <p><strong>${isCorrect ? 'Richtig!' : 'Leider falsch.'}</strong></p>
+        <p>${question.explanation || (isCorrect ? 'Gut gemacht!' : 'Die richtige Antwort ist markiert.')}</p>
+      `;
+
+          // Button-Text ändern
+          const nextBtn = document.getElementById('nextQuestionBtn');
+          nextBtn.textContent = currentQuestionIndex < quizData.questions.length - 1 ? 'Nächste Frage' : 'Ergebnis anzeigen';
+
+          return true;
+        }
+
+        // Funktion zum Anzeigen des Ergebnisses
+        function showResults() {
+          document.querySelector('.quiz-container').style.display = 'none';
+          document.querySelector('.quiz-results').style.display = 'block';
+
+          const percentage = Math.round((score / quizData.questions.length) * 100);
+
+          document.querySelector('.result-score').textContent = `${score}/${quizData.questions.length} Punkte`;
+          document.querySelector('.result-percentage').textContent = `${percentage}%`;
+
+          // Nachricht basierend auf dem Ergebnis
+          let message = '';
+          if (percentage >= 80) {
+            message = 'Hervorragend! Du scheinst dich sehr gut mit diesem Beruf auszukennen!';
+          } else if (percentage >= 60) {
+            message = 'Gut gemacht! Du hast ein solides Wissen über diesen Beruf.';
+          } else if (percentage >= 40) {
+            message = 'Nicht schlecht! Mit etwas mehr Information wirst du noch besser.';
+          } else {
+            message = 'Du kannst gerne noch mehr über diesen Beruf erfahren. Probiere den Test später noch einmal!';
+          }
+
+          document.querySelector('.result-message').textContent = message;
+
+          // Details der Antworten anzeigen
+          const detailsContainer = document.querySelector('.result-details');
+          detailsContainer.innerHTML = '<h4>Deine Antworten im Detail:</h4>';
+
+          selectedAnswers.forEach((answer, index) => {
+            const question = quizData.questions[answer.questionIndex];
+            const selectedOption = question.options.find(opt => opt.id == answer.selectedAnswerId);
+            const correctOption = question.options.find(opt => opt.id == question.correctAnswerId);
+
+            const resultItem = document.createElement('div');
+            resultItem.className = `result-item ${answer.isCorrect ? 'correct' : 'incorrect'}`;
+            resultItem.innerHTML = `
+          <p><strong>Frage ${index + 1}:</strong> ${question.text}</p>
+          <p>Deine Antwort: ${selectedOption ? selectedOption.text : 'Keine Antwort'}</p>
+          ${!answer.isCorrect ? `<p>Richtige Antwort: ${correctOption ? correctOption.text : 'Unbekannt'}</p>` : ''}
+          ${question.explanation ? `<p><small>${question.explanation}</small></p>` : ''}
+        `;
+
+            detailsContainer.appendChild(resultItem);
+          });
+        }
+
+        // Event-Listener für Quiz-Buttons
+        const closeQuizBtn = document.getElementById('closeQuizBtn');
+        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+        const restartQuizBtn = document.getElementById('restartQuizBtn');
+        const closeResultsBtn = document.getElementById('closeResultsBtn');
+
+        closeQuizBtn.addEventListener('click', () => {
+          document.getElementById('quiz-overlay').remove();
+          document.getElementById('quiz-styles').remove();
+        });
+
+        nextQuestionBtn.addEventListener('click', () => {
+          const feedback = document.querySelector('.quiz-feedback');
+
+          if (feedback.style.display === 'none') {
+            // Wenn noch keine Antwort überprüft wurde, überprüfen
+            if (checkAnswer()) {
+              // Button-Text wurde bereits in checkAnswer geändert
+            }
+          } else {
+            // Wenn bereits überprüft wurde, zur nächsten Frage oder zum Ergebnis
+            if (currentQuestionIndex < quizData.questions.length - 1) {
+              currentQuestionIndex++;
+              showQuestion(currentQuestionIndex);
+            } else {
+              showResults();
+            }
+          }
+        });
+
+        restartQuizBtn.addEventListener('click', () => {
+          // Quiz zurücksetzen
+          currentQuestionIndex = 0;
+          selectedAnswers = [];
+          score = 0;
+
+          // UI zurücksetzen
+          document.querySelector('.quiz-container').style.display = 'block';
+          document.querySelector('.quiz-results').style.display = 'none';
+
+          // Erste Frage anzeigen
+          showQuestion(0);
+        });
+
+        closeResultsBtn.addEventListener('click', () => {
+          document.getElementById('quiz-overlay').remove();
+          document.getElementById('quiz-styles').remove();
+        });
+
+        // Erste Frage anzeigen
+        showQuestion(0);
+
+        return true;
+      } catch (error) {
+        console.error('Fehler beim Anzeigen des Wissenstests:', error);
+        return false;
+      }
+    }
+
+    // Erweiterte Funktion für das Wissenstest-Handling
+    function getKnowledgeTestUrl(berufId) {
+      const beruf = findBerufById(berufId);
+
+      // Wenn im CMS eine spezifische URL definiert ist
+      if (beruf && beruf.knowledgeTestUrl) {
+        return beruf.knowledgeTestUrl;
+      }
+
+      // Fallback auf lokale Tests
+      const testPaths = {
+        'chemielaborant': 'tests/chemielaborant.html',
+        'fachkraft-metalltechnik': 'tests/metalltechnik.html',
+        'fachinformatiker-systemintegration': 'tests/blank.html',
+        'elektroniker-automatisierung': 'tests/eat.html'
+      };
+
+      // Prüfen ob der Test in den CMS-Daten gespeichert ist
+      if (beruf && beruf.hasKnowledgeTest) {
+        // API-basierter Test
+        return `#quiz-${berufId}`; // Verwende einen Hash-basierten Bezeichner
+      }
+
+      return testPaths[berufId] || '#';
+    }
+
+    // Event-Listener-Anpassung für den "Teste dein Wissen"-Button
+    function setupKnowledgeTestButton() {
+      const knowledgeTestLink = document.getElementById('testKnowledgeLink');
+      if (!knowledgeTestLink) return;
+
+      // Original onClick-Event entfernen und ersetzen
+      const originalHref = knowledgeTestLink.href;
+      knowledgeTestLink.removeAttribute('href');
+
+      knowledgeTestLink.addEventListener('click', async function (e) {
+        e.preventDefault();
+        resetInactivityTimer(); // Bestehende Funktion zum Zurücksetzen des Inaktivitäts-Timers
+
+        // Beruf-ID aus dem Detailseitenkontext extrahieren
+        const berufId = document.getElementById('detailTitle').dataset.berufId;
+
+        if (!berufId) {
+          console.error('Keine Beruf-ID gefunden');
+          return;
+        }
+
+        // Prüfen, ob ein API-basierter Test existiert
+        const hasAPITest = await checkIfAPIKnowledgeTestExists(berufId);
+
+        if (hasAPITest) {
+          // API-basierten Test laden und anzeigen
+          loadAndShowQuiz(berufId);
+        } else {
+          // Zu statischem Test-HTML navigieren
+          window.location.href = originalHref;
+        }
+      });
+    }
+
     function loadGalleryImages(berufId) {
-    const galleryWrapper = document.querySelector('.gallery-wrapper');
-    galleryWrapper.innerHTML = '';
-    
-    const beruf = findBerufById(berufId);
-    
-    // Überprüfen, ob wir gültige Berufsdaten haben
-    if (!beruf) {
+      const galleryWrapper = document.querySelector('.gallery-wrapper');
+      galleryWrapper.innerHTML = '';
+
+      const beruf = findBerufById(berufId);
+
+      // Überprüfen, ob wir gültige Berufsdaten haben
+      if (!beruf) {
         console.error(`Beruf mit ID ${berufId} nicht gefunden`);
         loadDefaultGalleryImages(galleryWrapper);
         return;
-    }
-    
-    console.log('Lade Galerie-Bilder für:', berufId, beruf);
-    
-    // CMS-Bilder verwenden, wenn vorhanden
-    if (beruf.gallery_images && beruf.gallery_images.length > 0) {
+      }
+
+      console.log('Lade Galerie-Bilder für:', berufId, beruf);
+
+      // CMS-Bilder verwenden, wenn vorhanden
+      if (beruf.gallery_images && beruf.gallery_images.length > 0) {
         console.log('Gefundene Galerie-Bilder:', beruf.gallery_images.length);
-        
+
         // Sortierte Bilder zur besseren Übersicht
         const sortedImages = [...beruf.gallery_images].sort((a, b) => {
-            // Nach ID sortieren, falls verfügbar
-            if (a.id && b.id) return a.id - b.id;
-            return 0;
+          // Nach ID sortieren, falls verfügbar
+          if (a.id && b.id) return a.id - b.id;
+          return 0;
         });
-        
+
         // Erstelle die Galerie-Slides
         sortedImages.forEach((image) => {
-            createGallerySlide(galleryWrapper, image);
+          createGallerySlide(galleryWrapper, image);
         });
-    } else {
+      } else {
         console.warn('Keine Galerie-Bilder für Beruf gefunden:', berufId);
         loadDefaultGalleryImages(galleryWrapper);
-    }
-    
-    // Navigationspunkte aktualisieren
-    const totalSlides = galleryWrapper.children.length;
-    updateGalleryDots(totalSlides);
-}
+      }
 
-// Hilfsfunktion zum Erstellen eines Gallery-Slides
-function createGallerySlide(galleryWrapper, image) {
-    const slide = document.createElement('div');
-    slide.className = 'gallery-slide';
-    
-    const img = document.createElement('img');
-    
-    // Vollständige URL setzen mit Fehlerbehandlung
-    if (image.url) {
+      // Navigationspunkte aktualisieren
+      const totalSlides = galleryWrapper.children.length;
+      updateGalleryDots(totalSlides);
+    }
+
+    // Hilfsfunktion zum Erstellen eines Gallery-Slides
+    function createGallerySlide(galleryWrapper, image) {
+      const slide = document.createElement('div');
+      slide.className = 'gallery-slide';
+
+      const img = document.createElement('img');
+
+      // Vollständige URL setzen mit Fehlerbehandlung
+      if (image.url) {
         // URL bereinigen und sicherstellen, dass sie korrekt ist
-        img.src = image.url.startsWith('http') ? image.url : 
-                 image.url.startsWith('/') ? image.url : '/' + image.url;
-    } else if (image.src) {
+        img.src = image.url.startsWith('http') ? image.url :
+          image.url.startsWith('/') ? image.url : '/' + image.url;
+      } else if (image.src) {
         img.src = image.src;
-    } else {
+      } else {
         console.warn('Bild ohne URL oder src:', image);
         img.src = 'img/placeholder.jpg';
-    }
-    
-    img.alt = image.alt_text || image.alt || 'Ausbildung bei Volkswagen';
-    img.className = 'gallery-image';
-    
-    // Fehlerbehandlung für Bilder
-    img.onerror = function() {
+      }
+
+      img.alt = image.alt_text || image.alt || 'Ausbildung bei Volkswagen';
+      img.className = 'gallery-image';
+
+      // Fehlerbehandlung für Bilder
+      img.onerror = function () {
         console.warn(`Bild konnte nicht geladen werden: ${img.src}`);
         this.src = 'img/placeholder.jpg';
         this.onerror = null; // Verhindern von Endlosschleifen
-    };
-    
-    slide.appendChild(img);
-    galleryWrapper.appendChild(slide);
-}
+      };
 
-// Standardbilder laden, wenn keine vom CMS verfügbar sind
-function loadDefaultGalleryImages(galleryWrapper) {
-    console.log('Lade Standardbilder für Galerie');
-    const defaultImages = [
-        { 
-            src: "img/gallery/default1.png",
-            alt: "Ausbildung bei Volkswagen" 
+      slide.appendChild(img);
+      galleryWrapper.appendChild(slide);
+    }
+
+    // Standardbilder laden, wenn keine vom CMS verfügbar sind
+    function loadDefaultGalleryImages(galleryWrapper) {
+      console.log('Lade Standardbilder für Galerie');
+      const defaultImages = [
+        {
+          src: "img/gallery/default1.png",
+          alt: "Ausbildung bei Volkswagen"
         },
-        { 
-            src: "img/gallery/default2.png",
-            alt: "Praktische Übungen" 
+        {
+          src: "img/gallery/default2.png",
+          alt: "Praktische Übungen"
         },
-        { 
-            src: "img/gallery/default3.png",
-            alt: "Team-Arbeit" 
+        {
+          src: "img/gallery/default3.png",
+          alt: "Team-Arbeit"
         },
-        { 
-            src: "img/gallery/default4.jpg", 
-            alt: "Moderner Arbeitsplatz" 
+        {
+          src: "img/gallery/default4.jpg",
+          alt: "Moderner Arbeitsplatz"
         }
-    ];
-    
-    defaultImages.forEach(image => {
+      ];
+
+      defaultImages.forEach(image => {
         createGallerySlide(galleryWrapper, image);
-    });
-}
+      });
+    }
 
     // Navigationspunkte für die Galerie aktualisieren
     function updateGalleryDots(imageCount) {
       const dotsContainer = document.querySelector('.gallery-dots');
       dotsContainer.innerHTML = '';
-      
+
       for (let i = 0; i < imageCount; i++) {
         const dot = document.createElement('span');
         dot.className = i === 0 ? 'gallery-dot active' : 'gallery-dot';
         dot.setAttribute('data-index', i);
-        
+
         dot.addEventListener('click', (e) => {
           e.stopPropagation();
           const index = parseInt(dot.getAttribute('data-index'));
@@ -834,7 +1333,7 @@ function loadDefaultGalleryImages(galleryWrapper) {
             window.galleryNavigation.goToSlide(index);
           }
         });
-        
+
         dotsContainer.appendChild(dot);
       }
     }
@@ -847,20 +1346,20 @@ function loadDefaultGalleryImages(galleryWrapper) {
       const fullscreenOverlay = document.querySelector('.fullscreen-overlay');
       const fullscreenImage = document.querySelector('.fullscreen-image');
       const closeFullscreen = document.querySelector('.close-fullscreen');
-      
+
       const slides = document.querySelectorAll('.gallery-slide');
       const totalSlides = slides.length;
-      
+
       let currentIndex = 0;
       let startX = 0;
       let currentX = 0;
       let isDragging = false;
       let autoplayInterval = null;
-      
+
       // Galerie aktualisieren
       function updateGallery() {
         galleryWrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
-        
+
         const currentDots = document.querySelectorAll('.gallery-dot');
         currentDots.forEach((dot, index) => {
           if (index === currentIndex) {
@@ -877,50 +1376,50 @@ function loadDefaultGalleryImages(galleryWrapper) {
         updateGallery();
         resetAutoplay();
       }
-      
+
       prevButton.addEventListener('click', (e) => {
         e.stopPropagation();
         currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
         updateGallery();
         resetAutoplay();
       });
-      
+
       nextButton.addEventListener('click', (e) => {
         e.stopPropagation();
         currentIndex = (currentIndex + 1) % totalSlides;
         updateGallery();
         resetAutoplay();
       });
-      
+
       // Touch-Events
       galleryWrapper.addEventListener('touchstart', (e) => {
         startX = e.touches[0].clientX;
         isDragging = true;
         galleryWrapper.style.transition = 'none';
       });
-      
+
       galleryWrapper.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
-        
+
         currentX = e.touches[0].clientX;
         const diffX = currentX - startX;
-        
+
         if ((currentIndex === 0 && diffX > 0) || (currentIndex === totalSlides - 1 && diffX < 0)) {
           galleryWrapper.style.transform = `translateX(calc(-${currentIndex * 100}% + ${diffX / 3}px))`;
         } else {
           galleryWrapper.style.transform = `translateX(calc(-${currentIndex * 100}% + ${diffX}px))`;
         }
       });
-      
+
       galleryWrapper.addEventListener('touchend', (e) => {
         if (!isDragging) return;
-        
+
         isDragging = false;
         galleryWrapper.style.transition = 'transform 0.3s ease-in-out';
-        
+
         const diffX = currentX - startX;
         const threshold = galleryWrapper.offsetWidth * 0.2;
-        
+
         if (Math.abs(diffX) > threshold) {
           if (diffX > 0 && currentIndex > 0) {
             currentIndex--;
@@ -928,15 +1427,15 @@ function loadDefaultGalleryImages(galleryWrapper) {
             currentIndex++;
           }
         }
-        
+
         updateGallery();
         resetAutoplay();
       });
-      
+
       // Vergrößerungsfunktion
       function setupVergroesserung() {
         const currentSlides = document.querySelectorAll('.gallery-slide');
-        
+
         currentSlides.forEach((slide) => {
           slide.addEventListener('click', () => {
             const img = slide.querySelector('img');
@@ -948,13 +1447,13 @@ function loadDefaultGalleryImages(galleryWrapper) {
           });
         });
       }
-      
+
       closeFullscreen.addEventListener('click', () => {
         fullscreenOverlay.classList.remove('active');
         document.body.style.overflow = '';
         startAutoplay();
       });
-      
+
       fullscreenOverlay.addEventListener('click', (e) => {
         if (e.target === fullscreenOverlay) {
           fullscreenOverlay.classList.remove('active');
@@ -962,7 +1461,7 @@ function loadDefaultGalleryImages(galleryWrapper) {
           startAutoplay();
         }
       });
-      
+
       // Autoplay
       function startAutoplay() {
         autoplayInterval = setInterval(() => {
@@ -970,23 +1469,23 @@ function loadDefaultGalleryImages(galleryWrapper) {
           updateGallery();
         }, 5000);
       }
-      
+
       function resetAutoplay() {
         if (autoplayInterval) {
           clearInterval(autoplayInterval);
         }
         startAutoplay();
       }
-      
+
       setupVergroesserung();
       startAutoplay();
       updateGallery();
-      
+
       // Navigation für externe Nutzung
       window.galleryNavigation = {
         goToSlide: goToSlide
       };
-      
+
       return {
         reinitialize: () => {
           setupVergroesserung();
@@ -995,28 +1494,28 @@ function loadDefaultGalleryImages(galleryWrapper) {
       };
     }
 
-// Service Worker für Offline-Funktionalität registrieren
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
-      .then(registration => {
-        console.log('Service Worker erfolgreich registriert:', registration.scope);
-        
-        // Nach dem Speichern eines neuen Berufs die Synchronisierung auslösen
-        document.addEventListener('cms-data-updated', () => {
-          if (registration.sync) {
-            registration.sync.register('sync-cms-data')
-              .then(() => console.log('Hintergrund-Sync für CMS-Daten registriert'))
-              .catch(err => console.error('Fehler bei der Sync-Registrierung:', err));
-          }
-        });
-      })
-      .catch(error => {
-        console.error('Service Worker Registrierung fehlgeschlagen:', error);
+    // Service Worker für Offline-Funktionalität registrieren
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+          .then(registration => {
+            console.log('Service Worker erfolgreich registriert:', registration.scope);
+
+            // Nach dem Speichern eines neuen Berufs die Synchronisierung auslösen
+            document.addEventListener('cms-data-updated', () => {
+              if (registration.sync) {
+                registration.sync.register('sync-cms-data')
+                  .then(() => console.log('Hintergrund-Sync für CMS-Daten registriert'))
+                  .catch(err => console.error('Fehler bei der Sync-Registrierung:', err));
+              }
+            });
+          })
+          .catch(error => {
+            console.error('Service Worker Registrierung fehlgeschlagen:', error);
+          });
       });
-  });
-}
-    
+    }
+
     // App starten, wenn DOM geladen ist
     document.addEventListener('DOMContentLoaded', () => {
       initializeApp();
@@ -1024,8 +1523,26 @@ if ('serviceWorker' in navigator) {
       setupOrientationHandling();
       setupAutoRefresh();
       setupInactivityDetection();
+
+      // Diese Funktion nach dem Öffnen der Detailseite aufrufen
+      function enhanceOpenDetailPage() {
+        const originalOpenDetailPage = window.openDetailPage;
+
+        window.openDetailPage = function (berufId) {
+          // Original-Funktionsaufruf
+          originalOpenDetailPage(berufId);
+
+          // Erweiterte Funktionalität
+          setupKnowledgeTestButton();
+        };
+      }
+
+      // Überschreibe die originale openDetailPage-Funktion
+      enhanceOpenDetailPage();
+
     });
   </script>
   <script src="translation.js"></script>
 </body>
+
 </html>

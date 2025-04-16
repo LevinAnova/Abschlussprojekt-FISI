@@ -142,3 +142,25 @@ const cmsApi = {
     return await response.json();
   }
 };
+
+cmsApi.saveQuizQuestions = async function(professionId, questions) {
+  const response = await fetch(`${this.baseUrl}/professions/${professionId}/quiz`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ questions })
+  });
+  
+  if (!response.ok) throw new Error('Fehler beim Speichern der Wissenstest-Fragen');
+  return await response.json();
+};
+
+cmsApi.getQuizQuestions = async function(professionId) {
+  const response = await fetch(`${this.baseUrl}/professions/${professionId}/quiz`);
+  if (!response.ok) {
+      if (response.status === 404) {
+          return []; // Kein Wissenstest gefunden
+      }
+      throw new Error('Fehler beim Laden der Wissenstest-Fragen');
+  }
+  return await response.json();
+};

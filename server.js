@@ -853,3 +853,240 @@ process.on('uncaughtException', (err) => {
   console.error('Unbehandelte Ausnahme:', err);
   process.exit(1);
 });
+
+pp.get('/api/professions/:id/quiz', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Prüfen, ob der Beruf existiert und einen Wissenstest hat
+    const [professions] = await pool.query(
+      'SELECT id, has_knowledge_test FROM professions WHERE id = ?',
+      [id]
+    );
+    
+    if (professions.length === 0) {
+      return res.status(404).json({ error: 'Beruf nicht gefunden' });
+    }
+    
+    if (!professions[0].has_knowledge_test) {
+      return res.status(404).json({ error: 'Dieser Beruf hat keinen Wissenstest' });
+    }
+    
+    // Wissenstest abrufen
+    const [knowledgeTests] = await pool.query(
+      'SELECT id FROM knowledge_tests WHERE profession_id = ?',
+      [id]
+    );
+    
+    if (knowledgeTests.length === 0) {
+      return res.json([]); // Leerer Wissenstest
+    }
+    
+    const testId = knowledgeTests[0].id;
+    
+    // Fragen abrufen
+    const [questions] = await pool.query(
+      'SELECT id, question, explanation, sort_order FROM test_questions WHERE test_id = ? ORDER BY sort_order',
+      [testId]
+    );
+    
+    // Für jede Frage die Antworten abrufen
+    const questionsWithAnswers = await Promise.all(questions.map(async (question) => {
+      const [answers] = await pool.query(
+        'SELECT id, text, is_correct, sort_order FROM answer_options WHERE question_id = ? ORDER BY sort_order',
+        [question.id]
+      );
+      
+      return {
+        id: question.id,
+        text: question.question,
+        explanation: question.explanation,
+        options: answers.map(answer => ({
+          id: answer.id,
+          text: answer.text,
+          isCorrect: answer.is_correct === 1
+        }))
+      };
+    }));
+    
+    res.json(questionsWithAnswers);
+  } catch (err) {
+    handleError(res, err, 'Fehler beim Abrufen des Wissenstests');
+  }
+});
+
+// Wissenstest für einen Beruf speichern
+app.post('/api/professions/:id/quiz', async (req, res) => {
+  let connection;
+  try {
+    const { id } = req.params;
+    const { questions } = req.body;
+    
+    if (!Array.isArray(questions)) {
+      return res.status(400).json({ error: 'Ungültiges Format für Fragen' });
+    }
+    
+    // Prüfen, ob der Beruf existiert und einen Wissenstest hat
+    const [professions] = await pool.query(
+      'SELECT id, has_knowledge_test FROM professions WHERE id = ?',
+      [id]
+    );
+    
+    if (professions.length === 0) {
+      return res.status(404).json({ error: 'Beruf nicht gefunden' });
+    }
+    
+    if (!professions[0].has_knowledge_test) {
+      return res.status(400).json({ error: 'Dieser Beruf hat keinen Wissenstest aktiviert' });
+    }
+    
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+    
+    // Prüfen, ob bereits ein Wissenstest existiert
+    const [existingTests] = await connection.query(
+      'SELECT id FROM knowledge_tests WHERE profession_id = ?',
+      [id]
+    );
+    
+    let testId;
+    
+    if (existingTests.length === 0) {
+      // Neuen Wissenstest erstellen
+      const [result] = await connection.query(
+        'INSERT INTO knowledge_tests (profession_id, title, status) VALUES (?, ?, ?)',
+        [id, `Wissenstest: ${id}`, 'published']
+      );
+      testId = result.insertId;
+    } else {
+      testId = existingTests[0].id;
+      
+      // Alte Fragen und Antworten löschen
+      const [oldQuestions] = await connection.query(
+        'SELECT id FROM test_questions WHERE test_id = ?',
+        [testId]
+      );
+      
+      for (const question of oldQuestions) {
+        await connection.query(
+          'DELETE FROM answer_options WHERE question_id = ?',
+          [question.id]
+        );
+      }
+      
+      await connection.query(
+        'DELETE FROM test_questions WHERE test_id = ?',
+        [testId]
+      );
+    }
+    
+    // Neue Fragen und Antworten speichern
+    for (let i = 0; i < questions.length; i++) {
+      const question = questions[i];
+      
+      // Frage speichern
+      const [questionResult] = await connection.query(
+        'INSERT INTO test_questions (test_id, question, explanation, sort_order) VALUES (?, ?, ?, ?)',
+        [testId, question.text, question.explanation || '', i]
+      );
+      
+      const questionId = questionResult.insertId;
+      
+      // Antworten speichern
+      for (let j = 0; j < question.options.length; j++) {
+        const option = question.options[j];
+        await connection.query(
+          'INSERT INTO answer_options (question_id, text, is_correct, sort_order) VALUES (?, ?, ?, ?)',
+          [questionId, option.text, option.isCorrect ? 1 : 0, j]
+        );
+      }
+    }
+    
+    await connection.commit();
+    
+    res.status(201).json({ message: 'Wissenstest erfolgreich gespeichert' });
+  } catch (err) {
+    if (connection) {
+      await connection.rollback();
+    }
+    handleError(res, err, 'Fehler beim Speichern des Wissenstests');
+  } finally {
+    if (connection) {
+      connection.release();
+    }
+  }
+});
+
+// Öffentliche API-Route für Testzugriff
+app.get('/api/quiz/:professionId', async (req, res) => {
+  try {
+    const { professionId } = req.params;
+    
+    // Prüfen, ob der Beruf existiert und einen Wissenstest hat
+    const [professions] = await pool.query(
+      'SELECT id, has_knowledge_test, title FROM professions WHERE id = ?',
+      [professionId]
+    );
+    
+    if (professions.length === 0) {
+      return res.status(404).json({ error: 'Beruf nicht gefunden' });
+    }
+    
+    if (!professions[0].has_knowledge_test) {
+      return res.status(404).json({ error: 'Dieser Beruf hat keinen Wissenstest' });
+    }
+    
+    // Wissenstest abrufen
+    const [knowledgeTests] = await pool.query(
+      'SELECT id, title FROM knowledge_tests WHERE profession_id = ? AND status = "published"',
+      [professionId]
+    );
+    
+    if (knowledgeTests.length === 0) {
+      return res.status(404).json({ error: 'Kein veröffentlichter Wissenstest gefunden' });
+    }
+    
+    const testId = knowledgeTests[0].id;
+    
+    // Fragen abrufen
+    const [questions] = await pool.query(
+      'SELECT id, question, explanation, sort_order FROM test_questions WHERE test_id = ? ORDER BY sort_order',
+      [testId]
+    );
+    
+    // Für jede Frage die Antworten abrufen (ohne is_correct-Angabe, damit die richtige Antwort nicht im Frontend angezeigt wird)
+    const questionsWithAnswers = await Promise.all(questions.map(async (question) => {
+      const [answers] = await pool.query(
+        'SELECT id, text, sort_order FROM answer_options WHERE question_id = ? ORDER BY sort_order',
+        [question.id]
+      );
+      
+      // Auch die richtige Antwort abrufen (für die Auswertung)
+      const [correctAnswer] = await pool.query(
+        'SELECT id FROM answer_options WHERE question_id = ? AND is_correct = 1',
+        [question.id]
+      );
+      
+      const correctAnswerId = correctAnswer.length > 0 ? correctAnswer[0].id : null;
+      
+      return {
+        id: question.id,
+        text: question.question,
+        explanation: question.explanation,
+        options: answers.map(answer => ({
+          id: answer.id,
+          text: answer.text
+        })),
+        correctAnswerId: correctAnswerId
+      };
+    }));
+    
+    res.json({
+      professionId: professionId,
+      title: `Wissenstest: ${professions[0].title}`,
+      questions: questionsWithAnswers
+    });
+  } catch (err) {
+    handleError(res, err, 'Fehler beim Abrufen des Wissenstests');
+  }
+});
