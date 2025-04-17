@@ -187,7 +187,7 @@ header {
 }
 
 .card-duration::before {
-  content: "<p>&#x1F5D3</p>";
+  content: "\01F5D3\FE0F";
   margin-right: 5px;
 }
 
