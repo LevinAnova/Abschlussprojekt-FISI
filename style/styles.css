@@ -187,8 +187,9 @@ header {
 }
 
 .card-duration::before {
-  content: "\01F5D3\FE0F";
+  content: "\01F5D3\FE0F";   /* U+1F5D3 + VS16 für das „spiral calendar pad“ */
   margin-right: 5px;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
 }
 
 footer {
