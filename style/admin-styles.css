@@ -28,6 +28,7 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    position: relative;
 }
 
 .logo {
@@ -41,6 +42,17 @@ header {
     margin-right: auto;
     font-size: 1.8rem;
     color: #001e50;
+}
+
+/* Benutzerinfo-Anzeige */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 20px;
+    font-size: 0.9rem;
+    position: absolute;
+    right: 0;
 }
 
 /* Navigation/Tabs */
@@ -684,6 +696,31 @@ textarea.form-control {
     margin-right: 0.5rem;
 }
 
+/* Styling für Benutzerrollen-Badges */
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.badge-admin {
+    background-color: #001e50;
+    color: white;
+}
+
+.badge-editor {
+    background-color: #4cc0f1;
+    color: white;
+}
+
+.password-hint {
+    color: #666;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
 /* Custom Scrollbar für bessere UX */
 ::-webkit-scrollbar {
     width: 8px;
@@ -752,6 +789,13 @@ textarea.form-control {
     .gallery-preview {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
+    
+    .user-info {
+        position: static;
+        margin-top: 10px;
+        margin-left: 0;
+        justify-content: center;
+    }
 }
 
 @media (max-width: 576px) {
@@ -768,5 +812,17 @@ textarea.form-control {
     
     .form-tab.active {
         border-bottom: 1px solid #ddd;
+    }
+    
+    .header-container {
+        flex-direction: column;
+    }
+    
+    .logo {
+        margin-bottom: 10px;
+    }
+    
+    .header-title {
+        margin-bottom: 10px;
     }
 }

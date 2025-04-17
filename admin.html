@@ -32,6 +32,9 @@
         <div class="header-container container">
             <img src="img/vwlogo.png" alt="Volkswagen Logo" class="logo">
             <h1 class="header-title">Ausbildungsberufe - Administration</h1>
+            <div id="user-info" class="user-info">
+                <!-- Benutzerinfo wird per JS eingefügt -->
+            </div>
         </div>
     </header>
 
@@ -402,40 +405,50 @@
             // Variablen für den aktuellen State
             let categories = [];
             let professions = [];
+            let users = []; // Hinzugefügt für Benutzerverwaltung
             let currentMode = 'add'; // 'add' oder 'edit'
             let currentCategoryId = null;
             let currentProfessionId = null;
+            let currentUserId = null; // Hinzugefügt für Benutzerverwaltung
             let requirements = [];
             let careerOptions = [];
             let locations = [];
-            let galleryImagesList = []; // Umbenannt von galleryImages zu galleryImagesList
+            let galleryImagesList = [];
             let qrCodeUrl = null;
 
             // DOM-Elemente
             const adminTabs = document.getElementById('adminTabs');
             const categoriesSection = document.getElementById('categoriesSection');
             const professionsSection = document.getElementById('professionsSection');
+            const usersSection = document.getElementById('usersSection'); // Hinzugefügt für Benutzerverwaltung
             const categoriesList = document.getElementById('categoriesList');
             const professionsList = document.getElementById('professionsList');
+            const usersList = document.getElementById('usersList'); // Hinzugefügt für Benutzerverwaltung
             const professionCategory = document.getElementById('professionCategory');
 
             // Modals
             const categoryModal = document.getElementById('categoryModal');
             const professionModal = document.getElementById('professionModal');
+            const userModal = document.getElementById('userModal'); // Hinzugefügt für Benutzerverwaltung
 
             // Forms
             const categoryForm = document.getElementById('categoryForm');
             const professionForm = document.getElementById('professionForm');
+            const userForm = document.getElementById('userForm'); // Hinzugefügt für Benutzerverwaltung
 
             // Buttons
             const addCategoryBtn = document.getElementById('addCategoryBtn');
             const addProfessionBtn = document.getElementById('addProfessionBtn');
+            const addUserBtn = document.getElementById('addUserBtn'); // Hinzugefügt für Benutzerverwaltung
             const saveCategoryBtn = document.getElementById('saveCategoryBtn');
             const saveProfessionBtn = document.getElementById('saveProfessionBtn');
+            const saveUserBtn = document.getElementById('saveUserBtn'); // Hinzugefügt für Benutzerverwaltung
             const cancelCategoryBtn = document.getElementById('cancelCategoryBtn');
             const cancelProfessionBtn = document.getElementById('cancelProfessionBtn');
+            const cancelUserBtn = document.getElementById('cancelUserBtn'); // Hinzugefügt für Benutzerverwaltung
             const closeCategoryModal = document.getElementById('closeCategoryModal');
             const closeProfessionModal = document.getElementById('closeProfessionModal');
+            const closeUserModal = document.getElementById('closeUserModal'); // Hinzugefügt für Benutzerverwaltung
             const addRequirementBtn = document.getElementById('addRequirementBtn');
             const addCareerOptionBtn = document.getElementById('addCareerOptionBtn');
             const addLocationBtn = document.getElementById('addLocationBtn');
@@ -448,6 +461,7 @@
             // Alerts
             const categoryAlert = document.getElementById('categoryAlert');
             const professionAlert = document.getElementById('professionAlert');
+            const userAlert = document.getElementById('userAlert'); // Hinzugefügt für Benutzerverwaltung
 
             // Neue Elemente für Bilder und QR-Code
             const formTabs = document.querySelectorAll('.form-tab');
@@ -463,6 +477,44 @@
             const removeQrBtn = document.getElementById('removeQrBtn');
             const uploadProgress = document.getElementById('uploadProgress');
             const qrUploadProgress = document.getElementById('qrUploadProgress');
+
+            // Authentifizierungsstatus prüfen und angemeldeten Benutzer anzeigen
+            async function checkAuth() {
+                try {
+                    const response = await fetch('/api/auth/status');
+                    const data = await response.json();
+                    
+                    if (!data.authenticated) {
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    
+                    // Angemeldeten Benutzer anzeigen
+                    const userInfoDiv = document.getElementById('user-info');
+                    if (userInfoDiv && data.user) {
+                        userInfoDiv.innerHTML = `
+                            <span>Angemeldet als: <b>${data.user.username}</b></span>
+                            <button id="logoutBtn" class="btn btn-sm btn-secondary">Abmelden</button>
+                        `;
+                        
+                        // Logout-Button Event-Listener
+                        document.getElementById('logoutBtn').addEventListener('click', logout);
+                    }
+                } catch (error) {
+                    console.error('Fehler bei der Authentifizierungsprüfung:', error);
+                    window.location.href = 'login.html';
+                }
+            }
+
+            // Logout-Funktion
+            async function logout() {
+                try {
+                    await fetch('/api/auth/logout', { method: 'POST' });
+                    window.location.href = 'login.html';
+                } catch (error) {
+                    console.error('Fehler beim Abmelden:', error);
+                }
+            }
 
             // Form-Tabs Funktionalität
             formTabs.forEach(tab => {
@@ -483,7 +535,7 @@
                 });
             });
 
-            // Tab-Wechsel
+            // Tab-Wechsel mit Unterstützung für den Users-Tab
             adminTabs.addEventListener('click', function (e) {
                 if (e.target.classList.contains('tab-item')) {
                     const activeTab = adminTabs.querySelector('.active');
@@ -502,6 +554,9 @@
                         categoriesSection.classList.add('active');
                     } else if (tabName === 'professions') {
                         professionsSection.classList.add('active');
+                    } else if (tabName === 'users') {
+                        usersSection.classList.add('active');
+                        loadUsers(); // Benutzer laden, wenn der Tab aktiviert wird
                     }
                 }
             });
@@ -574,6 +629,24 @@
 
             cancelProfessionBtn.addEventListener('click', function () {
                 closeModal(professionModal);
+            });
+
+            // Benutzer-Modal öffnen/schließen
+            addUserBtn.addEventListener('click', function () {
+                currentUserId = null;
+                document.getElementById('userModalTitle').textContent = 'Benutzer hinzufügen';
+                document.getElementById('userUsername').value = '';
+                document.getElementById('userPassword').value = '';
+                document.getElementById('userRole').value = 'admin';
+                openModal(userModal);
+            });
+
+            closeUserModal.addEventListener('click', function () {
+                closeModal(userModal);
+            });
+
+            cancelUserBtn.addEventListener('click', function () {
+                closeModal(userModal);
             });
 
             // Listen-Manager
@@ -1359,6 +1432,129 @@
                 }
             }
 
+            // CRUD-Funktionen für Benutzer
+            async function loadUsers() {
+                try {
+                    usersList.innerHTML = '<tr><td colspan="4">Benutzer werden geladen...</td></tr>';
+                    const response = await fetch('/api/users');
+                    
+                    if (!response.ok) {
+                        throw new Error(`Fehler beim Laden der Benutzer: ${response.status} ${response.statusText}`);
+                    }
+                    
+                    users = await response.json();
+                    renderUsers();
+                    showAlert(userAlert, 'Benutzer erfolgreich geladen.', 'success');
+                } catch (error) {
+                    console.error('Fehler beim Laden der Benutzer:', error);
+                    usersList.innerHTML = '<tr><td colspan="4">Fehler beim Laden der Benutzer.</td></tr>';
+                    showAlert(userAlert, 'Fehler beim Laden der Benutzer: ' + error.message, 'danger');
+                }
+            }
+
+            function renderUsers() {
+                if (!users || users.length === 0) {
+                    usersList.innerHTML = '<tr><td colspan="4">Keine Benutzer gefunden.</td></tr>';
+                    return;
+                }
+
+                usersList.innerHTML = '';
+                users.forEach(user => {
+                    const row = document.createElement('tr');
+                    
+                    // Datum formatieren
+                    let createdDate = 'Unbekannt';
+                    if (user.created_at) {
+                        const date = new Date(user.created_at);
+                        createdDate = date.toLocaleDateString('de-DE', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
+
+                    row.innerHTML = `
+                        <td>${user.username}</td>
+                        <td><span class="badge ${user.role === 'admin' ? 'badge-admin' : 'badge-editor'}">${user.role}</span></td>
+                        <td>${createdDate}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm delete-user" data-id="${user.id}">Löschen</button>
+                        </td>
+                    `;
+                    usersList.appendChild(row);
+                });
+
+                // Event-Listener für Lösch-Buttons
+                document.querySelectorAll('.delete-user').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const userId = this.dataset.id;
+                        const user = users.find(u => u.id == userId);
+                        if (user && confirm(`Möchten Sie den Benutzer "${user.username}" wirklich löschen?`)) {
+                            deleteUser(userId);
+                        }
+                    });
+                });
+            }
+
+            async function saveUser() {
+                const username = document.getElementById('userUsername').value.trim();
+                const password = document.getElementById('userPassword').value.trim();
+                const role = document.getElementById('userRole').value;
+
+                if (!username || !username.trim()) {
+                    showAlert(userAlert, 'Benutzername ist erforderlich.', 'danger');
+                    return;
+                }
+
+                if (!password || password.length < 8) {
+                    showAlert(userAlert, 'Passwort muss mindestens 8 Zeichen lang sein.', 'danger');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/users', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, password, role })
+                    });
+
+                    if (!response.ok) {
+                        const data = await response.json();
+                        throw new Error(data.error || 'Fehler beim Speichern des Benutzers');
+                    }
+
+                    closeModal(userModal);
+                    await loadUsers();
+                    showAlert(userAlert, 'Benutzer erfolgreich gespeichert.', 'success');
+                } catch (error) {
+                    console.error('Fehler beim Speichern des Benutzers:', error);
+                    showAlert(userAlert, 'Fehler beim Speichern des Benutzers: ' + error.message, 'danger');
+                }
+            }
+
+            async function deleteUser(userId) {
+                try {
+                    const response = await fetch(`/api/users/${userId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        const data = await response.json();
+                        throw new Error(data.error || 'Fehler beim Löschen des Benutzers');
+                    }
+
+                    await loadUsers();
+                    showAlert(userAlert, 'Benutzer erfolgreich gelöscht.', 'success');
+                } catch (error) {
+                    console.error('Fehler beim Löschen des Benutzers:', error);
+                    showAlert(userAlert, 'Fehler beim Löschen des Benutzers: ' + error.message, 'danger');
+                }
+            }
+
             // Helfer-Funktion zum Anzeigen von Alerts
             function showAlert(alertElement, message, type) {
                 alertElement.innerHTML = `<div class="alert-icon">${type === 'success' ? '✓' : '⚠'}</div>${message}`;
@@ -1374,10 +1570,7 @@
             // Event-Listener für Formular-Buttons
             saveCategoryBtn.addEventListener('click', saveCategory);
             saveProfessionBtn.addEventListener('click', saveProfession);
-
-            // Initial laden
-            loadCategories();
-            loadProfessions();
+            saveUserBtn.addEventListener('click', saveUser);
 
             // Quiz-bezogene DOM-Elemente
             const quizTab = document.getElementById('quizTab');
@@ -1548,32 +1741,6 @@
                 });
             }
 
-            // Aktuelle addQuestion-Funktion ersetzen:
-            function addQuestion() {
-                if (quizQuestionsData.length >= MAX_QUESTIONS) {
-                    showAlert(professionAlert, `Maximal ${MAX_QUESTIONS} Fragen erlaubt.`, 'warning');
-                    return;
-                }
-
-                // Neue Frage erstellen
-                const newQuestion = {
-                    id: Date.now(), // Temporäre ID für die UI
-                    text: '',
-                    explanation: '',
-                    options: [
-                        { text: '', isCorrect: false },
-                        { text: '', isCorrect: false },
-                        { text: '', isCorrect: false },
-                        { text: '', isCorrect: false }
-                    ]
-                };
-
-                quizQuestionsData.push(newQuestion);
-                console.log('Frage hinzugefügt, neue Anzahl:', quizQuestionsData.length);
-                renderQuizQuestions();
-                updateAddQuestionButton();
-            }
-
             // Wissenstest-Daten laden
             async function loadQuizQuestions(professionId) {
                 if (!professionId) {
@@ -1640,276 +1807,24 @@
             // Quiz-Button initialisieren
             addQuestionBtn.addEventListener('click', addQuestion);
 
-            // Wissenstest-Checkbox-Listener
-            hasKnowledgeTest.addEventListener('change', function () {
-                toggleQuizTab(this.checked);
-            });
-
             // Wissenstest-Tab initial ausblenden
             toggleQuizTab(false);
-        });
 
-
-        // Variablen für Benutzerverwaltung
-        let users = [];
-        let currentUserId = null;
-
-        // DOM-Elemente für Benutzerverwaltung
-        const usersSection = document.getElementById('usersSection');
-        const usersList = document.getElementById('usersList');
-        const addUserBtn = document.getElementById('addUserBtn');
-        const userAlert = document.getElementById('userAlert');
-        const userModal = document.getElementById('userModal');
-        const userForm = document.getElementById('userForm');
-        const saveUserBtn = document.getElementById('saveUserBtn');
-        const cancelUserBtn = document.getElementById('cancelUserBtn');
-        const closeUserModal = document.getElementById('closeUserModal');
-
-        // Authentifizierungsstatus prüfen
-        async function checkAuth() {
-            try {
-                const response = await fetch('/api/auth/status');
-                const data = await response.json();
-
-                if (!data.authenticated) {
-                    // Nicht angemeldet, zur Login-Seite umleiten
-                    window.location.href = 'login.html';
-                    return;
-                }
-
-                // Optional: Angemeldeten Benutzer anzeigen
-                const headerTitle = document.querySelector('.header-title');
-                if (headerTitle) {
-                    const userDisplay = document.createElement('div');
-                    userDisplay.className = 'user-display';
-                    userDisplay.innerHTML = `
-                <span>Angemeldet als: <b>${data.user.username}</b></span>
-                <button id="logoutBtn" class="btn btn-sm btn-secondary">Abmelden</button>
-            `;
-                    headerTitle.insertAdjacentElement('afterend', userDisplay);
-
-                    // Logout-Button Event-Listener
-                    document.getElementById('logoutBtn').addEventListener('click', logout);
-                }
-            } catch (error) {
-                console.error('Fehler bei der Authentifizierungsprüfung:', error);
-                window.location.href = 'login.html';
-            }
-        }
-
-        // Logout-Funktion
-        async function logout() {
-            try {
-                await fetch('/api/auth/logout', { method: 'POST' });
-                window.location.href = 'login.html';
-            } catch (error) {
-                console.error('Fehler beim Abmelden:', error);
-            }
-        }
-
-        // Benutzer laden
-        async function loadUsers() {
-            try {
-                usersList.innerHTML = '<tr><td colspan="4">Benutzer werden geladen...</td></tr>';
-
-                const response = await fetch('/api/users');
-                if (!response.ok) {
-                    throw new Error('Fehler beim Laden der Benutzer');
-                }
-
-                users = await response.json();
-                renderUsers();
-                showUserAlert('Benutzer erfolgreich geladen.', 'success');
-            } catch (error) {
-                console.error('Fehler beim Laden der Benutzer:', error);
-                usersList.innerHTML = '<tr><td colspan="4">Fehler beim Laden der Benutzer.</td></tr>';
-                showUserAlert('Fehler beim Laden der Benutzer: ' + error.message, 'danger');
-            }
-        }
-
-        // Benutzer-Liste rendern
-        function renderUsers() {
-            if (users.length === 0) {
-                usersList.innerHTML = '<tr><td colspan="4">Keine Benutzer gefunden.</td></tr>';
-                return;
-            }
-
-            usersList.innerHTML = '';
-            users.forEach(user => {
-                const row = document.createElement('tr');
-
-                // Datum formatieren
-                const createdDate = new Date(user.created_at).toLocaleDateString('de-DE', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-
-                row.innerHTML = `
-            <td>${user.username}</td>
-            <td><span class="badge ${user.role === 'admin' ? 'badge-admin' : 'badge-editor'}">${user.role}</span></td>
-            <td>${createdDate}</td>
-            <td>
-                <button class="btn btn-danger btn-sm delete-user" data-id="${user.id}">Löschen</button>
-            </td>
-        `;
-                usersList.appendChild(row);
-            });
-
-            // Event-Listener für Lösch-Buttons
-            document.querySelectorAll('.delete-user').forEach(button => {
-                button.addEventListener('click', function () {
-                    const userId = this.dataset.id;
-                    const user = users.find(u => u.id == userId);
-
-                    if (confirm(`Möchten Sie den Benutzer "${user.username}" wirklich löschen?`)) {
-                        deleteUser(userId);
-                    }
-                });
-            });
-        }
-
-        // Benutzer-Modal öffnen
-        addUserBtn.addEventListener('click', function () {
-            currentUserId = null;
-            document.getElementById('userModalTitle').textContent = 'Benutzer hinzufügen';
-            document.getElementById('userUsername').value = '';
-            document.getElementById('userPassword').value = '';
-            document.getElementById('userRole').value = 'admin';
-
-            openModal(userModal);
-        });
-
-        // Benutzer-Modal schließen
-        closeUserModal.addEventListener('click', function () {
-            closeModal(userModal);
-        });
-
-        cancelUserBtn.addEventListener('click', function () {
-            closeModal(userModal);
-        });
-
-        // Benutzer speichern
-        saveUserBtn.addEventListener('click', async function () {
-            const username = document.getElementById('userUsername').value.trim();
-            const password = document.getElementById('userPassword').value.trim();
-            const role = document.getElementById('userRole').value;
-
-            if (!username) {
-                showUserAlert('Benutzername ist erforderlich.', 'danger');
-                return;
-            }
-
-            if (!password || password.length < 8) {
-                showUserAlert('Passwort muss mindestens 8 Zeichen lang sein.', 'danger');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/users', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password, role })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Fehler beim Speichern des Benutzers');
-                }
-
-                closeModal(userModal);
-                loadUsers();
-                showUserAlert('Benutzer erfolgreich erstellt.', 'success');
-            } catch (error) {
-                console.error('Fehler beim Speichern des Benutzers:', error);
-                showUserAlert('Fehler beim Speichern des Benutzers: ' + error.message, 'danger');
-            }
-        });
-
-        // Benutzer löschen
-        async function deleteUser(userId) {
-            try {
-                const response = await fetch(`/api/users/${userId}`, {
-                    method: 'DELETE'
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Fehler beim Löschen des Benutzers');
-                }
-
-                loadUsers();
-                showUserAlert('Benutzer erfolgreich gelöscht.', 'success');
-            } catch (error) {
-                console.error('Fehler beim Löschen des Benutzers:', error);
-                showUserAlert('Fehler beim Löschen des Benutzers: ' + error.message, 'danger');
-            }
-        }
-
-        // Hilfsfunktion zum Anzeigen von Alerts in der Benutzerverwaltung
-        function showUserAlert(message, type) {
-            userAlert.innerHTML = `<div class="alert-icon">${type === 'success' ? '✓' : '⚠'}</div>${message}`;
-            userAlert.className = `alert alert-${type}`;
-            userAlert.style.display = 'flex';
-
-            // Alert nach 5 Sekunden ausblenden
-            setTimeout(() => {
-                userAlert.style.display = 'none';
-            }, 5000);
-        }
-
-        // CSS für Benutzerrollen-Badges
-        const styleTag = document.createElement('style');
-        styleTag.innerHTML = `
-.badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: bold;
-}
-.badge-admin {
-    background-color: #001e50;
-    color: white;
-}
-.badge-editor {
-    background-color: #4cc0f1;
-    color: white;
-}
-.user-display {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-left: 20px;
-    font-size: 0.9rem;
-}
-.password-hint {
-    color: #666;
-    font-size: 0.8rem;
-    margin-top: 5px;
-}
-`;
-        document.head.appendChild(styleTag);
-
-        // Authentifizierungsstatus beim Laden der Seite prüfen
-        document.addEventListener('DOMContentLoaded', function () {
-            const existingOnLoad = window.onload;
-
-            window.onload = function () {
-                if (existingOnLoad) existingOnLoad();
-
-                // Authentifizierung prüfen
+            // Initialisierung beim Laden der Seite
+            window.addEventListener('load', function() {
+                // Authentifizierungsstatus prüfen
                 checkAuth();
-
-                // Tab-Event-Listener für den Benutzer-Tab
-                document.querySelector('.tab-item[data-tab="users"]').addEventListener('click', function () {
+                
+                // Initial laden
+                loadCategories();
+                loadProfessions();
+                
+                // Wenn "users" der aktive Tab ist, Benutzer laden
+                const activeTab = adminTabs.querySelector('.active');
+                if (activeTab && activeTab.dataset.tab === 'users') {
                     loadUsers();
-                });
-            };
+                }
+            });
         });
     </script>
 </body>
