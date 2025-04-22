@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # VW Ausbildungsberufe Kiosk-Modus Autostart
-# Stellt sicher, dass server.js mit sudo-Rechten läuft
+# Mit verbesserter Fehlerbehandlung für X-Server und Chromium
 
 # Logging aktivieren
 exec &> /var/log/vw-kiosk-autostart.log
@@ -50,28 +50,71 @@ fi
 
 # Prüfen, ob X-Server bereits läuft
 echo "Prüfe, ob X-Server läuft..."
-if ! xset q &>/dev/null; then
+if ! DISPLAY=$DISPLAY_TO_USE xdpyinfo >/dev/null 2>&1; then
     echo "X-Server läuft nicht. Starte X-Server..."
     startx -- -nocursor &
-    sleep 5
+    # Längere Wartezeit, damit X-Server vollständig starten kann
+    echo "Warte 15 Sekunden auf vollständigen Start des X-Servers..."
+    sleep 15
 fi
 
-# Chromium starten, falls er nicht bereits läuft
+# Prüfe erneut, ob X-Server jetzt läuft
+if ! DISPLAY=$DISPLAY_TO_USE xdpyinfo >/dev/null 2>&1; then
+    echo "FEHLER: X-Server konnte nicht gestartet werden!"
+    exit 1
+fi
+
+echo "X-Server läuft. Versuche Bildschirmschoner zu deaktivieren..."
+
+# Bildschirmschoner sicher deaktivieren - mit Fehlerprüfung
+if command -v xset >/dev/null 2>&1; then
+    # Versuche jeden Befehl einzeln und ignoriere Fehler
+    xset s off || echo "xset s off fehlgeschlagen - ignoriere"
+    # Die problematische dpms-Option separat versuchen und Fehler ignorieren
+    xset -dpms || echo "xset -dpms fehlgeschlagen - ignoriere"
+    xset s noblank || echo "xset s noblank fehlgeschlagen - ignoriere"
+    echo "Bildschirmschoner-Befehle ausgeführt."
+else
+    echo "xset nicht gefunden, überspringe Bildschirmschoner-Einstellungen"
+fi
+
+# Chromium starten mit verbesserter Fehlerbehandlung
 echo "Starte Chromium im Kiosk-Modus..."
 if ! pgrep -f "chromium-browser" > /dev/null; then
-    # Bildschirmschoner und Energiesparoptionen deaktivieren
-    xset s off
-    xset -dpms
-    xset s noblank
+    # Überprüfe zuerst, ob Chromium überhaupt installiert ist
+    if ! command -v chromium-browser >/dev/null 2>&1; then
+        echo "FEHLER: chromium-browser ist nicht installiert!"
+        # Versuche als Fallback den richtigen Befehlsnamen zu finden
+        if command -v chromium >/dev/null 2>&1; then
+            CHROMIUM_CMD="chromium"
+        else
+            echo "KRITISCHER FEHLER: Chromium ist nicht installiert. Bitte installieren mit: sudo apt install chromium-browser"
+            exit 1
+        fi
+    else
+        CHROMIUM_CMD="chromium-browser"
+    fi
     
-    # Chromium im Kiosk-Modus starten
-    chromium-browser --kiosk --incognito --noerrdialogs --disable-translate \
+    echo "Starte $CHROMIUM_CMD mit folgenden Optionen..."
+    $CHROMIUM_CMD --kiosk --incognito --noerrdialogs --disable-translate \
         --no-first-run --fast --fast-start --disable-infobars \
         --disable-features=TranslateUI --disk-cache-dir=/dev/null \
         --overscroll-history-navigation=0 --disable-pinch \
         "$WEBSITE_URL" &
+    
     CHROMIUM_PID=$!
     echo "Chromium gestartet mit PID: $CHROMIUM_PID"
+    
+    # Prüfe, ob Chromium wirklich läuft
+    sleep 5
+    if kill -0 $CHROMIUM_PID 2>/dev/null; then
+        echo "Chromium läuft erfolgreich unter PID: $CHROMIUM_PID"
+    else
+        echo "FEHLER: Chromium wurde nicht erfolgreich gestartet!"
+        # Versuche einen alternativen Start ohne problematische Optionen
+        echo "Versuche Chromium mit minimalen Optionen..."
+        $CHROMIUM_CMD --kiosk "$WEBSITE_URL" &
+    fi
 else
     echo "Chromium läuft bereits"
 fi
