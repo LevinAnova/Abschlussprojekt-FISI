@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # VW Ausbildungsberufe Kiosk-Modus Autostart
-# Mit X-Session-Behandlung für die Ausführung als root
+# Mit erweiterter Chromium-Erkennung
 
 # Logging aktivieren
 exec &> /var/log/vw-kiosk-autostart.log
@@ -90,30 +90,84 @@ sudo -u $PI_USER DISPLAY=$DISPLAY_TO_USE xset -dpms 2>/dev/null || echo "xset -d
 sudo -u $PI_USER DISPLAY=$DISPLAY_TO_USE xset s noblank 2>/dev/null || echo "xset s noblank fehlgeschlagen"
 
 # Chromium starten, aber als pi-Benutzer
-echo "Starte Chromium als Benutzer $PI_USER im Kiosk-Modus..."
-if ! pgrep -f "chromium-browser" > /dev/null; then
-    # Überprüfe welcher Chromium-Befehl verfügbar ist
-    if sudo -u $PI_USER command -v chromium-browser >/dev/null 2>&1; then
-        CHROMIUM_CMD="chromium-browser"
-    elif sudo -u $PI_USER command -v chromium >/dev/null 2>&1; then
-        CHROMIUM_CMD="chromium"
-    else
-        echo "FEHLER: Chromium ist nicht installiert!"
-        exit 1
+echo "Suche nach installiertem Chromium..."
+
+# Direkte Pfadsuche für Chromium mit typischen Speicherorten
+CHROMIUM_PATHS=(
+    "/usr/bin/chromium-browser"
+    "/usr/bin/chromium"
+    "/usr/lib/chromium-browser/chromium-browser"
+    "/usr/local/bin/chromium-browser"
+    "/usr/local/bin/chromium"
+    "/snap/bin/chromium"
+)
+
+# Suche nach existierenden Pfaden
+CHROMIUM_CMD=""
+for path in "${CHROMIUM_PATHS[@]}"; do
+    if [ -f "$path" ] && [ -x "$path" ]; then
+        CHROMIUM_CMD="$path"
+        echo "Chromium gefunden unter: $CHROMIUM_CMD"
+        break
     fi
+done
+
+# Wenn nicht gefunden, versuche which/whereis-Befehle
+if [ -z "$CHROMIUM_CMD" ]; then
+    echo "Chromium nicht an Standard-Pfaden gefunden, versuche which/whereis..."
     
+    # Liste möglicher Befehlsnamen
+    COMMANDS=("chromium-browser" "chromium" "chromium-browser-stable" "chromium-stable")
+    
+    for cmd in "${COMMANDS[@]}"; do
+        FOUND_CMD=$(sudo -u $PI_USER which $cmd 2>/dev/null)
+        if [ -n "$FOUND_CMD" ]; then
+            CHROMIUM_CMD="$FOUND_CMD"
+            echo "Chromium-Befehl gefunden: $CHROMIUM_CMD"
+            break
+        fi
+    done
+fi
+
+# Wenn immer noch nicht gefunden, versuche eine systemweite Suche
+if [ -z "$CHROMIUM_CMD" ]; then
+    echo "Chromium nicht mit which/whereis gefunden, führe Systemsuche durch..."
+    CHROMIUM_CMD=$(find /usr/bin /usr/local/bin /snap/bin -name "chromium*" -type f -executable 2>/dev/null | head -n 1)
+    
+    if [ -n "$CHROMIUM_CMD" ]; then
+        echo "Chromium durch Systemsuche gefunden: $CHROMIUM_CMD"
+    fi
+fi
+
+# Ausgabe des Chromium-Pakets zur Diagnose
+echo "Installierte Chromium-Pakete:"
+dpkg-query -l '*chromium*' || echo "Keine Chromium-Pakete über dpkg gefunden"
+
+# Schließlich prüfen, ob wir Chromium gefunden haben
+if [ -z "$CHROMIUM_CMD" ]; then
+    echo "FEHLER: Konnte Chromium nicht finden! Bitte installieren Sie Chromium mit:"
+    echo "sudo apt update && sudo apt install chromium-browser"
+    exit 1
+fi
+
+echo "Starte Chromium als Benutzer $PI_USER im Kiosk-Modus..."
+if ! pgrep -f "chromium" > /dev/null; then
     # Starte Chromium als pi-Benutzer
     echo "Starte $CHROMIUM_CMD als Benutzer $PI_USER..."
     
+    # Vollständiger Befehl mit allen Optionen
+    FULL_CMD="$CHROMIUM_CMD --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI '$WEBSITE_URL'"
+    
     # Ausführen des Chromium als pi-Benutzer mit korrekten Umgebungsvariablen
-    sudo -u $PI_USER bash -c "DISPLAY=$DISPLAY_TO_USE XAUTHORITY=$XAUTHORITY $CHROMIUM_CMD --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI '$WEBSITE_URL'" &
+    echo "Ausführen von: $FULL_CMD"
+    sudo -u $PI_USER bash -c "DISPLAY=$DISPLAY_TO_USE XAUTHORITY=$XAUTHORITY $FULL_CMD" &
     
     CHROMIUM_PID=$!
     echo "Chromium-Befehl wurde gestartet mit PID: $CHROMIUM_PID"
     
     # Prüfe, ob Chromium wirklich läuft
     sleep 5
-    if sudo -u $PI_USER pgrep -f "$CHROMIUM_CMD" > /dev/null; then
+    if sudo -u $PI_USER pgrep -f "chromium" > /dev/null; then
         echo "Chromium läuft erfolgreich."
     else
         echo "FEHLER: Chromium wurde nicht erfolgreich gestartet!"
