@@ -1264,7 +1264,14 @@
                     } else {
                         resetQrCode();
                     }
-
+                    // Wissenstest laden, wenn aktiviert
+if (profession.has_knowledge_test) {
+    document.getElementById('quizTab').style.display = 'block';
+    loadQuizQuestions(professionId); 
+} else {
+    document.getElementById('quizTab').style.display = 'none';
+    quizQuestionsData = [];
+}
                     openModal(professionModal);
                 } catch (error) {
                     console.error('Fehler beim Laden des Berufs:', error);

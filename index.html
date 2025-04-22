@@ -101,6 +101,7 @@
           <h3 class="qr-title">Direkt bewerben</h3>
           <p class="qr-text">Scanne den QR-Code, um dich für diesen Ausbildungsberuf zu bewerben.</p>
           <div class="qr-code">
+            <img src="/api/placeholder/250/250" alt="QR-Code" id="qrCodeImage">
             <div class="qr-beruf-id" id="qrBerufId"></div>
           </div>
         </div>
@@ -471,7 +472,7 @@
       // QR-Code ID aktualisieren
       const qrBerufId = document.getElementById('qrBerufId');
       if (beruf.qr_code) {
-        const qrCodeImg = document.querySelector('.qr-code img');
+        const qrCodeImg = document.getElementById('qrCodeImage');
         if (qrCodeImg) {
           qrCodeImg.src = beruf.qr_code;
           qrCodeImg.onerror = function () {
