@@ -1145,7 +1145,7 @@ function setupKnowledgeTestButton() {
       .then(response => {
         if (response.ok) {
           return response.json().then(quizData => {
-            this.createQuizModal(quizData);
+            this.createQuizModal(quizData, berufId);
           });
         } else {
           console.error('Quiz nicht verfügbar:', response.status);
@@ -1203,12 +1203,15 @@ function setupKnowledgeTestButton() {
     });
   },
   
-  // Quiz-Modal erstellen und anzeigen
-  createQuizModal: function(quizData) {
+  // Quiz-Modal erstellen und anzeigen - mit verbessertem Design
+  createQuizModal: function(quizData, berufId) {
     // Stellen sicher, dass wir kein Modal doppelt erstellen
     if (document.getElementById('quiz-overlay')) {
       return;
     }
+    
+    const beruf = findBerufById(berufId);
+    const title = beruf ? `Wissenstest: ${beruf.title}` : quizData.title || 'Wissenstest';
     
     // Overlay-Element erstellen
     const overlayElement = document.createElement('div');
@@ -1220,44 +1223,11 @@ function setupKnowledgeTestButton() {
     overlayElement.innerHTML = `
       <div class="modal quiz-modal" id="${modalId}">
         <div class="modal-header">
-          <h3 class="modal-title">${quizData.title || 'Wissenstest'}</h3>
+          <h3 class="modal-title">${title}</h3>
           <button class="modal-close" id="closeQuizBtn">&times;</button>
         </div>
-        <div class="modal-body">
-          <div class="quiz-container">
-            <div class="quiz-progress">
-              <div class="progress-bar">
-                <div class="progress-fill" style="width: 0%"></div>
-              </div>
-              <div class="progress-text">Frage 1 von ${quizData.questions.length}</div>
-            </div>
-            
-            <div class="quiz-content">
-              <!-- Hier werden die Fragen dynamisch eingefügt -->
-            </div>
-            
-            <div class="quiz-feedback" style="display: none">
-              <div class="feedback-content"></div>
-            </div>
-            
-            <div class="quiz-navigation">
-              <button class="btn btn-primary" id="nextQuestionBtn">Antworten</button>
-            </div>
-          </div>
-          
-          <div class="quiz-results" style="display: none">
-            <h3>Dein Ergebnis</h3>
-            <div class="result-score">0/${quizData.questions.length} Punkte</div>
-            <div class="result-percentage">0%</div>
-            <div class="result-message"></div>
-            
-            <div class="result-details">
-              <!-- Details werden hier angezeigt -->
-            </div>
-            
-            <button class="btn btn-primary mt-4" id="restartQuizBtn">Test neu starten</button>
-            <button class="btn btn-secondary mt-4" id="closeResultsBtn">Schließen</button>
-          </div>
+        <div class="modal-body" id="quiz-modal-body">
+          <!-- Quiz-Inhalt wird hier dynamisch eingefügt -->
         </div>
       </div>
     `;
@@ -1297,38 +1267,48 @@ function setupKnowledgeTestButton() {
     }
   },
   
-  // Quiz-Inhalt initialisieren
+  // Quiz-Inhalt mit originalem Design initialisieren
   initializeQuizContent: function(quizData) {
     // Variablen für den Quiz-Status
     let currentQuestionIndex = 0;
     let selectedAnswers = [];
     let score = 0;
     
+    const modalBody = document.getElementById('quiz-modal-body');
+    
+    // Erste Frage anzeigen
+    showQuestion(currentQuestionIndex);
+    
     // Funktion zum Anzeigen einer Frage
-    const showQuestion = (index) => {
+    function showQuestion(index) {
       const question = quizData.questions[index];
-      const quizContent = document.querySelector('.quiz-content');
       
-      // Fortschritt aktualisieren
-      document.querySelector('.progress-fill').style.width = `${((index + 1) / quizData.questions.length) * 100}%`;
-      document.querySelector('.progress-text').textContent = `Frage ${index + 1} von ${quizData.questions.length}`;
-      
-      // Frage anzeigen
-      quizContent.innerHTML = `
-        <div class="quiz-question" data-question-id="${question.id}">
-          <div class="question-text">${question.text}</div>
-          <div class="answer-options">
-            ${question.options.map(option => `
-              <div class="answer-option" data-answer-id="${option.id}">
-                ${option.text}
-              </div>
-            `).join('')}
+      modalBody.innerHTML = `
+        <div class="quiz-container">
+          <p>Frage ${index + 1} von ${quizData.questions.length}</p>
+          <div class="quiz-question" data-question-id="${question.id}">
+            <div class="question-text">${question.text}</div>
+            <div class="answer-options">
+              ${question.options.map((option, i) => `
+                <div class="answer-option" data-answer-id="${option.id}">
+                  ${option.text}
+                </div>
+              `).join('')}
+            </div>
           </div>
+          
+          <div class="quiz-feedback" style="display: none; margin-top: 15px;">
+            <div class="feedback-content"></div>
+          </div>
+          
+          <button class="btn btn-primary" id="nextQuestionBtn" style="margin-top: 15px; background-color: #001e50; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">
+            Antworten
+          </button>
         </div>
       `;
       
       // Event-Listener für Antwortoptionen
-      const answerOptions = quizContent.querySelectorAll('.answer-option');
+      const answerOptions = modalBody.querySelectorAll('.answer-option');
       answerOptions.forEach(option => {
         option.addEventListener('click', () => {
           // Vorherige Auswahl entfernen
@@ -1339,7 +1319,6 @@ function setupKnowledgeTestButton() {
           
           // Button-Text ändern
           const nextBtn = document.getElementById('nextQuestionBtn');
-          nextBtn.textContent = index < quizData.questions.length - 1 ? 'Weiter' : 'Ergebnis anzeigen';
           nextBtn.disabled = false;
         });
       });
@@ -1347,19 +1326,39 @@ function setupKnowledgeTestButton() {
       // Button-Text und Status
       const nextBtn = document.getElementById('nextQuestionBtn');
       nextBtn.textContent = 'Antworten';
-      nextBtn.disabled = true;
       
-      // Feedback ausblenden
-      document.querySelector('.quiz-feedback').style.display = 'none';
-    };
+      // Event-Listener für den Button
+      nextBtn.addEventListener('click', handleNextButtonClick);
+    }
+    
+    // Handler für den Next-Button
+    function handleNextButtonClick() {
+      const feedback = modalBody.querySelector('.quiz-feedback');
+      
+      if (feedback.style.display === 'none') {
+        // Wenn noch keine Antwort überprüft wurde, überprüfen
+        checkAnswer();
+      } else {
+        // Wenn bereits überprüft wurde, zur nächsten Frage oder zum Ergebnis
+        if (currentQuestionIndex < quizData.questions.length - 1) {
+          currentQuestionIndex++;
+          showQuestion(currentQuestionIndex);
+        } else {
+          showResults();
+        }
+      }
+    }
     
     // Funktion zum Überprüfen der Antwort
-    const checkAnswer = () => {
-      const questionElement = document.querySelector('.quiz-question');
+    function checkAnswer() {
+      const questionElement = modalBody.querySelector('.quiz-question');
       const questionId = questionElement.dataset.questionId;
       const selectedOption = questionElement.querySelector('.answer-option.selected');
       
-      if (!selectedOption) return false;
+      if (!selectedOption) {
+        alert('Bitte wähle eine Antwort aus.');
+        return;
+      }
       
       const selectedAnswerId = selectedOption.dataset.answerId;
       const question = quizData.questions[currentQuestionIndex];
@@ -1380,13 +1379,16 @@ function setupKnowledgeTestButton() {
       // Antworten markieren
       const options = questionElement.querySelectorAll('.answer-option');
       options.forEach(option => {
-        option.classList.remove('selected');
         const answerId = option.dataset.answerId;
         
         if (answerId == question.correctAnswerId) {
           option.classList.add('correct');
+          option.style.backgroundColor = '#d4edda';
+          option.style.borderColor = '#c3e6cb';
         } else if (answerId == selectedAnswerId && !isCorrect) {
           option.classList.add('incorrect');
+          option.style.backgroundColor = '#f8d7da';
+          option.style.borderColor = '#f5c6cb';
         }
         
         // Antwortoptionen deaktivieren
@@ -1394,32 +1396,23 @@ function setupKnowledgeTestButton() {
       });
       
       // Feedback anzeigen
-      const feedback = document.querySelector('.quiz-feedback');
+      const feedback = modalBody.querySelector('.quiz-feedback');
       feedback.style.display = 'block';
       feedback.className = `quiz-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
       feedback.querySelector('.feedback-content').innerHTML = `
-        <p><strong>${isCorrect ? 'Richtig!' : 'Leider falsch.'}</strong></p>
-        <p>${question.explanation || (isCorrect ? 'Gut gemacht!' : 'Die richtige Antwort ist markiert.')}</p>
+        <p>${isCorrect ? '<strong>Richtig!</strong>' : '<strong>Leider falsch.</strong>'} ${question.explanation || ''}</p>
       `;
       
       // Button-Text ändern
       const nextBtn = document.getElementById('nextQuestionBtn');
       nextBtn.textContent = currentQuestionIndex < quizData.questions.length - 1 ? 'Nächste Frage' : 'Ergebnis anzeigen';
-      
-      return true;
-    };
+    }
     
     // Funktion zum Anzeigen des Ergebnisses
-    const showResults = () => {
-      document.querySelector('.quiz-container').style.display = 'none';
-      document.querySelector('.quiz-results').style.display = 'block';
-      
+    function showResults() {
       const percentage = Math.round((score / quizData.questions.length) * 100);
       
-      document.querySelector('.result-score').textContent = `${score}/${quizData.questions.length} Punkte`;
-      document.querySelector('.result-percentage').textContent = `${percentage}%`;
-      
-      // Nachricht basierend auf dem Ergebnis
+      // Ergebnis-Nachricht basierend auf dem Score
       let message = '';
       if (percentage >= 80) {
         message = 'Hervorragend! Du scheinst dich sehr gut mit diesem Beruf auszukennen!';
@@ -1431,76 +1424,89 @@ function setupKnowledgeTestButton() {
         message = 'Du kannst gerne noch mehr über diesen Beruf erfahren. Probiere den Test später noch einmal!';
       }
       
-      document.querySelector('.result-message').textContent = message;
+      // Ergebnis anzeigen
+      modalBody.innerHTML = `
+        <div class="quiz-results">
+          <h3>Dein Ergebnis</h3>
+          <p class="result-score">${score} von ${quizData.questions.length} Fragen richtig beantwortet.</p>
+          <div class="progress-bar" style="height: 15px; background-color: #e2e8f0; border-radius: 8px; margin: 15px 0 25px 0; overflow: hidden;">
+            <div class="progress-fill" style="height: 100%; background-color: #001e50; width: ${percentage}%;"></div>
+          </div>
+          <p class="result-message">${message}</p>
+          
+          <div class="result-details" style="margin-top: 25px;">
+            <h4>Übersicht:</h4>
+            <div class="result-items" style="margin-top: 15px;">
+              ${selectedAnswers.map((answer, index) => {
+                const question = quizData.questions[answer.questionIndex];
+                const selectedOption = question.options.find(opt => opt.id == answer.selectedAnswerId);
+                const correctOption = question.options.find(opt => opt.id == question.correctAnswerId);
+                
+                return `
+                  <div class="result-item" style="padding: 15px; margin-bottom: 10px; border-radius: 8px; background-color: ${answer.isCorrect ? '#d4edda' : '#f8d7da'};">
+                    <p><strong>Frage ${index + 1}:</strong> ${question.text}</p>
+                    <p>Deine Antwort: ${selectedOption ? selectedOption.text : 'Keine Antwort'}</p>
+                    ${!answer.isCorrect ? `<p>Richtige Antwort: ${correctOption ? correctOption.text : 'Unbekannt'}</p>` : ''}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+          
+          <div style="margin-top: 25px; display: flex; justify-content: center; gap: 15px;">
+            <button id="restartQuizBtn" class="btn btn-primary" style="background-color: #001e50; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">
+              Test neu starten
+            </button>
+            <button id="closeResultsBtn" class="btn btn-secondary" style="background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">
+              Schließen
+            </button>
+          </div>
+        </div>
+      `;
       
-      // Details der Antworten anzeigen
-      const detailsContainer = document.querySelector('.result-details');
-      detailsContainer.innerHTML = '<h4>Deine Antworten im Detail:</h4>';
-      
-      selectedAnswers.forEach((answer, index) => {
-        const question = quizData.questions[answer.questionIndex];
-        const selectedOption = question.options.find(opt => opt.id == answer.selectedAnswerId);
-        const correctOption = question.options.find(opt => opt.id == question.correctAnswerId);
-        
-        const resultItem = document.createElement('div');
-        resultItem.className = `result-item ${answer.isCorrect ? 'correct' : 'incorrect'}`;
-        resultItem.innerHTML = `
-          <p><strong>Frage ${index + 1}:</strong> ${question.text}</p>
-          <p>Deine Antwort: ${selectedOption ? selectedOption.text : 'Keine Antwort'}</p>
-          ${!answer.isCorrect ? `<p>Richtige Antwort: ${correctOption ? correctOption.text : 'Unbekannt'}</p>` : ''}
-          ${question.explanation ? `<p><small>${question.explanation}</small></p>` : ''}
-        `;
-        
-        detailsContainer.appendChild(resultItem);
+      // Event-Listener für die Ergebnis-Buttons
+      document.getElementById('restartQuizBtn').addEventListener('click', () => {
+        currentQuestionIndex = 0;
+        selectedAnswers = [];
+        score = 0;
+        showQuestion(0);
       });
-    };
-    
-    // Event-Listener für Quiz-Buttons
-    const nextQuestionBtn = document.getElementById('nextQuestionBtn');
-    const restartQuizBtn = document.getElementById('restartQuizBtn');
-    const closeResultsBtn = document.getElementById('closeResultsBtn');
-    
-    nextQuestionBtn.addEventListener('click', () => {
-      const feedback = document.querySelector('.quiz-feedback');
       
-      if (feedback.style.display === 'none') {
-        // Wenn noch keine Antwort überprüft wurde, überprüfen
-        if (checkAnswer()) {
-          // Button-Text wurde bereits in checkAnswer geändert
-        }
-      } else {
-        // Wenn bereits überprüft wurde, zur nächsten Frage oder zum Ergebnis
-        if (currentQuestionIndex < quizData.questions.length - 1) {
-          currentQuestionIndex++;
-          showQuestion(currentQuestionIndex);
-        } else {
-          showResults();
-        }
-      }
-    });
-    
-    restartQuizBtn.addEventListener('click', () => {
-      // Quiz zurücksetzen
-      currentQuestionIndex = 0;
-      selectedAnswers = [];
-      score = 0;
-      
-      // UI zurücksetzen
-      document.querySelector('.quiz-container').style.display = 'block';
-      document.querySelector('.quiz-results').style.display = 'none';
-      
-      // Erste Frage anzeigen
-      showQuestion(0);
-    });
-    
-    closeResultsBtn.addEventListener('click', () => {
-      this.closeQuizModal();
-    });
-    
-    // Erste Frage anzeigen
-    showQuestion(0);
+      document.getElementById('closeResultsBtn').addEventListener('click', () => {
+        QuizModalManager.closeQuizModal();
+      });
+    }
   }
 };
+
+// Überarbeitete Funktion zum Einrichten des Wissenstest-Buttons
+function setupKnowledgeTestButton() {
+  // QuizModalManager initialisieren
+  QuizModalManager.initialize();
+  
+  const knowledgeTestLink = document.getElementById('testKnowledgeLink');
+  if (!knowledgeTestLink) return;
+  
+  // Alte Event-Listener entfernen (falls vorhanden)
+  const newKnowledgeTestLink = knowledgeTestLink.cloneNode(true);
+  knowledgeTestLink.parentNode.replaceChild(newKnowledgeTestLink, knowledgeTestLink);
+  
+  // Neuen Event-Listener hinzufügen
+  newKnowledgeTestLink.addEventListener('click', function(e) {
+    e.preventDefault();
+    resetInactivityTimer(); // Inaktivitäts-Timer zurücksetzen
+    
+    // Beruf-ID aus dem Detailseitenkontext extrahieren
+    const berufId = document.getElementById('detailTitle').dataset.berufId;
+    if (!berufId) {
+      console.error('Keine Beruf-ID gefunden');
+      return;
+    }
+    
+    // QuizModalManager verwenden
+    QuizModalManager.openQuizModal(berufId);
+  });
+}
 
   </script>
   <script src="translation.js"></script>
