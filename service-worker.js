@@ -197,3 +197,192 @@ self.addEventListener('message', event => {
     });
   }
 });
+
+// Verbesserte Installation mit Fehlerprotokollierung
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('Service Worker: Statische Assets werden gecached');
+        // Versuche, jeden Asset einzeln zu cachen und Fehler abzufangen
+        return Promise.allSettled(
+          STATIC_ASSETS.map(asset => 
+            cache.add(asset).catch(error => {
+              console.warn(`Konnte ${asset} nicht cachen:`, error);
+              // Fehlgeschlagene Assets protokollieren, aber Installation fortsetzen
+              return Promise.resolve();
+            })
+          )
+        );
+      })
+      .then(() => self.skipWaiting())
+  );
+});
+
+// Verbesserte fetch-Eventbehandlung mit Fehlermanagement
+self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+  
+  // Ignoriere Chrome-Extensions und andere externe Anfragen
+  if (!url.origin.includes(self.location.origin)) {
+    return;
+  }
+  
+  // API-Anfragen mit besserer Fehlerbehandlung
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          if (!response.ok) {
+            console.warn(`API-Antwort nicht OK: ${url.pathname} (${response.status})`);
+            // Trotzdem weitermachen und Cache aktualisieren, wenn möglich
+          }
+          
+          // Erfolgreiche Antwort im API-Cache speichern
+          const clonedResponse = response.clone();
+          caches.open(API_CACHE_NAME).then(cache => {
+            cache.put(event.request, clonedResponse).catch(err => {
+              console.warn('Cache-Speicherfehler:', err);
+            });
+          });
+          return response;
+        })
+        .catch(error => {
+          console.warn(`Fetch-Fehler für ${url.pathname}:`, error);
+          // Bei Netzwerkfehler aus dem Cache bedienen
+          return caches.match(event.request)
+            .then(cachedResponse => {
+              if (cachedResponse) {
+                return cachedResponse;
+              }
+              
+              // Spezifische Offline-Fallbacks für API-Endpunkte
+              if (url.pathname.includes('/quiz/')) {
+                return new Response(JSON.stringify({ 
+                  error: 'offline',
+                  message: 'Quiz ist im Offline-Modus nicht verfügbar.' 
+                }), { headers: { 'Content-Type': 'application/json' } });
+              }
+              
+              // Allgemeiner Fallback für andere API-Anfragen
+              return new Response(JSON.stringify({ 
+                error: 'Offline und nicht im Cache' 
+              }), {
+                status: 503,
+                headers: { 'Content-Type': 'application/json' }
+              });
+            });
+        })
+    );
+  } 
+  // Bilder und Assets mit Fehlertoleranz
+  else if (url.pathname.includes('/img/') || 
+           url.pathname.includes('/uploads/') || 
+           url.pathname.endsWith('.jpg') || 
+           url.pathname.endsWith('.png')) {
+    
+    event.respondWith(
+      caches.match(event.request)
+        .then(cachedResponse => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          
+          return fetch(event.request)
+            .then(response => {
+              if (!response || response.status !== 200) {
+                console.warn(`Bild konnte nicht geladen werden: ${url.pathname}`);
+                // Versuchen, ein Platzhalterbild zurückzugeben
+                return caches.match('/img/placeholder.jpg')
+                  .then(placeholder => {
+                    return placeholder || response;
+                  });
+              }
+              
+              const clonedResponse = response.clone();
+              caches.open(CACHE_NAME)
+                .then(cache => {
+                  cache.put(event.request, clonedResponse).catch(err => {
+                    console.warn('Fehler beim Cachen eines Bildes:', err);
+                  });
+                });
+              return response;
+            })
+            .catch(() => {
+              console.warn(`Netzwerkfehler beim Laden des Bildes: ${url.pathname}`);
+              // Platzhalterbild aus dem Cache zurückgeben
+              return caches.match('/img/placeholder.jpg');
+            });
+        })
+    );
+  }
+  // HTML-Seiten mit verbesserten Fallbacks
+  else if (url.pathname.endsWith('.html') || url.pathname === '/' || url.pathname.includes('/tests/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Failed to fetch ${url.pathname}: ${response.status}`);
+          }
+          
+          const clonedResponse = response.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => {
+              cache.put(event.request, clonedResponse).catch(err => {
+                console.warn('Fehler beim Cachen von HTML:', err);
+              });
+            });
+          return response;
+        })
+        .catch(error => {
+          console.warn('HTML Fetch Error:', error);
+          return caches.match(event.request)
+            .then(cachedResponse => {
+              return cachedResponse || caches.match('/offline.html');
+            });
+        })
+    );
+  }
+  // Für alle anderen Anfragen
+  else {
+    event.respondWith(
+      caches.match(event.request)
+        .then(cachedResponse => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          
+          return fetch(event.request)
+            .then(response => {
+              if (!response || response.status !== 200) {
+                return response;
+              }
+              
+              // Nur basics cachen
+              if (response.type === 'basic') {
+                const clonedResponse = response.clone();
+                caches.open(CACHE_NAME)
+                  .then(cache => {
+                    cache.put(event.request, clonedResponse).catch(err => {
+                      console.warn('Cache-Fehler:', err);
+                    });
+                  });
+              }
+              return response;
+            })
+            .catch(error => {
+              console.warn('Genereller Fetch-Fehler:', error);
+              
+              if (event.request.headers.get('Accept')?.includes('text/html')) {
+                return caches.match('/offline.html');
+              }
+              
+              return new Response('Offline-Fehler', { 
+                status: 503,
+                headers: { 'Content-Type': 'text/plain' }
+              });
+            });
+        })
+    );
+  }
+});

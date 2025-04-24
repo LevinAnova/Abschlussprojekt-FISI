@@ -1540,6 +1540,158 @@
       enhanceOpenDetailPage();
 
     });
+
+// Modal-Manager für Quiz-Fenster
+const QuizModalManager = {
+  activeModal: null,
+  isModalOpen: false,
+  
+  // Quiz-Modal öffnen und sicherstellen, dass nur eines gleichzeitig existiert
+  openQuizModal: function(berufId) {
+    // Wenn bereits ein Modal offen ist, dieses schließen
+    if (this.isModalOpen && this.activeModal) {
+      this.closeQuizModal();
+    }
+    
+    // Kurze Verzögerung, um sicherzustellen, dass das vorherige Modal vollständig geschlossen ist
+    setTimeout(() => {
+      this.isModalOpen = true;
+      
+      // Prüfen, ob ein API-basierter Test existiert
+      this.checkIfAPIKnowledgeTestExists(berufId)
+        .then(hasAPITest => {
+          if (hasAPITest) {
+            this.loadAndShowApiQuiz(berufId);
+          } else {
+            this.loadStaticQuiz(berufId);
+          }
+        })
+        .catch(error => {
+          console.error('Fehler beim Prüfen des Wissenstests:', error);
+          // Fallback zur statischen Quiz-Seite
+          this.loadStaticQuiz(berufId);
+        });
+    }, 300);
+  },
+  
+  // API-Test laden
+  loadAndShowApiQuiz: async function(berufId) {
+    try {
+      // API-basierten Test laden und anzeigen
+      const response = await fetch(`/api/quiz/${berufId}`);
+      if (!response.ok) {
+        throw new Error(`Quiz konnte nicht geladen werden: ${response.status}`);
+      }
+      
+      const quizData = await response.json();
+      this.createQuizModal(quizData);
+    } catch (error) {
+      console.error('Fehler beim Laden des API-Quizzes:', error);
+      // Bei Fehler zur statischen Quiz-Seite weiterleiten
+      this.loadStaticQuiz(berufId);
+    }
+  },
+  
+  // Statischen Test laden
+  loadStaticQuiz: function(berufId) {
+    const testPaths = {
+      'chemielaborant': 'tests/chemielaborant.html',
+      'fachkraft-metalltechnik': 'tests/metalltechnik.html',
+      'fachinformatiker-systemintegration': 'tests/blank.html',
+      'elektroniker-automatisierung': 'tests/eat.html'
+    };
+    
+    const testUrl = testPaths[berufId] || `tests/${berufId}.html`;
+    window.location.href = testUrl;
+  },
+  
+  // Quiz-Modal erstellen und anzeigen
+  createQuizModal: function(quizData) {
+    // Overlay-Element erstellen
+    const overlayElement = document.createElement('div');
+    overlayElement.id = 'quiz-overlay';
+    overlayElement.className = 'modal-overlay active';
+    
+    // Modal-Inhalt mit einzigartiger ID erstellen
+    const modalId = `quiz-modal-${Date.now()}`;
+    overlayElement.innerHTML = `
+      <div class="modal quiz-modal" id="${modalId}">
+        <div class="modal-header">
+          <h3 class="modal-title">${quizData.title || 'Wissenstest'}</h3>
+          <button class="modal-close" id="closeQuizBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <!-- Quiz-Inhalt wird hier dynamisch eingefügt -->
+        </div>
+      </div>
+    `;
+    
+    // Modal zum DOM hinzufügen
+    document.body.appendChild(overlayElement);
+    this.activeModal = document.getElementById(modalId);
+    
+    // Schließen-Button Event Listener
+    const closeBtn = overlayElement.querySelector('#closeQuizBtn');
+    closeBtn.addEventListener('click', () => this.closeQuizModal());
+    
+    // Escape-Taste zum Schließen
+    document.addEventListener('keydown', this.handleEscapeKey);
+    
+    // Overlay-Klick zum Schließen
+    overlayElement.addEventListener('click', (e) => {
+      if (e.target === overlayElement) {
+        this.closeQuizModal();
+      }
+    });
+    
+    // Quiz-Inhalt initialisieren
+    this.initializeQuizContent(quizData);
+  },
+  
+  // Quiz-Modal schließen
+  closeQuizModal: function() {
+    const overlay = document.getElementById('quiz-overlay');
+    if (overlay) {
+      // Animation zum Ausblenden
+      overlay.classList.remove('active');
+      
+      // EventListener für Escape-Taste entfernen
+      document.removeEventListener('keydown', this.handleEscapeKey);
+      
+      // Nach der Animation das Element entfernen
+      setTimeout(() => {
+        overlay.remove();
+        this.activeModal = null;
+        this.isModalOpen = false;
+      }, 300);
+    }
+  },
+  
+  // Escape-Taste Handler
+  handleEscapeKey: function(e) {
+    if (e.key === 'Escape') {
+      QuizModalManager.closeQuizModal();
+    }
+  },
+  
+  // Prüfen, ob ein API-Wissenstest existiert
+  checkIfAPIKnowledgeTestExists: async function(berufId) {
+    try {
+      const response = await fetch(`/api/quiz/${berufId}`);
+      return response.ok;
+    } catch (error) {
+      console.error('Fehler beim Prüfen des API-Wissenstests:', error);
+      return false;
+    }
+  },
+  
+  // Quiz-Inhalt initialisieren
+  initializeQuizContent: function(quizData) {
+    // Hier den Quiz-Inhalt basierend auf quizData generieren
+    // (Implementierung je nach Anforderungen des Quiz-Formats)
+  }
+};
+
   </script>
   <script src="translation.js"></script>
 </body>
