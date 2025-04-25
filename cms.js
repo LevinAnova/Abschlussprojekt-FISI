@@ -1,6 +1,6 @@
 // Hauptfunktionen für das CMS
 const cmsApi = {
-  baseUrl: 'http://localhost:4848/api',
+  baseUrl: '/api',
   
   // Alle Kategorien abrufen
   async getCategories() {
