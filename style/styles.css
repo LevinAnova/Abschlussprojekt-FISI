@@ -979,7 +979,7 @@ footer {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  z-index: 100;
+  z-index: 10000;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
