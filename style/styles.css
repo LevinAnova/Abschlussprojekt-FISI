@@ -1154,13 +1154,68 @@ footer {
     display: none;
   }
 }
-
 /* Quiz-Modal Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 2000; /* Höherer z-index als die Detailseite (1000) */
+  display: none;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.active {
+  display: flex;
+  opacity: 1;
+  visibility: visible;
+}
+
 .quiz-modal {
   max-width: 800px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.modal-header {
+  background-color: var(--vw-blue);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+}
+
+.modal-body {
+  padding: 20px;
 }
 
 .quiz-progress {
@@ -1297,22 +1352,11 @@ footer {
   border-left: 4px solid #dc3545;
 }
 
-.error-message {
-  background-color: #feecef;
-  border-left: 4px solid #dc3545;
-  padding: 15px;
-  margin: 20px 0;
-  border-radius: 8px;
-}
-
-.mt-4 {
-  margin-top: 1.5rem;
-}
-
-/* Mobile-Anpassungen für Quiz */
+/* Anpassungen für mobile Geräte */
 @media (max-width: 768px) {
   .quiz-modal {
-    max-width: 95%;
+    width: 95%;
+    max-height: 85vh;
   }
   
   .modal-body {

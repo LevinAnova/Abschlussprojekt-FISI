@@ -1187,8 +1187,15 @@ function setupKnowledgeTestButton() {
       </div>
     `;
     
-    // Modal zum DOM hinzufügen
-    document.body.appendChild(overlayElement);
+    // Modal zum DOM hinzufügen - HIER IST DIE ÄNDERUNG
+    // Wenn wir in der Detailseite sind, fügen wir das Modal dort hinzu
+    const detailPage = document.getElementById('detailPage');
+    if (detailPage && detailPage.style.display === 'flex') {
+      detailPage.appendChild(overlayElement);
+    } else {
+      document.body.appendChild(overlayElement);
+    }
+    
     this.activeModal = document.getElementById(modalId);
     
     // Schließen-Button Event Listener
@@ -1232,8 +1239,15 @@ function setupKnowledgeTestButton() {
       </div>
     `;
     
-    // Modal zum DOM hinzufügen
-    document.body.appendChild(overlayElement);
+    // Modal zum DOM hinzufügen - HIER IST DIE ÄNDERUNG
+    // Wenn wir in der Detailseite sind, fügen wir das Modal dort hinzu
+    const detailPage = document.getElementById('detailPage');
+    if (detailPage && detailPage.style.display === 'flex') {
+      detailPage.appendChild(overlayElement);
+    } else {
+      document.body.appendChild(overlayElement);
+    }
+    
     this.activeModal = document.getElementById(modalId);
     
     // Schließen-Button Event Listener
@@ -1260,7 +1274,9 @@ function setupKnowledgeTestButton() {
       
       // Nach der Animation das Element entfernen
       setTimeout(() => {
-        overlay.remove();
+        if (overlay.parentNode) {
+          overlay.parentNode.removeChild(overlay);
+        }
         this.activeModal = null;
         this.isModalOpen = false;
       }, 300);
@@ -1494,6 +1510,7 @@ function setupKnowledgeTestButton() {
   // Neuen Event-Listener hinzufügen
   newKnowledgeTestLink.addEventListener('click', function(e) {
     e.preventDefault();
+    e.stopPropagation(); // Verhindert Bubbling des Events
     resetInactivityTimer(); // Inaktivitäts-Timer zurücksetzen
     
     // Beruf-ID aus dem Detailseitenkontext extrahieren
@@ -1511,5 +1528,4 @@ function setupKnowledgeTestButton() {
   </script>
   <script src="translation.js"></script>
 </body>
-
 </html>
