@@ -1159,22 +1159,23 @@ footer {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(0, 0, 0, 0.8);
-  z-index: 2000; /* Höherer z-index als die Detailseite (1000) */
+  z-index: 9999; /* Extrem hoher z-index um alle Elemente zu überlagern */
   display: none;
   justify-content: center;
   align-items: center;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
+  pointer-events: all; /* Stellt sicher, dass Mausevents registriert werden */
 }
 
 .modal-overlay.active {
-  display: flex;
-  opacity: 1;
-  visibility: visible;
+  display: flex !important; /* !important um andere display-Eigenschaften zu überschreiben */
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .quiz-modal {

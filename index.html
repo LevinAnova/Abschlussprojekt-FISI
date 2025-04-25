@@ -1187,14 +1187,8 @@ function setupKnowledgeTestButton() {
       </div>
     `;
     
-    // Modal zum DOM hinzufügen - HIER IST DIE ÄNDERUNG
-    // Wenn wir in der Detailseite sind, fügen wir das Modal dort hinzu
-    const detailPage = document.getElementById('detailPage');
-    if (detailPage && detailPage.style.display === 'flex') {
-      detailPage.appendChild(overlayElement);
-    } else {
-      document.body.appendChild(overlayElement);
-    }
+    // Modal immer direkt zum body hinzufügen, damit es über alles gelegt wird
+    document.body.appendChild(overlayElement);
     
     this.activeModal = document.getElementById(modalId);
     
@@ -1239,14 +1233,7 @@ function setupKnowledgeTestButton() {
       </div>
     `;
     
-    // Modal zum DOM hinzufügen - HIER IST DIE ÄNDERUNG
-    // Wenn wir in der Detailseite sind, fügen wir das Modal dort hinzu
-    const detailPage = document.getElementById('detailPage');
-    if (detailPage && detailPage.style.display === 'flex') {
-      detailPage.appendChild(overlayElement);
-    } else {
-      document.body.appendChild(overlayElement);
-    }
+    document.body.appendChild(overlayElement);
     
     this.activeModal = document.getElementById(modalId);
     
