@@ -76,9 +76,9 @@
     </div>
   </div>
 
-  <!-- Detail Seite HTML-Struktur -->
+  <!--Detail Seite-->
   <div id="detailPage" class="detail-page">
-    <!-- Header und Navigation bleiben bestehen -->
+
     <div class="detail-header">
       <button id="backButton" class="back-button">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -92,7 +92,6 @@
 
     <span id="detailCategory" class="detail-category">Kategorie</span>
 
-    <!-- Neues flexibles Container-Layout -->
     <div class="detail-container">
       <!-- Oberer Bereich: QR-Code und Galerie nebeneinander -->
       <div class="flex-container top-section">
@@ -190,7 +189,7 @@
   <script>
     // CMS-Konfiguration
     const cmsConfig = {
-      apiUrl: '/api', // Direktus API über Nginx Proxy
+      apiUrl: '/api', //API über Nginx Proxy
       imageBasePath: '/assets', // Pfad zu Bildern/Assets
       refreshInterval: 3600000, // 1 Stunde Aktualisierungsintervall
       cacheName: 'vw-ausbildung-cache', // Cache-Name für Offline-Funktionalität
@@ -275,7 +274,7 @@
       }
     }
 
-    // Kategorien aus dem Direktus-Format transformieren
+
     function transformCategories(categoriesData) {
       const categories = [
         { id: "all", name: "Alle" } // Standard-Kategorie "Alle" beibehalten
@@ -291,7 +290,6 @@
       return categories;
     }
 
-    // Berufe aus dem Direktus-Format transformieren
     function transformProfessions(professionsData) {
       return professionsData.map(profession => {
         // Anforderungen aus JSON extrahieren
