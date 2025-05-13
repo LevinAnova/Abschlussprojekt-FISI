@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # VW Ausbildungsberufe Kiosk-Modus Autostart
-# Mit D-Bus-Unterstützung für Chromium
-
 # Logging aktivieren
 exec &> /var/log/vw-kiosk-autostart.log
 
@@ -18,7 +16,6 @@ DISPLAY_TO_USE=":0"
 API_SERVICE="vw-ausbildung-api.service"
 PI_USER="pi"  # Der standardmäßige Desktop-Benutzer auf dem Raspberry Pi
 
-# Stellen wir sicher, dass der API-Service mit sudo-Rechten läuft
 echo "Überprüfe Status des API-Service..."
 if ! systemctl is-active --quiet "$API_SERVICE"; then
     echo "API-Service ist nicht aktiv. Starte $API_SERVICE mit sudo..."
